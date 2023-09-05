@@ -1,0 +1,231 @@
+﻿@model QuestionViewModel
+@{
+    Layout = null;
+}
+<style>
+    .select2-container {
+        display: block;
+    }
+</style>
+@using (Html.BeginForm("SaveQuestions", "Questions", FormMethod.Post, new { id = "questionForm" }))
+{
+    <div class="row">
+        <div class="col-12">
+            <div class="form-group">
+                @Html.HiddenFor(p => p.QuestionId)
+                @Html.LabelFor(model => model.QuestionDesc,"QuestionDesc")
+                @Html.TextBoxFor(p => p.QuestionDesc, new { @class = "form-control", @placeholder = "QuestionDesc" ,@name="QuestionDesc" })
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.QuestionInfo,"QuestionInfo")
+                @Html.TextBoxFor(p => p.QuestionInfo, new { @class = "form-control", @placeholder = "QuestionInfo" ,@name="QuestionInfo"})
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.CountryName, "CountryName")
+                @Html.DropDownListFor(model => model.CountryId, new SelectList(ViewBag.CountryList, "Value", "Text", Model.CountryId), "-- Select Country --", new { @class = "form-control js-select2" ,onchange = "StepByCountry();",@name="CountryName" })
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.StepId, "Step")
+                @*<select id="StepId" name="StepId" class="form-control" title="Steps"></select>*@
+                @Html.DropDownListFor(model => model.StepId, new SelectList(ViewBag.StepList, "StepId", "Title", Model.StepId), "-- Select step --", new { @class = "form-control" ,@name="Title" })
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.DefaultWeightage,"DefaultWeightage")
+                @Html.TextBoxFor(p => p.DefaultWeightage, new { @class = "form-control", @placeholder = "DefaultWeightage" ,@name="DefaultWeightage"})
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="form-group">
+                @Html.LabelFor(model => model.Priority,"Priority")
+                @Html.TextBoxFor(p => p.Priority, new { @class = "form-control", @placeholder = "Priority" ,@name="Priority" })
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="form-group">
+                @Html.LabelFor(model => model.PageNumber,"Page Number")
+                @Html.TextBoxFor(p => p.PageNumber, new { @class = "form-control", @placeholder = "Page Number" ,@name="PageNumber" })
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="form-group">
+                @Html.LabelFor(model => model.PageTitle,"Page Title")
+                @Html.TextBoxFor(p => p.PageTitle, new { @class = "form-control", @placeholder = "Page Title" ,@name="PageTitle" })
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.AnsType, "AnsType")
+                @Html.DropDownListFor(model => model.AnsType, new SelectList(ViewBag.GetAnsType, "Value", "Text", Model.AnsType), "-- Select AnsType --", new { @class = "form-control" ,@name="AnsType" })
+            </div>
+        </div>
+        <div class="col-6 answerTypeText">
+            @*  <div class="form-group">
+        @Html.LabelFor(model => model.AnswerTypeText, "Answer")
+        @Html.TextAreaFor(model => model.AnswerTypeText, new { @class = "form-control", @placeholder = "QuestionInfo" ,@name="QuestionInfo"})
+        </div>*@
+            <table class="table" id="tbl_answer" style=" border-collapse:collapse;width:100%;margin-top:20px;">
+                @*<tr><th>Answer</th></tr>*@
+                @for (int i = 0; i < Model.Answers.Count; i++)
+                {
+                    @Html.Partial("AddAnswer", Model.Answers[i])
+                }
+            </table>
+        </div>
+        <div class="row col-12 mt-1" style="float: right;">
+            <div class="form-group" style="margin-left:8px;">
+                <button type="button" onclick="AddMoreAns();" id="addMoreAns" class="btn btn-primary">Add</button>
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                <label for="IsCountryDropdown">IsCountryDropdown</label>
+                
+                
+                    @Html.CheckBoxFor(model => model.IsCountryDropdown)
+                    <span asp-validation-for="Title"></span>
+                    <div class="form-group">
+                    </div>
+           
+
+
+            </div>
+
+
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+}
+<script type="text/javascript">
+
+    $("#CountryId").select2();
+
+    //var AnsTypeDatas = $('#AnsType').find(":selected").text();
+    //if (AnsTypeDatas != "-- Select AnsType --") {
+    //    $('.answerTypeText').css('display', 'block');
+    //}
+    //else {
+    //    $('.answerTypeText').css('display', 'none');
+    //}
+    //$("#AnsType").change(function () {
+    //    var AnsTypeData = $('#AnsType').find(":selected").text();
+    //    if (AnsTypeData != "-- Select AnsType --") {
+    //        $('.answerTypeText').css('display', 'block');
+    //    }
+    //    else {
+    //        $('.answerTypeText').css('display', 'none');
+    //    }
+    //});
+
+    $("body").on("click", ".deleteAns", function () {
+        debugger;
+        var ansId = $(this).closest("tr").find("#hdnAnswerId").val();
+        var id = $(this).closest("tr").attr('id');
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+
+            if (result != undefined && result.value) {
+
+                if (ansId > 0) {
+
+                    $.ajax({
+                        url: "/Answer/DeleteAnswerPOST",
+                        type: "POST",
+                        data: { AnswerId: ansId },
+                        dataType: "json",
+                        success: function (response, status, xhr) {
+                            debugger;
+                            if (response[0].code == 200) {
+
+                                $("#"+id).remove();
+
+                                Swal.fire(
+                                    'Deleted!',
+                                    'Your file has been deleted.',
+                                    'success'
+                                )
+
+                                
+                            }
+                        },
+                        error: function () {
+                            NotifyMsg(response.message, 'error');
+                        }
+                    });
+                }
+                else {
+                    $(this).closest('tr').remove();
+                }
+                
+            }
+        })
+
+       
+    });
+
+    function AddMoreAns()
+    {
+        debugger
+        $.ajax({
+            url: "/Questions/AddMoreAnswer",
+            type: "GET",
+            dataType: "html",
+            success: function (response) {
+                debugger;
+                $("#tbl_answer tbody").append(response);
+
+            },
+            error: function () {
+                NotifyMsg("An error has occured!!!", "danger");
+            }
+        });
+    }
+
+
+    function StepByCountry() {
+        $("#StepId").append('');
+        var drpCountryId = $("#CountryId").val();
+
+        $.ajax(
+            {
+                url: '/Questions/OnlySteps_GetByCountryId',
+                type: 'GET',
+                data: { CountryId: drpCountryId },
+                contentType: 'application/json; charset=utf-8',
+                success: function (data) {
+                    debugger;
+                    //$("#StepId").append('');
+                    $("#StepId option").remove()
+                    $("#StepId").append(`
+                                                        <option value="0">-- Select step --</option>
+                                `);
+                    if (data != null && data.length > 0) {
+                        for (var i = 0; i < data.length; i++) {
+                            $("#StepId").append(`
+                                                        <option name="${data[i].title}" value="${data[i].stepId}">${data[i].title}</option>
+                                `);
+                        }
+                    }
+                },
+                error: function () {
+                    alert("error");
+                }
+            });
+
+
+    }
+</script>

@@ -1,0 +1,28 @@
+﻿@model CopyCountryDataViewModel
+@{
+    Layout = null;
+}
+@using (Html.BeginForm("SaveCopyCountryWiseDocument", "CountryWiseDocument", FormMethod.Post, new { id = "copyCountryDataForm" }))
+{
+    <div class="row">
+        <div class="col-6">
+            <div class="form-group">
+                @Html.HiddenFor(p => p.Id)
+                @Html.HiddenFor(p => p.FromCountry)
+                @Html.LabelFor(model => model.FromCountry,"FromCountry")
+                @Html.DropDownListFor(model => model.FromCountry, new SelectList(ViewBag.CountryList, "Value", "Text", Model.FromCountry), "-- Select Country --", new { @class = "form-control js-select2" ,@name="FromCountry",@disabled="true" })
+
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.ToCountry, "ToCountry")
+                @Html.DropDownListFor(model => model.ToCountry, new SelectList(ViewBag.CountryList, "Value", "Text", Model.ToCountry), "-- Select Country --", new { @class = "form-control js-select2" ,@name="ToCountry" })
+            </div>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+}

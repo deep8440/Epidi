@@ -1,0 +1,8 @@
+﻿@model List<Epidi.Models.ViewModel.TermsCondition.TCMultipleFilViewModel>
+@{
+	Layout = null;
+}
+@foreach (var item in Model)
+{
+	@Html.Partial("TCSingleFile", item)
+}

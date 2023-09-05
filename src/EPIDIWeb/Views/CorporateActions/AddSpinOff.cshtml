@@ -1,0 +1,547 @@
+﻿@model SpinoffViewModel
+@{
+    Layout = null;
+}
+
+<div class="row">
+    <div class="col-6">
+        <div class="form-group">
+            @Html.LabelFor(model => model.EquityToSpinOff,"EquityToSpinOff*")
+            @Html.DropDownListFor(model => model.InstrumentId, new SelectList(ViewBag.spinOffInstrument, "Value", "Text", Model.InstrumentId), "-- Select Instrument --", new { @class = "form-control js-select2",@Id="ddlEquityToSpinOff" })
+
+           @* <select id="ddlEquityToSpinOff" class="form-control"></select>*@
+            <label id="lblEquityToSpinOff" class="error">Please select equity to spin off.</label>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-6">
+        <div class="form-group">
+            @Html.LabelFor(model => model.NewEquitySpinned,"NewEquitySpinned*")
+            @Html.DropDownListFor(model => model.NewInstrumentId, new SelectList(ViewBag.spinOffInstrument, "Value", "Text", Model.InstrumentId), "-- Select Instrument --", new { @class = "form-control js-select2",@Id="ddlNewEquitySpinned" })
+
+            @*<select id="ddlNewEquitySpinned" class="form-control"></select>*@
+            <label id="lblNewEquitySpinned" class="error">Please select new equity spinned.</label>
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="form-group">
+            @Html.LabelFor(model => model.NewRatio, "NewRatio*")
+            @Html.TextBoxFor(p => p.NewRatio, new { @class = "form-control", @placeholder = "NewRatio" ,@name="NewRatio"})
+            <label id="lblNewRatio" class="error">Please enter new ratio.</label>
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="form-group">
+            @Html.LabelFor(model => model.SpinOffRatio, "SpinOffRatio*")
+            @Html.TextBoxFor(p => p.SpinOffRatio, new { @class = "form-control", @placeholder = "SpinOffRatio" ,@name="SpinOffRatio"})
+            <label id="lblSpinOffRatio" class="error">Please enter spin off ratio.</label>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-3">
+        <div class="form-group">
+            @Html.LabelFor(model => model.SpinOffMDU,"MDU (Max Decimals Units)*")
+            @Html.TextBoxFor(p => p.SpinOffMDU, new { @class = "form-control", @placeholder = "Max Decimals Units" ,@name="MDU" })
+            <label id="lblSpinOffMDU" class="error">Please enter max decimal units.</label>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="form-group">
+            @Html.LabelFor(model => model.SpinOffAdjustment,"Adjustment*")
+            <div class="row" style="margin-top: 6px;">
+                <div class="col-4">
+                    <input id="rdYes" name="SpinOffadjustment" type="radio" value="1">
+                    <label for="rdYes">Yes</label>
+                </div>
+                <div class="col-4">
+                    <input id="rdNo" name="SpinOffadjustment" type="radio" value="0">
+                    <label for="rdNo">No</label>
+                </div>
+            </div>
+            <label id="lblSpinOffAdjustment" class="error">Please select adjustment.</label>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="form-group">
+            @Html.LabelFor(model => model.SpinOffRoundUnitsBuy, "Round Units Buy*")
+            <select id="ddlSpinOffRoundUnitsBuy" class="form-control">
+                <option value="">select</option>
+                <option value="up">Up</option>
+                <option value="down">Down</option>
+            </select>
+            <label id="lblSpinOffRoundUnitsBuy" class="error">Please select one option.</label>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="form-group">
+            @Html.LabelFor(model => model.SpinOffRoundUnitsSell, "Round Units Sell*")
+            <select id="ddlSpinOffRoundUnitsSell" class="form-control">
+                <option value="">select</option>
+                <option value="up">Up</option>
+                <option value="down">Down</option>
+            </select>
+            <label id="lblSpinOffRoundUnitsSell" class="error">Please select one option.</label>
+        </div>
+    </div>
+    <div class="col-12">
+        <button type="button" onclick="GetCalculatedSpinOffOrderDetails();" class="btn btn-primary">Show Orders</button>
+        <div />
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <table id="tblSpinOffEquityStockDetails" class="table table-responsive">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="checkBoxAllSpinOff"></th>
+                        <th>Client Id</th>
+                        <th>Trading Account</th>
+                        <th>Order Id</th>
+                        <th>Side Name</th>
+                        <th>Equity Name</th>
+                        <th>Open DateTime</th>
+                        <th>Legal Entity</th>
+                        <th>Open Price</th>
+                        <th>Open Units</th>
+                        <th>Close Price</th>
+                        <th>Swap</th>
+                        <th>Commission</th>
+                        <th>Leverage</th>
+                        <th>Position</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <table id="tblNewSpinOffEquityStockDetails" class="table table-responsive">
+                <thead>
+                    <tr>
+                        
+                        <th>Client Id</th>
+                        <th>Trading Account</th>
+                        <th>Order Id</th>
+                        <th>New Order Id</th>
+                        <th>Side Name</th>
+                        <th>Equity Name</th>
+                        <th>Open DateTime</th>
+                        <th>Legal Entity</th>
+                        <th>Close Price Before</th>
+                        <th>Open Units OldEquity</th>
+                        <th>Open Price After SpinOff</th>
+                        <th>Open Units After SpinOff</th>
+                        <th>Leverage</th>
+                        <th>Open Price Old Equity</th>
+                        <th>Units No Round</th>
+                        <th>PriceDiff</th>
+                        <th>UnitsDiff</th>
+                        <th>Adjustment in $</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button id="btnSpinOffSave" type="button" onclick="AddUpdateSpinOffValue();" class="btn btn-primary">Apply Changes On Position</button>
+    </div>
+
+    <script type="text/javascript">
+        var countSpinOffOrder = 1;
+        var boxIdCount;
+        var boxIdTotalCount = 0;
+        var selectedRows = [];
+        var AllselectedRows = [];
+        var newspinresponse = [];
+
+        $(document).ready(() => {
+            debugger;
+
+            $('#Loader').show();
+            $("#tblSpinOffEquityStockDetails").hide();
+            $("#tblNewSpinOffEquityStockDetails").hide();
+            $("#lblEquityToSpinOff").hide();
+            $("#lblNewEquitySpinned").hide();
+            $("#lblNewRatio").hide();
+            $("#lblSpinOffRatio").hide();
+            $("#lblSpinOffMDU").hide();
+            $("#lblSpinOffAdjustment").hide();
+            $("#lblSpinOffRoundUnitsBuy").hide();
+            $("#lblSpinOffRoundUnitsSell").hide();
+            $("#btnSpinOffSave").hide();
+
+            $("body").on("change", "#csSpinOffAll", function () {
+                debugger;
+                var isChecked = $(this).is(":checked");
+                $(".spinOff-chk-per").each(function () {
+                    if (isChecked)
+                        $(this).prop("checked", true);
+                    else
+                        $(this).prop("checked", false);
+                });
+            });
+
+            $("body").on("change", ".spinOff-chk-per", function () {
+                debugger;
+                var mode = 0;
+                var clsName = "";
+                var mainclass = "";
+                if ($(this).hasClass("spinOff-chk-per")) {
+                    mode = 1;
+                    clsName = ".spinOff-chk-per";
+                    mainclass = "#csSpinOffAll";
+                }
+                if (mode > 0) {
+                    var total = $(clsName).length;
+                    var totalchecked = $(clsName + ":Checked").length;
+                    if (total == totalchecked) {
+                        $(mainclass).prop("checked", true);
+                    } else {
+                        $(mainclass).prop("checked", false);
+                    }
+                }
+            });
+
+            $('#Loader').hide();
+            //BindSpinOffIntruments();
+        });
+
+
+        function BindSpinOffIntruments() {
+            $.ajax({
+                async: false,
+                type: "POST",
+                url: '/CorporateActions/GetInstrumentsDropDown',
+                dataType: 'json',
+                data: {},
+                success: function (response) {
+                    $("#ddlEquityToSpinOff").append(`<option value = "" > --Select--</option>`)
+                    $("#ddlNewEquitySpinned").append(`<option value = "" > --Select--</option>`)
+                    for (var i = 0; i < response.length; i++) {
+                        $("#ddlEquityToSpinOff").append(`<option value = "${response[i].value}"> ${response[i].text}</option>`)
+                        $("#ddlNewEquitySpinned").append(`<option value = "${response[i].value}"> ${response[i].text}</option>`)
+                    }
+                    $('#Loader').hide();
+                },
+                error: function (errorTemp) {
+                    console.log('error', errorTemp);
+                }
+            });
+        }
+
+        function GetCalculatedSpinOffOrderDetails() {
+            debugger;
+            $("#lblEquityToSpinOff").hide();
+            $("#lblNewEquitySpinned").hide();
+            $("#lblNewRatio").hide();
+            $("#lblSpinOffRatio").hide();
+            $("#lblSpinOffMDU").hide();
+            $("#lblSpinOffAdjustment").hide();
+            $("#lblSpinOffRoundUnitsBuy").hide();
+            $("#lblSpinOffRoundUnitsSell").hide();
+
+            if (IsValidate()) {
+                $('#Loader').show();
+                debugger;
+                var instrumentId = $("#ddlEquityToSpinOff").val();
+                var newInstrumentId = $("#ddlNewEquitySpinned").val();
+
+                var param = {};
+                param.InstrumentId = instrumentId;
+                param.NewInstrumentId = newInstrumentId;
+                param.NewRatio = $("#NewRatio").val();
+                param.SpinOffRatio = $("#SpinOffRatio").val();
+                param.SpinOffMDU = $("#SpinOffMDU").val();
+                param.SpinOffadjustment = ($("input[name='SpinOffadjustment']:checked").val() == '1' ? true : false);
+                param.SpinOffRoundUnitsBuy = $("#ddlSpinOffRoundUnitsBuy").val();
+                param.SpinOffRoundUnitsBuy = $("#ddlSpinOffRoundUnitsSell").val();
+
+                $.ajax({
+                    async: false,
+                    type: "GET",
+                    url: '/CorporateActions/GetCalculatedSpinOffOrderDetails',
+                    dataType: 'json',
+                    data: param,
+                    success: function (response) {
+                        console.log(response);
+                        debugger
+
+                        $("#tblSpinOffEquityStockDetails tbody").empty();
+                        $("#tblNewSpinOffEquityStockDetails tbody").empty();
+                        //$("#lblReverseSplitEquity").hide();
+                        for (var i = 0; i < response.item1.length; i++) {
+                            boxIdCount = i;
+                            boxIdTotalCount = boxIdTotalCount + 1;
+
+                            BindGridWithSpinOffOldStockDetails(response.item1[i]);
+                        }
+                        for (var i = 0; i < response.item2.length; i++) {
+                            boxIdCount = i;
+                            boxIdTotalCount = boxIdTotalCount + 1;
+
+                            BindGridWithSpinOffNewStockDetails(response.item2[i]);
+                        }
+                        //BindGridWithStockDetails(response);
+                        $('#Loader').hide();
+                    },
+                    error: function (errorTemp) {
+                        console.log('error', errorTemp);
+                    }
+                });
+            }
+        }
+
+        function BindGridWithSpinOffOldStockDetails(response, equityType) {
+
+            $("#tblSpinOffEquityStockDetails > thead > tr > th").removeAttr("style");
+
+            if (response != null) {
+
+
+                AllselectedRows.push(response.orderId);
+                var sdEquityData = "";
+
+                sdEquityData += '<tr>';
+                sdEquityData += '<td><input type="checkbox" onclick="CheckValue(' + response.orderId + ',' + boxIdCount + ')" id="checkSpinOff' + boxIdCount + '"></td>';
+                sdEquityData += '<td>' + response.clientId + '</td>';
+                sdEquityData += '<td>' + response.tradingAccount + '</td>';
+                sdEquityData += '<td>' + response.orderId + '</td>';
+                sdEquityData += '<td>' + response.sideName + '</td>';
+                sdEquityData += '<td>' + response.equityName + '</td>';
+                sdEquityData += '<td>' + response.openTiming + '</td>';
+                sdEquityData += '<td>' + response.legalEntity + '</td>';
+                sdEquityData += '<td>' + response.openPrice + '</td>';
+                sdEquityData += '<td>' + response.openUnits + '</td>';
+                sdEquityData += '<td>' + response.closePrice + '</td>';
+                sdEquityData += '<td>' + response.swap + '</td>';
+                sdEquityData += '<td>' + response.commission + '</td>';
+                sdEquityData += '<td>' + response.leverage + '</td>';
+
+                if (response.position == "Open")
+                    sdEquityData += '<td><span class="badge badge-success">' + response.position + '</span></td>';
+                else
+                    sdEquityData += '<td><span class="badge badge-danger">' + response.position + '</span></td>';
+
+                sdEquityData += '</tr>';
+
+                debugger;
+
+                $("#tblSpinOffEquityStockDetails tbody").append(sdEquityData);
+                $("#tblSpinOffEquityStockDetails").show();
+                //$("#btnSpinOffSave").show();
+                //countSpinOffOrder = countSpinOffOrder + 1;
+
+
+            }
+            else {
+                $("#tblSpinOffEquityStockDetails tbody").empty();
+                $("#tblSpinOffEquityStockDetails tbody").append('<tr><td class="text-center" colspan="10">No data found</td></tr>');
+                $("#tblSpinOffEquityStockDetails").show();
+                $("#tblSpinOffEquityStockDetails > thead > tr > th").attr("style", "width: 120px;");
+
+            }
+        }
+
+        function BindGridWithSpinOffNewStockDetails(response, equityType) {
+
+            $("#tblNewSpinOffEquityStockDetails > thead > tr > th").removeAttr("style");
+
+            if (response != null) {
+
+                newspinresponse.push(response);
+                //AllselectedRows.push(response.orderId);
+                var sdEquityData = "";
+
+                sdEquityData += '<tr>';
+                //sdEquityData += '<td><input type="checkbox" onclick="CheckNewValue(' + response.orderId + ',' + boxIdCount + ')" id="checkNewSpinOff' + boxIdCount + '"></td>';
+                sdEquityData += '<td>' + response.clientId + '</td>';
+                sdEquityData += '<td>' + response.tradingAccount + '</td>';
+                sdEquityData += '<td>' + response.orderId + '</td>';
+                sdEquityData += '<td>' + response.newOrderId + '</td>';
+                sdEquityData += '<td>' + response.sideName + '</td>';
+                sdEquityData += '<td>' + response.newEquityName + '</td>';
+                sdEquityData += '<td>' + response.openDateTiming + '</td>';
+                sdEquityData += '<td>' + response.legalEntity + '</td>';
+                sdEquityData += '<td>' + response.closePriceBefore + '</td>';
+                sdEquityData += '<td>' + response.openUnitsOldEquity + '</td>';
+                sdEquityData += '<td>' + response.openPriceAfterSpinOff + '</td>';
+                sdEquityData += '<td>' + response.openUnitsAfterSpinOff + '</td>';
+                sdEquityData += '<td>' + response.leverage + '</td>';
+                sdEquityData += '<td>' + response.openPriceOldEquity + '</td>';
+                sdEquityData += '<td>' + response.unitsNoRound + '</td>';
+                sdEquityData += '<td>' + response.priceDiff + '</td>';
+                sdEquityData += '<td>' + response.unitsDiff + '</td>';
+                sdEquityData += '<td>' + response.spinOffAdjustment + '</td>';
+                
+
+                sdEquityData += '</tr>';
+
+                debugger;
+
+                $("#tblNewSpinOffEquityStockDetails tbody").append(sdEquityData);
+                $("#tblNewSpinOffEquityStockDetails").show();
+                $("#btnSpinOffSave").show();
+
+                $("#orderId_" + countSpinOffOrder + "").val(response.orderId);
+                $("#position_" + countSpinOffOrder + "").val(response.position);
+                $("#openPriceAfterSpinOff_" + countSpinOffOrder + "").val(response.openPriceAfterSpinOff);
+                $("#openUnitsAfterSpinOff_" + countSpinOffOrder + "").val(response.openUnitsAfterSpinOff);
+                $("#spinOffAdjustment_" + countSpinOffOrder + "").val(response.spinOffAdjustment);
+                $("#newInstrumentId_" + countSpinOffOrder + "").val(response.newInstrumentId);
+
+                countSpinOffOrder = countSpinOffOrder + 1;
+
+
+            }
+            else {
+                $("#tblNewSpinOffEquityStockDetails tbody").empty();
+                $("#tblNewSpinOffEquityStockDetails tbody").append('<tr><td class="text-center" colspan="10">No data found</td></tr>');
+                $("#tblNewSpinOffEquityStockDetails").show();
+                $("#tblNewSpinOffEquityStockDetails > thead > tr > th").attr("style", "width: 120px;");
+
+            }
+        }
+
+        $('#checkBoxAllSpinOff').change(function () {
+            if ($(this).is(':checked')) {
+                for (var i = 0; i < boxIdTotalCount + 1; i++) {
+                    $('#checkSpinOff' + i).prop('checked', true);
+                    selectedRows = AllselectedRows;
+                }
+            } else {
+                for (var i = 0; i < boxIdTotalCount + 1; i++) {
+                    $('#checkSpinOff' + i).prop('checked', false);
+                    selectedRows = [];
+                }
+            }
+        });
+
+        function CheckValue(orderid, id) {
+
+            if ($("#checkSpinOff" + id).prop('checked') == true) {
+                selectedRows.push(orderid);
+            }
+            else {
+                var filteredArray = selectedRows.filter(function (element) {
+                    return element !== orderid;
+                });
+                selectedRows = filteredArray;
+            }
+
+            $('#checkBoxAllSpinOff').prop('checked', true);
+            for (var i = 0; i < boxIdTotalCount; i++) {
+                if ($("#checkSpinOff" + i).prop('checked') == false) {
+                    $('#checkBoxAllSpinOff').prop('checked', false);
+                }
+            }
+        }
+
+        //$('#checkBoxAllNewSpinOff').change(function () {
+        //    if ($(this).is(':checked')) {
+        //        for (var i = 0; i < boxIdTotalCount + 1; i++) {
+        //            $('#checkNewSpinOff' + i).prop('checked', true);
+        //            selectedRows = AllselectedRows;
+        //        }
+        //    } else {
+        //        for (var i = 0; i < boxIdTotalCount + 1; i++) {
+        //            $('#checkNewSpinOff' + i).prop('checked', false);
+        //            selectedRows = [];
+        //        }
+        //    }
+        //});
+
+        //function CheckNewValue(orderid, id) {
+
+        //    if ($("#checkNewSpinOff" + id).prop('checked') == true) {
+        //        selectedRows.push(orderid);
+        //    }
+        //    else {
+        //        var filteredArray = selectedRows.filter(function (element) {
+        //            return element !== orderid;
+        //        });
+        //        selectedRows = filteredArray;
+        //    }
+
+        //    $('#checkBoxAllNewSpinOff').prop('checked', true);
+        //    for (var i = 0; i < boxIdTotalCount; i++) {
+        //        if ($("#checkNewSpinOff" + i).prop('checked') == false) {
+        //            $('#checkBoxAllNewSpinOff').prop('checked', false);
+        //        }
+        //    }
+        //}
+
+
+        function AddUpdateSpinOffValue() {
+            debugger;
+            var selectedRowsIds = selectedRows.join(',');
+            
+                $.ajax({
+                    async: false,
+                    type: "POST",
+                    url: '/CorporateActions/AddUpdateSpinOffValue',
+                    dataType: 'json',
+                    data: { model: newspinresponse, SelectedOrderid: selectedRowsIds },
+                    success: function (response) {
+                        debugger
+                        NotifyMsg('success', response.message);
+                        $("#custom-tabs-five-normal-tab1").trigger("click");
+                    },
+                    error: function (errorTemp) {
+                        console.log('error', errorTemp);
+                    }
+                });
+        }
+
+        function IsValidate() {
+            
+            var errorCount = 0;
+            if ($("#ddlEquityToSpinOff").val() == "") {
+                $("#lblEquityToSpinOff").show();
+                errorCount++;
+            }
+            if ($("#ddlNewEquitySpinned").val() == "") {
+                $("#lblNewEquitySpinned").show();
+                errorCount++;
+            }
+            if ($("#NewRatio").val() == "" || $("#NewRatio").val() == "0") {
+                $("#lblNewRatio").show();
+                errorCount++;
+            }
+            if ($("#SpinOffRatio").val() == "" || $("#SpinOffRatio").val() == "0") {
+                $("#lblSpinOffRatio").show();
+                errorCount++;
+            }
+            if ($("#SpinOffMDU").val() == "" || $("#SpinOffMDU").val() == "0") {
+                $("#lblSpinOffMDU").show();
+                errorCount++;
+            }
+            if ($("input[name='SpinOffadjustment']").is(":checked") == false) {
+                $("#lblSpinOffAdjustment").show();
+                errorCount++;
+            }
+            if ($("#ddlSpinOffRoundUnitsSell").val() == "") {
+                $("#lblSpinOffRoundUnitsSell").show();
+                errorCount++;
+            }
+            if ($("#ddlSpinOffRoundUnitsBuy").val() == "") {
+                $("#lblSpinOffRoundUnitsBuy").show();
+                errorCount++;
+            }
+            else if ($("#tblSpinOffEquityStockDetails tbody tr").length == 1) {
+                NotifyMsg('error', "No data found.");
+                errorCount++;
+            }
+
+            if (errorCount > 0) {
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+    </script>

@@ -1,0 +1,92 @@
+﻿@using Epidi.Models.ViewModel.LeverageRules;
+@using Epidi.Models.ViewModel.InstrumentMaster;
+@model LevarageRuleImportViewModel
+@{
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+    ViewBag.PageTitle = "Edit Leverage Rule";
+    ViewBag.Method = "Edit Leverage Rule";
+
+
+    ViewBag.DetailName = "Leverage Rule";
+    ViewBag.DetailURL = "/LevarageRuleImport/Index";
+
+
+}
+<div class="row">
+    <div class="col-md-6 form-group">
+        <label>Master Instrument</label>
+        <input type="hidden" id="leverageid" value="@Model.LeverageId" />
+
+        <select class="form-control" id="ddlmasterinstrument">
+            @foreach (var item in (List<InstrumentMasterViewModel>)ViewBag.Instruments)
+            {
+                if (Model.MasterInstrumentId == item.Id)
+                {
+                    <option value="@item.Id" selected="selected">@item.Name</option>
+                }
+                else
+                {
+                    <option value="@item.Id">@item.Name</option>
+                }
+
+            }
+        </select>
+    </div>
+    <div class="col-md-6 form-group">
+        <label>Day</label>
+        <input type="number" value="@Model.Day" class="form-control" id="txtday" />
+    </div>
+    <div class="col-md-6 form-group">
+        <label>Time From</label>
+        <input type="time" class="form-control" value="@DateTime.Parse(Model.TimeFrom).ToString("HH:mm:ss")" id="txttimefrom" />
+    </div>
+    <div class="col-md-6 form-group">
+        <label>Time To</label>
+        <input type="time" class="form-control" value="@DateTime.Parse(Model.TimeTo).ToString("HH:mm:ss")" id="txttimeto" />
+    </div>
+    <div class="col-md-6 form-group">
+        <label>Is New position</label>
+        <select class="form-control" id="ddlisnewpos">
+            @if (Model.IsNewPosition == "1")
+            {
+                <option selected>Yes</option>
+                <option>No</option>
+            }
+            else
+            {
+                <option>Yes</option>
+                <option selected>No</option>
+            }
+        </select>
+    </div>
+    <br />
+    <br />
+</div>
+@{
+    int i = 0;
+}
+@foreach (var item in Model.ObjLeverageBandMapping)
+    {
+        <div class="row leveragebandmapping">
+            <div class="col-md-3 form-group">
+                <label>Band From</label>
+                <input type="number" class="form-control" value="@Model.ObjLeverageBand.FirstOrDefault(x=>x.LeverageBandId==item.LeverageBandId).BandFrom" id=@("bandfrom"+i) />
+            </div>
+            <div class="col-md-3 form-group">
+                <label>Band To</label>
+                <input type="number" class="form-control" value="@Model.ObjLeverageBand.FirstOrDefault(x=>x.LeverageBandId==item.LeverageBandId).BandTo" id=@("txtbandto"+i) />
+            </div>
+            <div class="col-md-3 form-group">
+                <label>Levarage Amount</label>
+                <input type="number" class="form-control" value="@item.LeverageAmount" id=@("txtamt"+i) />
+            </div>
+            <a class="btn btn-sm" onclick="DeletedIds(@item.LeverageBandMappingId,$(this));"><i class="fa fa-trash" style="margin-top:30px;"></i></a>
+        </div>
+    <span style="display:none;">@(i++)</span>
+    }
+
+<div class="row">
+    <div class="col-md-12">
+        <button class="btn btn-primary" id="btnaddnewrow">Add New</button>
+    </div>
+</div>

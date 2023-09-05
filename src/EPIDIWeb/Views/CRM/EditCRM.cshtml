@@ -1,0 +1,322 @@
+﻿@model UsersViewModel
+@{
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+    ViewBag.PageTitle = "Edit CRM";
+    ViewBag.Method = "Edit CRM";
+}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-12">
+                        <h3>Specification Rule</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                @using (Html.BeginForm("SaveUser", "CRM", FormMethod.Post, new { enctype = "multipart/form-data", id = "frmEditForm" }))
+                {
+                    <div class="row">
+                        <div class="col-4">
+                            <div class="form-group">
+                                @Html.HiddenFor(model => model.Id)
+                                @Html.LabelFor(model => model.Name,"Name")
+                                @Html.TextBoxFor(p => p.Name, new { @class = "form-control", @placeholder = "Name" ,@name="Name"})
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.Surname,"Surname")
+                                @Html.TextBoxFor(p => p.Surname, new { @class = "form-control", @placeholder = "Surname" ,@name="Surname"})
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.Address,"Address")
+                                @Html.TextBoxFor(p => p.Address, new { @class = "form-control", @placeholder = "Address" ,@name="Address"})
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.PostCode,"PostCode")
+                                @Html.TextBoxFor(p => p.PostCode, new { @class = "form-control", @placeholder = "PostCode" ,@name="PostCode"})
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.CountryId,"CountryId")
+                                @Html.DropDownListFor(model => model.CountryId, new SelectList(ViewBag.DropdownlistCountry, "Value", "Text", Model.CountryId), "-- Select Country --", new { @class = "form-control" ,@name="countryName",@Onchange = "GetCountryListAll($('#CountryId').val());"})
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.Email,"Email")
+                                @Html.TextBoxFor(p => p.Email, new { @class = "form-control", @placeholder = "Email" ,@name="Email"})
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.Mobile,"Mobile")
+                                @Html.TextBoxFor(p => p.Mobile, new { @class = "form-control", @placeholder = "Mobile" ,@name="Mobile"})
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.CurrentBalance,"Current Balance")
+                                @Html.TextBoxFor(p => p.CurrentBalance, new { @class = "form-control", @placeholder = "Current Balance" ,@name="CurrentBalance"})
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.Leverage,"Leverage")
+                                @Html.TextBoxFor(p => p.Leverage, new { @class = "form-control", @placeholder = "Leverage" ,@name="Leverage"})
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.TaxResidenceId,"Tax Residence")
+                                @Html.DropDownListFor(model => model.TaxResidenceId, new SelectList(ViewBag.DropdownlistCountry, "Value", "Text", Model.TaxResidenceId), "-- Select Country --", new { @class = "form-control" ,@name="countryName",@Onchange = "GetCountryListAll($('#TaxResidenceId').val());"})
+                                @*@Html.TextBoxFor(p => p.TaxResidenceId, new { @class = "form-control", @placeholder = "TaxResidence" ,@name="TaxResidence"})*@
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.LegalEntityName, "LegalEntity")
+                                @Html.DropDownListFor(model => model.LegalEntityName, new SelectList(ViewBag.DropdownlistLegalEntity, "Value", "Text", Model.LegalEntityName), "-- Select LegalEntity --", new { @class = "form-control" ,@name="legalEntityName",@Onchange = "GetLegalEntityListALL($('#LegalEntityId').val());" })
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.IBId,"IBId")
+                                @Html.DropDownListFor(model => model.IBId, new SelectList(ViewBag.IBDropDown, "Value", "Text", Model.IBId), "-- Select IB --", new { @class = "form-control" ,@name="IBName",@Onchange = "GetIBList($('#IBId').val());" })
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.BDMId,"BDMId")
+                                @Html.DropDownListFor(model => model.BDMId, new SelectList(ViewBag.BDMDropDown, "Value", "Text", Model.BDMId), "-- Select BDM --", new { @class = "form-control" ,@name="BDMName",@Onchange = "GetBDMListALL($('#BDMId').val());"})
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.DateOfBirth,"DateOfBirth")
+                                @Html.TextBoxFor(p => p.DateOfBirth,"{0:yyyy-MM-dd}", new { @type="date",@class = "form-control", @placeholder = "DateOfBirth" ,@name="DateOfBirth",})
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.MobileCountryCode,"MobileCountryCode")
+                                @Html.TextBoxFor(p => p.MobileCountryCode, new { @class = "form-control", @placeholder = "MobileCountryCode" ,@name="MobileCountryCode"})
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.NationlityId,"NationlityId")
+                                @*@Html.TextBoxFor(p => p.NationlityId, new { @class = "form-control", @placeholder = "NationlityId" ,@name="NationlityId"})*@
+                                @Html.DropDownListFor(model => model.NationlityId, new SelectList(ViewBag.DropdownlistCountry, "Value", "Text", Model.NationlityId), "-- Select Country --", new { @class = "form-control" ,@name="countryName",@Onchange = "GetCountryListAll($('#NationlityId').val());"})
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.IDNumber,"IDNumber")
+                                @Html.TextBoxFor(p => p.IDNumber, new { @class = "form-control", @placeholder = "IDNumber" ,@name="IDNumber"})
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.TINNumber,"TINNumber")
+                                @Html.TextBoxFor(p => p.TINNumber, new { @class = "form-control", @placeholder = "TINNumber" ,@name="TINNumber"})
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.Address2,"Address2")
+                                @Html.TextBoxFor(p => p.Address2, new { @class = "form-control", @placeholder = "Address2" ,@name="Address2"})
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.ResidentArea,"ResidentArea")
+                                @Html.TextBoxFor(p => p.ResidentArea, new { @class = "form-control", @placeholder = "ResidentArea" ,@name="ResidentArea"})
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.OnboardingEntity,"OnboardingEntity")
+                                @Html.TextBoxFor(p => p.OnboardingEntity, new { @class = "form-control", @placeholder = "OnboardingEntity" ,@name="OnboardingEntity"})
+                            </div>
+                        </div>
+                        <div class="col-2">
+                            <div class="form-group">
+                                @Html.CheckBoxFor(p => p.IsActive)
+                                @Html.LabelFor(model => model.IsActive,"Active")
+                            </div>
+                        </div>
+                        <div class="col-2">
+                            <div class="form-group">
+                                @Html.CheckBoxFor(p => p.PEP)
+                                @Html.LabelFor(model => model.PEP,"PEP")
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <div class="custom-file form-group float-sm-left mr-3" style="width:230px">
+            <input type="file" id="FileUpload" name="FileUpload" class="custom-file-input" multiple>
+            <label id="GatelblName" class="custom-file-label" style="text-align:left" for="file">Choose PDF</label>
+        </div>
+        <button type="button" onclick="UploadDocument()" class="btn btn-info form-group float-sm-left mr-3 ">Import PDF</button>
+    </div>
+    <div class="col-12">
+
+        <table class="table" id="tbl_answer" style="border-collapse:collapse;width:100%;margin-top:20px;">
+
+            @Html.Partial("CRMMultiFile", Model.UsersDocumentViewModels)
+        </table>
+    </div>
+</div>
+@section Scripts{
+    <script src="~/js/jquery-validation/jquery.validate.min.js"></script>
+    <script src="~/js/jquery-validation/additional-methods.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+    <script>
+        $(document).ready(() => {
+            $(document).on("submit", "#frmEditForm", function (e) {
+                e.preventDefault();
+                //BDMValidation();
+                var form = $(this);
+                form.ajaxSubmit({
+                    beforeSubmit: function () {
+                        if (!form.valid()) {
+                            return false;
+                        }
+                        else {
+                            $("#Loader").show();
+                            return true;
+                        }
+                    },
+                    success: function (res) {
+                        $("#Loader").hide();
+                        if (res.code == 200) {
+                            NotifyMsg('success', res.message);
+                            window.location.href = "/CRM/index";
+
+                        } else {
+                            debugger;
+                            NotifyMsg('error', res.message);
+                            //location.reload();
+                        }
+                        setTimeout(() => { location.reload(); }, 3000);
+                    },
+                    Errors: function () {
+                        $("#Loader").hide();
+                        NotifyMsg('error', res.message);
+                    }
+                });
+                return false;
+            });
+
+            $('#FileUpload').on('change', function (e) {
+
+                var fileName = e.target.files[0].name;
+                $(this).next('.custom-file-label').html(fileName);
+            })
+
+            $("body").on("click", ".deletefile", function () {
+
+                var tblid = $(this).closest("tr").attr('id');
+                var fileName = $(this).closest("tr").find("#hdnDocumentName").val();
+                var id = $(this).closest("tr").find("#hdnId").val();
+                var userId = $(this).closest("tr").find("#hdnUserId").val();
+
+                $.ajax({
+                    type: "POST",
+                    url: '/CRM/RemoveDocument',
+                    data: { FileName: fileName, Id: id,UserId:userId },
+                    success: function (res) {
+
+                        if (res.statusCode == 200) {
+
+                            $("#" + tblid).remove();
+                            NotifyMsg('success', res.message);
+
+
+                        } else {
+                            NotifyMsg('error', res.message);
+                        }
+                    },
+                    error: function (errorTemp) {
+                        NotifyMsg('error', errorTemp);
+                        console.log('error', errorTemp);
+                    }
+                })
+            });
+        });
+
+        function UploadDocument() {
+            debugger
+            var fdata = new FormData();
+
+            //var fileInput = $('#FileUpload');
+            var fileInput = document.getElementById('FileUpload');
+            fdata.append("UserId", $('#Id').val());
+            for (i = 0; i < fileInput.files.length; i++) {
+
+                var sfilename = fileInput.files[i].name;
+                let srandomid = Math.random().toString(36).substring(7);
+
+                fdata.append("FileUpload", fileInput.files[i]);
+            }
+
+            $.ajax({
+                type: "POST",
+                url: '/CRM/UploadDocument',
+                data: fdata,
+                processData: false,
+                contentType: false,
+                dataType: "html",
+                success: function (res) {
+
+                    if (res != null) {
+                        debugger;
+                        if ($('#tbl_answer tr').length > 0) {
+                            $("#tbl_answer").append(res);
+                            $('#FileUpload').val('');
+
+                            $('#GatelblName').html('Choose File')
+                            //var fileName = $('#hdnFileName').val('');
+                            //$('#FileUrl').val(fileName);
+
+                        }
+                        else {
+                            $("#tbl_answer").html(res);
+                            $('#FileUpload').val('');
+                            $('#GatelblName').html('Choose File')
+                            //var fileName = $('#hdnFileName').val();
+                            //$('#FileUrl').val(fileName);
+                        }
+
+
+                    } else {
+                        NotifyMsg('error', res.message);
+                    }
+                },
+                error: function (errorTemp) {
+
+                    NotifyMsg('error', errorTemp);
+                    console.log('error', errorTemp);
+                }
+            })
+        }
+    </script>
+ }

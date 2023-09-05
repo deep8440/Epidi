@@ -1,0 +1,212 @@
+2022-09-26 00:00:36.342 +05:30 [INF] User profile is available. Using 'C:\Users\moinv\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2022-09-26 00:00:37.326 +05:30 [INF] Application started. Press Ctrl+C to shut down.
+2022-09-26 00:00:37.327 +05:30 [INF] Hosting environment: Development
+2022-09-26 00:00:37.327 +05:30 [INF] Content root path: D:\Epidi\Epidi\src\Epidi.API\
+2022-09-26 00:00:37.521 +05:30 [INF] Request starting HTTP/2 GET https://localhost:44395/weatherforecast - -
+2022-09-26 00:00:38.493 +05:30 [INF] Route matched with {action = "Get", controller = "WeatherForecast"}. Executing controller action with signature System.Collections.Generic.IEnumerable`1[Epidi.API.WeatherForecast] Get() on controller Epidi.API.Controllers.WeatherForecastController (Epidi.API).
+2022-09-26 00:00:38.541 +05:30 [INF] Executing ObjectResult, writing value of type 'Epidi.API.WeatherForecast[]'.
+2022-09-26 00:00:39.479 +05:30 [INF] Executed action Epidi.API.Controllers.WeatherForecastController.Get (Epidi.API) in 949.5209ms
+2022-09-26 00:00:39.536 +05:30 [INF] Request finished HTTP/2 GET https://localhost:44395/weatherforecast - - - 200 501 application/json;+charset=utf-8 2036.0268ms
+2022-09-26 00:00:44.252 +05:30 [INF] Request starting HTTP/1.1 POST https://localhost:44395/api/token/login application/x-www-form-urlencoded 51
+2022-09-26 00:00:44.447 +05:30 [INF] Route matched with {action = "GetToken", controller = "Token"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetTokenAsync(Epidi.Models.ViewModel.User.LoginViewModel) on controller Epidi.API.Controllers.Account.TokenController (Epidi.API).
+2022-09-26 00:00:47.304 +05:30 [INF] Executed action Epidi.API.Controllers.Account.TokenController.GetTokenAsync (Epidi.API) in 2855.892ms
+2022-09-26 00:00:48.643 +05:30 [ERR] Something went wrong: System.ArgumentOutOfRangeException: IDX10653: The encryption algorithm 'System.String' requires a key size of at least 'System.Int32' bits. Key 'Microsoft.IdentityModel.Tokens.SymmetricSecurityKey', is of size: 'System.Int32'. (Parameter 'key')
+   at Microsoft.IdentityModel.Tokens.SymmetricSignatureProvider..ctor(SecurityKey key, String algorithm, Boolean willCreateSignatures)
+   at Microsoft.IdentityModel.Tokens.CryptoProviderFactory.CreateSignatureProvider(SecurityKey key, String algorithm, Boolean willCreateSignatures, Boolean cacheProvider)
+   at Microsoft.IdentityModel.Tokens.CryptoProviderFactory.CreateForSigning(SecurityKey key, String algorithm, Boolean cacheProvider)
+   at Microsoft.IdentityModel.JsonWebTokens.JwtTokenUtilities.CreateEncodedSignature(String input, SigningCredentials signingCredentials)
+   at System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.CreateJwtSecurityTokenPrivate(String issuer, String audience, ClaimsIdentity subject, Nullable`1 notBefore, Nullable`1 expires, Nullable`1 issuedAt, SigningCredentials signingCredentials, EncryptingCredentials encryptingCredentials, IDictionary`2 claimCollection, String tokenType)
+   at System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.CreateToken(SecurityTokenDescriptor tokenDescriptor)
+   at Epidi.Service.TokenService.TokenService.generateJwtToken(ApplicationUserDetail user) in D:\Epidi\Epidi\src\Epidi.Service\TokenService\TokenService.cs:line 68
+   at Epidi.Service.TokenService.TokenService.Authenticate(LoginViewModel model) in D:\Epidi\Epidi\src\Epidi.Service\TokenService\TokenService.cs:line 46
+   at Epidi.API.Controllers.Account.TokenController.GetTokenAsync(LoginViewModel login) in D:\Epidi\Epidi\src\Epidi.API\Controllers\Account\TokenController.cs:line 45
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeNextResourceFilter>g__Awaited|25_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResourceExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Builder.RouterMiddleware.Invoke(HttpContext httpContext)
+   at Epidi.API.Common.JwtMiddleware.Invoke(HttpContext context, IApplicationUserService userService) in D:\Epidi\Epidi\src\Epidi.API\Common\JwtMiddleware.cs:line 29
+   at Epidi.API.Common.ExceptionMiddleware.InvokeAsync(HttpContext httpContext) in D:\Epidi\Epidi\src\Epidi.API\Common\ExceptionMiddleware.cs:line 33
+2022-09-26 00:00:48.643 +05:30 [ERR] Inner Exception: 
+2022-09-26 00:00:48.685 +05:30 [INF] Request finished HTTP/1.1 POST https://localhost:44395/api/token/login application/x-www-form-urlencoded 51 - 500 - applicaton/json 4433.6255ms
+2022-09-26 00:00:51.746 +05:30 [INF] Request starting HTTP/1.1 POST https://localhost:44395/api/token/login application/x-www-form-urlencoded 51
+2022-09-26 00:00:51.750 +05:30 [INF] Route matched with {action = "GetToken", controller = "Token"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetTokenAsync(Epidi.Models.ViewModel.User.LoginViewModel) on controller Epidi.API.Controllers.Account.TokenController (Epidi.API).
+2022-09-26 00:00:51.961 +05:30 [INF] Executed action Epidi.API.Controllers.Account.TokenController.GetTokenAsync (Epidi.API) in 210.8404ms
+2022-09-26 00:00:52.555 +05:30 [ERR] Something went wrong: System.ArgumentOutOfRangeException: IDX10653: The encryption algorithm 'System.String' requires a key size of at least 'System.Int32' bits. Key 'Microsoft.IdentityModel.Tokens.SymmetricSecurityKey', is of size: 'System.Int32'. (Parameter 'key')
+   at Microsoft.IdentityModel.Tokens.SymmetricSignatureProvider..ctor(SecurityKey key, String algorithm, Boolean willCreateSignatures)
+   at Microsoft.IdentityModel.Tokens.CryptoProviderFactory.CreateSignatureProvider(SecurityKey key, String algorithm, Boolean willCreateSignatures, Boolean cacheProvider)
+   at Microsoft.IdentityModel.Tokens.CryptoProviderFactory.CreateForSigning(SecurityKey key, String algorithm, Boolean cacheProvider)
+   at Microsoft.IdentityModel.JsonWebTokens.JwtTokenUtilities.CreateEncodedSignature(String input, SigningCredentials signingCredentials)
+   at System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.CreateJwtSecurityTokenPrivate(String issuer, String audience, ClaimsIdentity subject, Nullable`1 notBefore, Nullable`1 expires, Nullable`1 issuedAt, SigningCredentials signingCredentials, EncryptingCredentials encryptingCredentials, IDictionary`2 claimCollection, String tokenType)
+   at System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.CreateToken(SecurityTokenDescriptor tokenDescriptor)
+   at Epidi.Service.TokenService.TokenService.generateJwtToken(ApplicationUserDetail user) in D:\Epidi\Epidi\src\Epidi.Service\TokenService\TokenService.cs:line 68
+   at Epidi.Service.TokenService.TokenService.Authenticate(LoginViewModel model) in D:\Epidi\Epidi\src\Epidi.Service\TokenService\TokenService.cs:line 46
+   at Epidi.API.Controllers.Account.TokenController.GetTokenAsync(LoginViewModel login) in D:\Epidi\Epidi\src\Epidi.API\Controllers\Account\TokenController.cs:line 45
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeNextResourceFilter>g__Awaited|25_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResourceExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Builder.RouterMiddleware.Invoke(HttpContext httpContext)
+   at Epidi.API.Common.JwtMiddleware.Invoke(HttpContext context, IApplicationUserService userService) in D:\Epidi\Epidi\src\Epidi.API\Common\JwtMiddleware.cs:line 29
+   at Epidi.API.Common.ExceptionMiddleware.InvokeAsync(HttpContext httpContext) in D:\Epidi\Epidi\src\Epidi.API\Common\ExceptionMiddleware.cs:line 33
+2022-09-26 00:00:52.556 +05:30 [ERR] Inner Exception: 
+2022-09-26 00:00:52.560 +05:30 [INF] Request finished HTTP/1.1 POST https://localhost:44395/api/token/login application/x-www-form-urlencoded 51 - 500 - applicaton/json 813.7658ms
+2022-09-26 00:01:56.930 +05:30 [INF] User profile is available. Using 'C:\Users\moinv\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2022-09-26 00:01:57.545 +05:30 [INF] Application started. Press Ctrl+C to shut down.
+2022-09-26 00:01:57.545 +05:30 [INF] Hosting environment: Development
+2022-09-26 00:01:57.545 +05:30 [INF] Content root path: D:\Epidi\Epidi\src\Epidi.API\
+2022-09-26 00:01:57.629 +05:30 [INF] Request starting HTTP/2 GET https://localhost:44395/weatherforecast - -
+2022-09-26 00:01:58.090 +05:30 [INF] Route matched with {action = "Get", controller = "WeatherForecast"}. Executing controller action with signature System.Collections.Generic.IEnumerable`1[Epidi.API.WeatherForecast] Get() on controller Epidi.API.Controllers.WeatherForecastController (Epidi.API).
+2022-09-26 00:01:58.113 +05:30 [INF] Executing ObjectResult, writing value of type 'Epidi.API.WeatherForecast[]'.
+2022-09-26 00:01:58.615 +05:30 [INF] Executed action Epidi.API.Controllers.WeatherForecastController.Get (Epidi.API) in 511.5609ms
+2022-09-26 00:01:58.653 +05:30 [INF] Request finished HTTP/2 GET https://localhost:44395/weatherforecast - - - 200 500 application/json;+charset=utf-8 1035.0474ms
+2022-09-26 00:02:02.341 +05:30 [INF] Request starting HTTP/1.1 POST https://localhost:44395/api/token/login application/x-www-form-urlencoded 51
+2022-09-26 00:02:02.425 +05:30 [INF] Route matched with {action = "GetToken", controller = "Token"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetTokenAsync(Epidi.Models.ViewModel.User.LoginViewModel) on controller Epidi.API.Controllers.Account.TokenController (Epidi.API).
+2022-09-26 00:02:04.485 +05:30 [INF] Executed action Epidi.API.Controllers.Account.TokenController.GetTokenAsync (Epidi.API) in 2059.5742ms
+2022-09-26 00:02:05.224 +05:30 [ERR] Something went wrong: System.ArgumentOutOfRangeException: IDX10653: The encryption algorithm 'System.String' requires a key size of at least 'System.Int32' bits. Key 'Microsoft.IdentityModel.Tokens.SymmetricSecurityKey', is of size: 'System.Int32'. (Parameter 'key')
+   at Microsoft.IdentityModel.Tokens.SymmetricSignatureProvider..ctor(SecurityKey key, String algorithm, Boolean willCreateSignatures)
+   at Microsoft.IdentityModel.Tokens.CryptoProviderFactory.CreateSignatureProvider(SecurityKey key, String algorithm, Boolean willCreateSignatures, Boolean cacheProvider)
+   at Microsoft.IdentityModel.Tokens.CryptoProviderFactory.CreateForSigning(SecurityKey key, String algorithm, Boolean cacheProvider)
+   at Microsoft.IdentityModel.JsonWebTokens.JwtTokenUtilities.CreateEncodedSignature(String input, SigningCredentials signingCredentials)
+   at System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.CreateJwtSecurityTokenPrivate(String issuer, String audience, ClaimsIdentity subject, Nullable`1 notBefore, Nullable`1 expires, Nullable`1 issuedAt, SigningCredentials signingCredentials, EncryptingCredentials encryptingCredentials, IDictionary`2 claimCollection, String tokenType)
+   at System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.CreateToken(SecurityTokenDescriptor tokenDescriptor)
+   at Epidi.Service.TokenService.TokenService.generateJwtToken(ApplicationUserDetail user) in D:\Epidi\Epidi\src\Epidi.Service\TokenService\TokenService.cs:line 68
+   at Epidi.Service.TokenService.TokenService.Authenticate(LoginViewModel model) in D:\Epidi\Epidi\src\Epidi.Service\TokenService\TokenService.cs:line 46
+   at Epidi.API.Controllers.Account.TokenController.GetTokenAsync(LoginViewModel login) in D:\Epidi\Epidi\src\Epidi.API\Controllers\Account\TokenController.cs:line 45
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeNextResourceFilter>g__Awaited|25_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResourceExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Builder.RouterMiddleware.Invoke(HttpContext httpContext)
+   at Epidi.API.Common.JwtMiddleware.Invoke(HttpContext context, IApplicationUserService userService) in D:\Epidi\Epidi\src\Epidi.API\Common\JwtMiddleware.cs:line 29
+   at Epidi.API.Common.ExceptionMiddleware.InvokeAsync(HttpContext httpContext) in D:\Epidi\Epidi\src\Epidi.API\Common\ExceptionMiddleware.cs:line 33
+2022-09-26 00:02:05.224 +05:30 [ERR] Inner Exception: 
+2022-09-26 00:02:05.273 +05:30 [INF] Request finished HTTP/1.1 POST https://localhost:44395/api/token/login application/x-www-form-urlencoded 51 - 500 - applicaton/json 2932.3717ms
+2022-09-26 00:02:06.969 +05:30 [INF] Request starting HTTP/1.1 POST https://localhost:44395/api/token/login application/x-www-form-urlencoded 51
+2022-09-26 00:02:06.971 +05:30 [INF] Route matched with {action = "GetToken", controller = "Token"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetTokenAsync(Epidi.Models.ViewModel.User.LoginViewModel) on controller Epidi.API.Controllers.Account.TokenController (Epidi.API).
+2022-09-26 00:02:07.098 +05:30 [INF] Executed action Epidi.API.Controllers.Account.TokenController.GetTokenAsync (Epidi.API) in 126.6386ms
+2022-09-26 00:02:07.288 +05:30 [ERR] Something went wrong: System.ArgumentOutOfRangeException: IDX10653: The encryption algorithm 'System.String' requires a key size of at least 'System.Int32' bits. Key 'Microsoft.IdentityModel.Tokens.SymmetricSecurityKey', is of size: 'System.Int32'. (Parameter 'key')
+   at Microsoft.IdentityModel.Tokens.SymmetricSignatureProvider..ctor(SecurityKey key, String algorithm, Boolean willCreateSignatures)
+   at Microsoft.IdentityModel.Tokens.CryptoProviderFactory.CreateSignatureProvider(SecurityKey key, String algorithm, Boolean willCreateSignatures, Boolean cacheProvider)
+   at Microsoft.IdentityModel.Tokens.CryptoProviderFactory.CreateForSigning(SecurityKey key, String algorithm, Boolean cacheProvider)
+   at Microsoft.IdentityModel.JsonWebTokens.JwtTokenUtilities.CreateEncodedSignature(String input, SigningCredentials signingCredentials)
+   at System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.CreateJwtSecurityTokenPrivate(String issuer, String audience, ClaimsIdentity subject, Nullable`1 notBefore, Nullable`1 expires, Nullable`1 issuedAt, SigningCredentials signingCredentials, EncryptingCredentials encryptingCredentials, IDictionary`2 claimCollection, String tokenType)
+   at System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.CreateToken(SecurityTokenDescriptor tokenDescriptor)
+   at Epidi.Service.TokenService.TokenService.generateJwtToken(ApplicationUserDetail user) in D:\Epidi\Epidi\src\Epidi.Service\TokenService\TokenService.cs:line 68
+   at Epidi.Service.TokenService.TokenService.Authenticate(LoginViewModel model) in D:\Epidi\Epidi\src\Epidi.Service\TokenService\TokenService.cs:line 46
+   at Epidi.API.Controllers.Account.TokenController.GetTokenAsync(LoginViewModel login) in D:\Epidi\Epidi\src\Epidi.API\Controllers\Account\TokenController.cs:line 45
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeNextResourceFilter>g__Awaited|25_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResourceExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Builder.RouterMiddleware.Invoke(HttpContext httpContext)
+   at Epidi.API.Common.JwtMiddleware.Invoke(HttpContext context, IApplicationUserService userService) in D:\Epidi\Epidi\src\Epidi.API\Common\JwtMiddleware.cs:line 29
+   at Epidi.API.Common.ExceptionMiddleware.InvokeAsync(HttpContext httpContext) in D:\Epidi\Epidi\src\Epidi.API\Common\ExceptionMiddleware.cs:line 33
+2022-09-26 00:02:07.288 +05:30 [ERR] Inner Exception: 
+2022-09-26 00:02:07.289 +05:30 [INF] Request finished HTTP/1.1 POST https://localhost:44395/api/token/login application/x-www-form-urlencoded 51 - 500 - applicaton/json 319.4526ms
+2022-09-26 00:02:08.477 +05:30 [INF] Request starting HTTP/1.1 POST https://localhost:44395/api/token/login application/x-www-form-urlencoded 51
+2022-09-26 00:02:08.478 +05:30 [INF] Route matched with {action = "GetToken", controller = "Token"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetTokenAsync(Epidi.Models.ViewModel.User.LoginViewModel) on controller Epidi.API.Controllers.Account.TokenController (Epidi.API).
+2022-09-26 00:02:08.556 +05:30 [INF] Executed action Epidi.API.Controllers.Account.TokenController.GetTokenAsync (Epidi.API) in 78.0479ms
+2022-09-26 00:02:08.725 +05:30 [ERR] Something went wrong: System.ArgumentOutOfRangeException: IDX10653: The encryption algorithm 'System.String' requires a key size of at least 'System.Int32' bits. Key 'Microsoft.IdentityModel.Tokens.SymmetricSecurityKey', is of size: 'System.Int32'. (Parameter 'key')
+   at Microsoft.IdentityModel.Tokens.SymmetricSignatureProvider..ctor(SecurityKey key, String algorithm, Boolean willCreateSignatures)
+   at Microsoft.IdentityModel.Tokens.CryptoProviderFactory.CreateSignatureProvider(SecurityKey key, String algorithm, Boolean willCreateSignatures, Boolean cacheProvider)
+   at Microsoft.IdentityModel.Tokens.CryptoProviderFactory.CreateForSigning(SecurityKey key, String algorithm, Boolean cacheProvider)
+   at Microsoft.IdentityModel.JsonWebTokens.JwtTokenUtilities.CreateEncodedSignature(String input, SigningCredentials signingCredentials)
+   at System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.CreateJwtSecurityTokenPrivate(String issuer, String audience, ClaimsIdentity subject, Nullable`1 notBefore, Nullable`1 expires, Nullable`1 issuedAt, SigningCredentials signingCredentials, EncryptingCredentials encryptingCredentials, IDictionary`2 claimCollection, String tokenType)
+   at System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.CreateToken(SecurityTokenDescriptor tokenDescriptor)
+   at Epidi.Service.TokenService.TokenService.generateJwtToken(ApplicationUserDetail user) in D:\Epidi\Epidi\src\Epidi.Service\TokenService\TokenService.cs:line 68
+   at Epidi.Service.TokenService.TokenService.Authenticate(LoginViewModel model) in D:\Epidi\Epidi\src\Epidi.Service\TokenService\TokenService.cs:line 46
+   at Epidi.API.Controllers.Account.TokenController.GetTokenAsync(LoginViewModel login) in D:\Epidi\Epidi\src\Epidi.API\Controllers\Account\TokenController.cs:line 45
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeNextResourceFilter>g__Awaited|25_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResourceExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Builder.RouterMiddleware.Invoke(HttpContext httpContext)
+   at Epidi.API.Common.JwtMiddleware.Invoke(HttpContext context, IApplicationUserService userService) in D:\Epidi\Epidi\src\Epidi.API\Common\JwtMiddleware.cs:line 29
+   at Epidi.API.Common.ExceptionMiddleware.InvokeAsync(HttpContext httpContext) in D:\Epidi\Epidi\src\Epidi.API\Common\ExceptionMiddleware.cs:line 33
+2022-09-26 00:02:08.725 +05:30 [ERR] Inner Exception: 
+2022-09-26 00:02:08.725 +05:30 [INF] Request finished HTTP/1.1 POST https://localhost:44395/api/token/login application/x-www-form-urlencoded 51 - 500 - applicaton/json 248.2692ms
+2022-09-26 00:02:25.413 +05:30 [INF] Request starting HTTP/1.1 POST https://localhost:44395/api/token/login application/x-www-form-urlencoded 51
+2022-09-26 00:02:25.413 +05:30 [INF] Route matched with {action = "GetToken", controller = "Token"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetTokenAsync(Epidi.Models.ViewModel.User.LoginViewModel) on controller Epidi.API.Controllers.Account.TokenController (Epidi.API).
+2022-09-26 00:03:02.537 +05:30 [INF] Executed action Epidi.API.Controllers.Account.TokenController.GetTokenAsync (Epidi.API) in 37123.1973ms
+2022-09-26 00:03:03.027 +05:30 [ERR] Something went wrong: System.ArgumentOutOfRangeException: IDX10653: The encryption algorithm 'System.String' requires a key size of at least 'System.Int32' bits. Key 'Microsoft.IdentityModel.Tokens.SymmetricSecurityKey', is of size: 'System.Int32'. (Parameter 'key')
+   at Microsoft.IdentityModel.Tokens.SymmetricSignatureProvider..ctor(SecurityKey key, String algorithm, Boolean willCreateSignatures)
+   at Microsoft.IdentityModel.Tokens.CryptoProviderFactory.CreateSignatureProvider(SecurityKey key, String algorithm, Boolean willCreateSignatures, Boolean cacheProvider)
+   at Microsoft.IdentityModel.Tokens.CryptoProviderFactory.CreateForSigning(SecurityKey key, String algorithm, Boolean cacheProvider)
+   at Microsoft.IdentityModel.JsonWebTokens.JwtTokenUtilities.CreateEncodedSignature(String input, SigningCredentials signingCredentials)
+   at System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.CreateJwtSecurityTokenPrivate(String issuer, String audience, ClaimsIdentity subject, Nullable`1 notBefore, Nullable`1 expires, Nullable`1 issuedAt, SigningCredentials signingCredentials, EncryptingCredentials encryptingCredentials, IDictionary`2 claimCollection, String tokenType)
+   at System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler.CreateToken(SecurityTokenDescriptor tokenDescriptor)
+   at Epidi.Service.TokenService.TokenService.generateJwtToken(ApplicationUserDetail user) in D:\Epidi\Epidi\src\Epidi.Service\TokenService\TokenService.cs:line 68
+   at Epidi.Service.TokenService.TokenService.Authenticate(LoginViewModel model) in D:\Epidi\Epidi\src\Epidi.Service\TokenService\TokenService.cs:line 46
+   at Epidi.API.Controllers.Account.TokenController.GetTokenAsync(LoginViewModel login) in D:\Epidi\Epidi\src\Epidi.API\Controllers\Account\TokenController.cs:line 45
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeNextResourceFilter>g__Awaited|25_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResourceExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Builder.RouterMiddleware.Invoke(HttpContext httpContext)
+   at Epidi.API.Common.JwtMiddleware.Invoke(HttpContext context, IApplicationUserService userService) in D:\Epidi\Epidi\src\Epidi.API\Common\JwtMiddleware.cs:line 29
+   at Epidi.API.Common.ExceptionMiddleware.InvokeAsync(HttpContext httpContext) in D:\Epidi\Epidi\src\Epidi.API\Common\ExceptionMiddleware.cs:line 33
+2022-09-26 00:03:03.027 +05:30 [ERR] Inner Exception: 
+2022-09-26 00:03:03.029 +05:30 [INF] Request finished HTTP/1.1 POST https://localhost:44395/api/token/login application/x-www-form-urlencoded 51 - 500 - applicaton/json 37615.6485ms
+2022-09-26 00:03:51.054 +05:30 [INF] User profile is available. Using 'C:\Users\moinv\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2022-09-26 00:03:51.623 +05:30 [INF] Application started. Press Ctrl+C to shut down.
+2022-09-26 00:03:51.624 +05:30 [INF] Hosting environment: Development
+2022-09-26 00:03:51.624 +05:30 [INF] Content root path: D:\Epidi\Epidi\src\Epidi.API\
+2022-09-26 00:03:51.697 +05:30 [INF] Request starting HTTP/2 GET https://localhost:44395/weatherforecast - -
+2022-09-26 00:03:52.168 +05:30 [INF] Route matched with {action = "Get", controller = "WeatherForecast"}. Executing controller action with signature System.Collections.Generic.IEnumerable`1[Epidi.API.WeatherForecast] Get() on controller Epidi.API.Controllers.WeatherForecastController (Epidi.API).
+2022-09-26 00:03:52.187 +05:30 [INF] Executing ObjectResult, writing value of type 'Epidi.API.WeatherForecast[]'.
+2022-09-26 00:03:52.745 +05:30 [INF] Executed action Epidi.API.Controllers.WeatherForecastController.Get (Epidi.API) in 564.0749ms
+2022-09-26 00:03:52.777 +05:30 [INF] Request finished HTTP/2 GET https://localhost:44395/weatherforecast - - - 200 499 application/json;+charset=utf-8 1091.7262ms
+2022-09-26 00:03:55.538 +05:30 [INF] Request starting HTTP/1.1 POST https://localhost:44395/api/token/login application/x-www-form-urlencoded 51
+2022-09-26 00:03:55.601 +05:30 [INF] Route matched with {action = "GetToken", controller = "Token"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetTokenAsync(Epidi.Models.ViewModel.User.LoginViewModel) on controller Epidi.API.Controllers.Account.TokenController (Epidi.API).
+2022-09-26 00:04:01.756 +05:30 [INF] Executing ObjectResult, writing value of type 'Epidi.API.Common.BaseResponse`1[[Epidi.Service.Helpers.AuthenticateResponse, Epidi.Service, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2022-09-26 00:04:01.795 +05:30 [INF] Executed action Epidi.API.Controllers.Account.TokenController.GetTokenAsync (Epidi.API) in 6193.2096ms
+2022-09-26 00:04:01.814 +05:30 [INF] Request finished HTTP/1.1 POST https://localhost:44395/api/token/login application/x-www-form-urlencoded 51 - 200 419 application/json;+charset=utf-8 6276.0763ms

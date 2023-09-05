@@ -1,0 +1,582 @@
+﻿@{
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+    ViewBag.PageTitle = "Orders";
+    ViewBag.Method = "Orders";
+}
+<style href="https://cdn.datatables.net/select/1.6.2/css/select.dataTables.min.css"></style>
+<style>
+    .progress {
+        display: block;
+        position: relative;
+        margin: 20px;
+        width: 425px;
+        background-color: #ddd;
+        border: 1px solid blue;
+        padding: 1px;
+        left: 40px;
+        border-radius: 3px;
+    }
+
+
+
+    .percent {
+        position: absolute;
+        display: inline-block;
+        color: #fff;
+        font-weight: bold;
+        top: 100%;
+        left: 50%;
+        margin-top: -9px;
+        margin-left: -20px;
+        -webkit-border-radius: 4px;
+    }
+
+
+
+    .bar {
+        background-color: #007bff;
+        width: 0%;
+        height: 30px;
+        border-radius: 4px;
+        -webkit-border-radius: 4px;
+        -moz-border-radius: 4px;
+    }
+
+
+
+    #status {
+        margin: 20px;
+        color: #008000;
+        font-size: 16px;
+    }
+</style>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Filters</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <label>Equity Name</label>
+                        <select class="form-control" id="ddlMasterInstrument">
+                            @foreach (var item in (List<InstrumentMaster>)ViewBag.Instruments)
+                            {
+                                <option value="@item.id">@item.name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label>Users</label>
+                        <select class="form-control" id="ddlusers">
+                            @foreach (var item in (List<UsersViewModel>)ViewBag.Users)
+                            {
+                                if (!string.IsNullOrEmpty(item.UserName))
+                                {
+                                    <option value="@item.Id">@item.UserName</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label>Date</label>
+                        <input type="date" class="form-control" id="datefilter" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <label>IB</label>
+                        <input type="text" class="form-control" id="txtib" />
+                    </div>
+                    <div class="col-md-4">
+                        <label>Time From</label>
+                        <input type="time" class="form-control" id="opentimefilter" />
+                    </div>
+                    <div class="col-md-4">
+                        <label>Country</label>
+                        <select class="form-control" id="ddlcountries">
+                            @foreach (var item in (List<CountryDDl>)ViewBag.Countries)
+                            {
+                                if (!string.IsNullOrEmpty(item.CountryName))
+                                {
+                                    <option value="@item.Id">@item.CountryName</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <label>Time To</label>
+                        <input type="time" class="form-control" id="closetimefilter" />
+                    </div>
+                    <div class="col-md-4">
+                        <label>Open/Close Price</label>
+                        <input type="text" class="form-control" id="txtopenprice" />
+                    </div>
+                    <div class="col-md-4">
+                        <label>Specific Price</label>
+                        <input type="text" class="form-control" id="txtspprice" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <input type="button" id="btnSearch" class="btn btn-outline-primary btn-uppercase float-right" value="Search" style="margin-top:30px;width: 10%;" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-5" id="divUploadFile">
+                        @using (Html.BeginForm("UploadOrderData", "Orders", FormMethod.Post, new { enctype = "multipart/form-data", id = "frmExcelForm" }))//onsubmit = "return myFunction()"
+                        {
+                            <div class="row">
+                                <div class="col-7">
+                                    <div class="custom-file form-group float-sm-left mr-3" style="width: 100%;">
+                                        <input type="file" id="FileUpload" name="FileUpload" class="custom-file-input">
+                                        <label id="lblOrder" class="custom-file-label" style="text-align:left" for="file">Choose Orders</label>
+                                    </div>
+                                </div>
+                                <div class="col-5">
+                                    <div class="form-group">
+                                        <button type="submit" class="btn btn-info">Import Orders</button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-2">
+                        <button type="button" class="btn btn-info float-sm-left mr-3 " onclick="ExportOrderData()">Export Orders</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Orders</h3>
+            </div>
+
+            <div class="card-body">
+                <table id="ordersList" class="table table-bordered table-striped">
+                </table>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+@*<div class="modal fade" id="OrderFields">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label id="lblfield">Field Text</label>
+                        <input type="text" class="form-cotrol" id="txtfieldvalue" />
+                        <input type="hidden" id="orderid" value="" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="btnupdatefields"></button>
+
+            </div>
+        </div>
+    </div>
+</div>*@
+<div class="modal fade" id="ProcessModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <h1>Processing...</h1>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="col-6">
+                    <div class="progress">
+                        <div class="bar"></div>
+                        <div class="percent">0%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            InstrumentDataTable.init();
+            $('#btnSearch').click(function () {
+                InstrumentDataTable.init();
+            });
+
+            $('#btnupdatefields').click(function () {
+
+                $.ajax({
+                    type: "POST",
+                    async: false,
+                    url: '/Orders/UpdateFields',
+                    data: { 'FieldName': $('#lblfield').html(), 'FieldValue': $('#txtfieldvalue').val(), 'ID': $('#orderid').val() },
+                    success: function (data) {
+                        alert('Record Updated !!');
+                        location.reload();
+                    }
+                });
+            })
+
+            //$(document).on('click', '#btnchangevolume', function () {
+            //    ChangeVolume($(this));
+            //});
+            //$(document).on('click', '#btnchangeClosePrice', function () {
+            //    ChangeClosePrice($(this));
+            //});
+            //$(document).on('click', '#btnchangeOpenPrice', function () {
+            //    ChangeOpenPrice($(this));
+            //});
+            ////$(document).on('click', '#btnSaveGridChanges', function () {
+            ////    SaveGridChanges($(this));
+            ////});
+
+        })
+        function DeleteOrders(obj) {
+            var ID = $($(obj).closest('tr').find('input[type="hidden"]')).val();
+            debugger;
+            if (confirm('Are you sure you want to delete this record')) {
+                $.ajax({
+                    type: "POST",
+                    async: false,
+                    url: '/Orders/RemoveOrder',
+                    data: { ID },
+                    success: function (data) {
+
+                        alert('Record Deleted !!');
+                        location.reload();
+
+                    }
+                });
+            }
+        }
+        function ChangeVolume(obj) {
+            var ID = $($(obj).closest('tr').find('input[type="hidden"]')).val();
+            $('#lblfield').html('OpenUnits');
+            $('#txtfieldvalue').val('');
+            $('#orderid').val(ID);
+            $('#OrderFields').modal('show');
+        }
+        function ChangeOpenPrice(obj) {
+            var ID = $($(obj).closest('tr').find('input[type="hidden"]')).val();
+            $('#lblfield').html('OpenPrice');
+            $('#txtfieldvalue').val('');
+            $('#orderid').val(ID);
+            $('#OrderFields').modal('show');
+        }
+        function ChangeClosePrice(obj) {
+            var ID = $($(obj).closest('tr').find('input[type="hidden"]')).val();
+            $('#lblfield').html('ClosePrice');
+            $('#txtfieldvalue').val('');
+            $('#orderid').val(ID);
+            $('#OrderFields').modal('show');
+        }
+        function SaveGridChanges(num, Id) {
+            debugger;
+            var OrderId = Id;
+            var closeprice = $("#ClosePrice_" + num).val();
+            var openUnits = $("#OpenUnits_" + num).val();
+            var openPrice = $("#OpenPrice_" + num).val();
+            $.ajax({
+                type: "POST",
+                async: false,
+                url: '/Orders/UpdateGridChanges',
+                data: { "OrderId": OrderId, "Closeprice": closeprice, "OpenUnits": openUnits, "OpenPrice": openPrice },
+                success: function (data) {
+                    NotifyMsg('success', data.message);
+                    location.reload();
+                }
+            });
+        }
+        var InstrumentDataTable = function () {
+
+            let initTable1 = function () {
+                let table = $('#ordersList');
+                var search1 = '';
+                var countRuleInstrument = 0;
+                search1 += $('#ddlMasterInstrument').val() + ',';
+                search1 += $('#datefilter').val() + ',';
+                search1 += $('#opentimefilter').val() + ',';
+
+                search1 += $('#ddlusers').val() + ',';
+                search1 += $('#ddlcountries').val() + ',';
+                search1 += $('#txtopenprice').val() + ',';
+                search1 += $('#txtspprice').val() + ',';
+                let oTable = table.dataTable({
+
+                    "stateSave": true,
+                    "autoWidth": true,
+                    "scrollX": true,
+                    "paging": true,
+                    // Internationalisation. For more info refer to http://datatables.net/manual/i18n
+                    "language": {
+                        "aria": {
+                            "sortAscending": ": activate to sort column ascending",
+                            "sortDescending": ": activate to sort column descending"
+                        },
+                        "emptyTable": "No data available in table",
+                        "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+                        "infoEmpty": "No entries found",
+                        "infoFiltered": "(filtered1 from MAX total entries)",
+                        //"lengthMenu": "MENU entries",
+                        "search": "Search",
+                        "zeroRecords": "No matching records found"
+                    },
+                    "pageLength": 10,
+                    "processing": true,
+                    "serverSide": true,
+                    "ajax": {
+                        async: true,
+                        url: '/Orders/GetOrders',
+                        type: "post",
+                        data: { 'search1': search1 }
+
+                    },
+                    "columns": [
+                        {
+                            "title": "", "data": null,
+                            "render": function () {
+                                let html = '';
+                                html += '<input type="checkbox"/>';
+                                return html;
+                            },
+                            "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Order", "data": "orders", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "ClientId", "data": "userId", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Trading Account", "data": "tradingAccount", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Order ID", "data": "orderId", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Side", "data": "side", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Equity Name", "data": "equityName", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Open DateTime", "data": "openTiming", "orderable": false, "width": "170px"
+                        },
+                        {
+                            "title": "Legal Entity", "data": "legalEntity", "orderable": false, "width": "150px"
+                        },
+                        {
+                            "title": "Open Price", "data": "openPrice",
+                            "render": function (data, type, row) {
+                                var html = "";
+                                html += "<input class='form-control' id='OpenPrice_" + countRuleInstrument + "' value=" + row.openPrice + ">";
+                                return html;
+                            },
+                            "width": "3%"
+                        },
+                        {
+                            "title": "Open Units", "data": "openUnits",
+                            "render": function (data, type, row) {
+                                var html = "";
+                                html += "<input class='form-control' id='OpenUnits_" + countRuleInstrument + "' value=" + row.openUnits + ">";
+                                return html;
+                            }, "width": "3%"
+                        },
+                        {
+                            "title": "SL", "data": "sl", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "TP", "data": "tp", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Close Price", "data": "closePrice",
+                            "render": function (data, type, row) {
+
+                                var html = "";
+                                html += "<input class='form-control' id='ClosePrice_" + countRuleInstrument + "' value=" + row.closePrice + ">";
+                                return html;
+                            },
+                            "width": "3%"
+                        },
+                        {
+                            "title": "Swaps", "data": "swap", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Commision", "data": "commision", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Profit", "data": "profit", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Leverage", "data": "leverage", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Comment", "data": "commentOfPosition", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Action", "data": "orderId",
+                            "render": function (data, type, row) {
+                                let htmlData = "";
+
+                                htmlData += "<button title='Delete Order' class='btn btn-sm btn-danger mr-1' onclick='DeleteOrders($(this));'><i class='fa fa-trash'></i></button>";
+                                htmlData += "<input type='hidden' value=" + row['orderId'] + " />"
+                                //htmlData += `<button title="Change Volume" class="btn btn-sm btn-danger mr-1" id="btnchangevolume" onclick="ChangeVolume($(this));"><i class="fa fa-map"></i></button>`;
+                                //htmlData += `<button title="Change Open Price" class="btn btn-sm btn-danger mr-1" id="btnchangeOpenPrice" onclick="ChangeOpenPrice($(this));"><i class="fa fa-map"></i></button>`;
+                                //htmlData += `<button title="Change Close Price" class="btn btn-sm btn-danger mr-1" id="btnchangeClosePrice" onclick="ChangeClosePrice($(this));"><i class="fa fa-map"></i></button>`;
+                                htmlData += "<button title='Save Changes' class='btn btn-success edt-rcd mr-1' onclick='SaveGridChanges(" + countRuleInstrument + "," + row['orderId'] + ");'><i class='fa fa-edit'></i></button>";
+                                htmlData += "<button title='Restore Order' class='btn btn-sm btn-danger mr-1' id='btnRestoreOrder' onclick='RestoreOrder($(this));'><i class='fa fa-map'></i></button>";
+                                htmlData += "<button title='Close Order' class='btn btn-sm btn-danger mr-1' id='btnCloseOrder' onclick='CloseOrder($(this));'><i class='fa fa-map'></i></button>";
+                                countRuleInstrument++;
+                                return htmlData;
+                            }
+                            , "orderable": false, "width": "110px"
+                        },
+                    ],
+                    "scrollX": true,
+                    "lengthMenu": [
+                        [5, 10, 15, 20, 1000],
+                        [5, 10, 15, 20, 1000] // change per page values here
+                    ],
+
+                });
+            }
+
+            return {
+                init: function () {
+                    if ($.fn.DataTable.isDataTable("#ordersList")) {
+                        $('#ordersList').dataTable().fnDestroy();
+                        //$('#divUserTable').html('<table class="table table-striped" width="100%" id="UserTable"></table>');
+                    }
+                    initTable1();
+                }
+            };
+        }();
+        $('#FileUpload').on('change', function (e) {
+            //get the file name
+            var fileName = e.target.files[0].name;
+            $(this).next('.custom-file-label').html(fileName);
+        })
+        $(document).on("submit", "#frmExcelForm", function (e) {
+            e.preventDefault();
+            var form = $(this);
+            form.ajaxSubmit({
+                beforeSubmit: function () {
+                    if (!form.valid()) {
+                        return false;
+                    }
+                    else {
+                        return true;
+                    }
+                },
+                success: function (res) {
+                    if (res.statusCode == 200) {
+                        $('#FileUpload').val('');
+                        $('#lblOrder').html('Choose File')
+                        NotifyMsg('success', res.message);
+                        //$('#divUploadFile').hide();
+                        window.location.href = "/Orders/index";
+                    } else {
+                        NotifyMsg('error', res.message);
+                    }
+                },
+                Errors: function () {
+                    console.log('error', res.message);
+                    NotifyMsg('error', res.message);
+                }
+            });
+            return false;
+        });
+        function ExportOrderData() {
+            debugger;
+            updateProgress(0);
+            var table1 = $('#ordersList').dataTable();
+
+            $("#ProcessModal").modal({ backdrop: 'static', keyboard: false });
+            $("#ProcessModal").focus();
+            $("#ProcessModal").modal('show');
+
+            var totalCnt = table1.fnSettings().fnRecordsTotal()
+            var Interval = totalCnt / 100;
+            Interval = Interval * 10;
+            var counter = totalCnt / 100;
+            counter = Math.round(10);
+            var intervalId = window.setInterval(function () {
+                if (counter < 90) {
+                    updateProgress(counter);
+                    counter = counter + 7;
+                }
+            }, Interval);
+
+            $.ajax({
+                type: "POST",
+                url: 'ExportOrderData',
+                //contentType: false,
+                dataType: "binary",
+                processData: false,
+                xhrFields: {
+                    'responseType': 'blob'
+                },
+                success: function (res) {
+                    debugger
+                    const date = new Date();
+                    let day = date.getDate();
+                    let month = date.getMonth() + 1;
+                    let year = date.getFullYear();
+                    let currentDate = `${day}_${month}_${year}`;
+                    $("#ProcessModal").modal("hide");
+                    clearInterval(intervalId);
+                    completeHandler();
+
+                    NotifyMsg('success', 'The file is exported');
+                    var link = document.createElement('a'),
+                        filename = "Orders_" + currentDate + ".xlsx";
+                    link.href = URL.createObjectURL(res);
+                    link.download = filename;
+                    link.click();
+                },
+                error: function (errorTemp) {
+                    NotifyMsg('error', errorTemp);
+                    console.log('error', errorTemp);
+                }
+            })
+        }
+
+        function updateProgress(count) {
+            $('.bar').css('width', count + '%');
+            $('.percent').text(count + '%');
+        }
+        function progressHandler(event) {
+            debugger;
+            if (event.lengthComputable) {
+                var percent = Math.round((event.loaded / event.total) * 100);
+
+                $("#ProcessModal").modal('show');
+                $('.bar').width(percent + "%");
+                $('.percent').html(percent + "%");
+            }
+        }
+        function completeHandler() {
+            $('.bar').width("100%");
+            $('.percent').html("100%");
+            $("#ProcessModal").modal('hide');
+        }
+    </script>
+}

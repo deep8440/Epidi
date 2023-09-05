@@ -1,0 +1,8 @@
+﻿@model List<Epidi.Models.ViewModel.CorporateActions.DividendDetailsViewModel>
+@{
+	Layout = null;
+}
+@foreach (var item in Model)
+{
+	@Html.Partial("DividendTableDetails", item)
+}

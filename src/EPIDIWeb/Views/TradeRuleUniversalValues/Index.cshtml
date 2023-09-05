@@ -1,0 +1,564 @@
+﻿@model List<TradeRuleUniversalValuesViewModel>
+@{
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+    ViewBag.PageTitle = "TradeRuleUniversalValues";
+    ViewBag.Method = "TradeRuleUniversalValues";
+}
+<style>
+    /* Chrome, Safari, Edge, Opera */
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    /* Firefox */
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+
+    .select2-container {
+        display: block;
+    }
+
+    h3 {
+        color: #dc3545 !important;
+        font-weight: bold;
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th, td {
+        text-align: left;
+        padding: 8px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
+    .progress {
+        display: block;
+        position: relative;
+        margin: 20px;
+        width: 425px;
+        background-color: #ddd;
+        border: 1px solid blue;
+        padding: 1px;
+        left: 40px;
+        border-radius: 3px;
+    }
+
+    .percent {
+        position: absolute;
+        display: inline-block;
+        color: #fff;
+        font-weight: bold;
+        top: 100%;
+        left: 50%;
+        margin-top: -9px;
+        margin-left: -20px;
+        -webkit-border-radius: 4px;
+    }
+
+    .bar {
+        background-color: #007bff;
+        width: 0%;
+        height: 30px;
+        border-radius: 4px;
+        -webkit-border-radius: 4px;
+        -moz-border-radius: 4px;
+    }
+
+    .my-custom-scrollbar {
+        position: relative;
+        height: 300px;
+        overflow: auto;
+    }
+
+    .table-wrapper-scroll-y {
+        display: block;
+    }
+
+</style>
+<div class="row">
+    <div class="col-12">
+        @using (Html.BeginForm("SaveTradeRuleUniversalValues", "TradeRuleUniversalValues", FormMethod.Post, new { id = "frmAdd" }))
+        {
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-3 text-left" id="divUploadFile">
+                            <div class="custom-file form-group" style="width:225px">
+                                <input type="file" id="FileUpload" name="FileUpload" class="custom-file-input">
+                                <label id="lblRule" class="custom-file-label" style="text-align:left" for="file">Choose TradeRule</label>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <button type="button" id="importToExcel" onclick="UploadFile()" class="form-control btn btn-info">Import TradeRuleUnivarsalValues</button>
+                        </div>
+                        <div class="col-5">
+                            <button type="button" data-toggle="modal" data-target="#btnPataAndActions" class="btn btn-outline-primary btn-uppercase float-right">Trade Rules Parameters</button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-7">
+                            @*<a href="/TradeRuleUniversalValues/ExportTradeRuleUniversalValuesExcel" class="btn btn-info float-sm-left mt-3">Export TradeRuleUnivarsalValues</a>*@
+                            <button type="button" class="btn btn-info float-sm-left mt-3" onclick="ExportTradeRuleUnivarsalValuesData()">Export TradeRuleUnivarsalValues</button>
+                        </div>
+                        <div class="col-5">
+                            <button type="button" data-toggle="modal" data-target="#btnActions" class="btn btn-outline-primary btn-uppercase float-right mt-3">Trade Rules Action</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="accordion">
+                        <div class="card card-info">
+                            <div class="card-header">
+                                <h3 class="card-title w-100">
+                                    <a class="d-block w-100 collapsed" data-toggle="collapse" href="#collapseOne" aria-expanded="false">
+                                        Instrument Rules
+                                    </a>
+                                </h3>
+                            </div>
+                            <div id="collapseOne" class="collapse show" data-parent="#accordion" style="overflow:auto">
+                                <div class="card-body">
+                                    <div id="DivInstrument">
+                                        <table id="tblInstrument">
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Priority</th>
+                                                <th>Values</th>
+                                                <th>Formulas <i class="fa fa-info-circle" title="Client Open Req Price &#10 Current Market Price &#10 Symbol Points &#10 LPHedgeOrderperClientID &#10 Current Price &#10 SL Req Price &#10 TP Req Price &#10 Client Open Price &#10 Floating &#10 Available Balance &#10 LPOpenPrice &#10 LPCurrent Price"></i></th>
+                                                <th>ActionsDefintiions</th>
+                                                <th>Function</th>
+                                                <th>Table</th>
+                                                <th>WhenToCheck</th>
+                                                <th>Comment</th>
+                                                <th>Action</th>
+                                                <th>Delete</th>
+                                            </tr>
+                                            @for (int i = 0; i < Model.Count; i++)
+                                            {
+                                                @Html.Partial("EditTradeRuleUniversalValues", Model[i])
+                                            }
+                                        </table>
+
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+
+        }
+        <!-- /.card -->
+
+        <div class="modal fade" id="btnPataAndActions" role="dialog">
+            <div class="modal-dialog" style="max-width:800px;">
+                >
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        @*<h4 class="modal-title">Modal Header</h4>*@
+                    </div>
+                    <div class="modal-body">
+                        <div class="table-wrapper-scroll-y my-custom-scrollbar">
+                        @*<p>Some text in the modal.</p>*@
+                        <table id="tblPataAndActions" class="table table-bordered table-striped mb-0">
+                            <thead>
+                                <tr>
+                                    <th colspan="2" style="text-align:center;">Universal Parameters Values</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><b>Name</b></td>
+                                    <td><b>Comment</b></td>
+                                </tr>
+                                <tr>
+                                    <td>Floating</td>
+                                    <td>This is the Client Total Profit on open positions</td>
+                                </tr>
+                                <tr>
+                                    <td>Avaialble Balance</td>
+                                    <td>This is the avaialble Balance of the Client</td>
+                                </tr>
+                                <tr>
+                                    <td>LPClose</td>
+                                    <td>This will be when the formula is reached then the respective LP position will be closed</td>
+                                </tr>
+                                <tr>
+                                    <td>LPOpen</td>
+                                    <td>This will be when the formula is reached then the respective LP position will be open</td>
+                                </tr>
+                                <tr>
+                                    <td>LPCurrentPriceAsk</td>
+                                    <td>This will be the LP Current Price ASK</td>
+                                </tr>
+                                <tr>
+                                    <td>LPCurrentPriceBid</td>
+                                    <td>This will be the LP Current Price BID</td>
+                                </tr><tr>
+                                    <td>LPOpenPrice</td>
+                                    <td>This is the LP Open price for the specific position</td>
+                                </tr>
+                                <tr>
+                                    <td>Open Price</td>
+                                    <td>This is the Open Price of the Client Order</td>
+                                </tr><tr>
+                                    <td>OpenReqPrice</td>
+                                    <td>This is the price that the client requested to open a position</td>
+                                </tr>
+                                <tr>
+                                    <td>CloseReqPrice</td>
+                                    <td>This is the price that the client requested to close a position</td>
+                                </tr>
+                                <tr>
+                                    <td>Close Price</td>
+                                    <td>This is the Close Price of the Client Order</td>
+                                </tr>
+                                <tr>
+                                    <td>Current Bid</td>
+                                    <td>This will be the current Bid of the respective LP</td>
+                                </tr>
+                                <tr>
+                                    <td>Current Ask</td>
+                                    <td>This will be the current Ask of the respective LP</td>
+                                </tr>
+                                <tr>
+                                    <td>SLTriggeredPrice</td>
+                                    <td>This will be the Stop Loss Triggered Price will be the value to be provided</td>
+                                </tr>
+                                <tr>
+                                    <td>SLReqPRice</td>
+                                    <td>This will be the SLReqPrice will be the value to be provided</td>
+                                </tr>
+                                <tr>
+                                    <td>SLPRice</td>
+                                    <td>This will be the Stop Loss price the client has set</td>
+                                </tr>
+                                <tr>
+                                    <td>TPTriggeredPrice</td>
+                                    <td>This will be the Take Pofit Triggered Price will be the value to be provided</td>
+                                </tr>
+                                <tr>
+                                    <td>TPReqPrice</td>
+                                    <td>This will be the TPReqPrice will be the value to be provided</td>
+                                </tr>
+                                <tr>
+                                    <td>TPPrice</td>
+                                    <td>This will be Take Profit Price the client has set</td>
+                                </tr>
+                                <tr>
+                                    <td>MarginLevel</td>
+                                    <td>This will the margin level of the Client</td>
+                                </tr>
+                                <tr>
+                                    <td>Decimals</td>
+                                    <td>This is the master instrument table decimals specificaiton</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="modal fade" id="btnActions" role="dialog">
+            <div class="modal-dialog" style="max-width:800px;">
+                >
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        @*<h4 class="modal-title">Modal Header</h4>*@
+                    </div>
+                    <div class="modal-body">
+                        <div class="table-wrapper-scroll-y my-custom-scrollbar">
+                            @*<p>Some text in the modal.</p>*@
+                            <table id="tblPataAndActions" class="table table-bordered table-striped mb-0">
+                                <thead>
+                                    <tr>
+                                        <th colspan="2" style="text-align:center;">Actions Defintions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><b>Name</b></td>
+                                        <td><b>Description</b></td>
+                                    </tr>
+                                    <tr>
+                                        <td>OnOpen</td>
+                                        <td>This is when the client is requesting to OPEN a positon</td>
+                                    </tr>
+                                    <tr>
+                                        <td>OnClose</td>
+                                        <td>This is when the client is requesting to CLOSE a position</td>
+                                    </tr>
+                                    <tr>
+                                        <td>OnStopLoss</td>
+                                        <td>This is when the client position is requested to close by the stop loss</td>
+                                    </tr>
+                                    <tr>
+                                        <td>OnTakeProfit</td>
+                                        <td>This is when the client position is requested to close by the take profit</td>
+                                    </tr>
+                                    <tr>
+                                        <td>AfterOpen</td>
+                                        <td>This is cehcked after the position is opened</td>
+                                    </tr>
+                                    <tr>
+                                        <td>LPClose</td>
+                                        <td>Close the respective position on the LP</td>
+                                    </tr>
+                                    <tr>
+                                        <td>LPOpen</td>
+                                        <td>Open the respective position to the LP</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    <!-- /.col -->
+</div>
+<div class="modal fade" id="ProcessModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <h1>Processing...</h1>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="col-6">
+                    <div class="progress">
+                        <div class="bar"></div>
+                        <div class="percent">0%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+    {
+    @*<script src="~/js/jquery-validation/jquery.validate.min.js"></script>
+    <script src="~/js/jquery-validation/additional-methods.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>*@
+    <script>
+
+        $(document).ready(() => {
+
+            //tradeRuleUniversalValues.init();
+
+            //$("body").on("click", "#btnAddTradeRuleUniversalValues", function () {
+            //    AddModal("/TradeRuleUniversalValues/AddTradeRuleUniversalValues", "Add New TradeRule Universal Value")
+            //});
+
+            //$("body").on("click", "#btnPataAndActions", function () {
+
+            //    AddModal("/TradeRuleUniversalValues/AddTradeRuleUniversalValues", "Show Trade Rulles Para and Action )
+            //});
+            //$('#tblPataAndActions').DataTable({
+            //    "scrollY": "50px",
+            //    "scrollCollapse": true,
+            //});
+
+            $('#FileUpload').on('change', function (e) {
+                var fileName = e.target.files[0].name;
+                $(this).next('.custom-file-label').html(fileName);
+            })
+
+            $(document).on("submit", "#frmAdd", function (e) {
+                debugger
+                e.preventDefault();
+
+                var form = $(this);
+                form.ajaxSubmit({
+                    beforeSubmit: function () {
+                        //if (!form.valid()) {
+
+                        //    return false;
+                        //}
+                        //else {
+
+                        //    return true;
+                        //}
+                    },
+                    success: function (res) {
+                        debugger
+                        if (res.statusCode == 200) {
+
+                            NotifyMsg('success', res.message);
+                            location.reload();
+
+                        } else {
+                            NotifyMsg('error', res.message);
+                        }
+                    },
+                    Errors: function () {
+                        NotifyMsg('error', "error occured");
+                    }
+                });
+                return false;
+            });
+
+            $("body").on("click", ".deleteitem", function () {
+                debugger;
+                var tblid = $(this).closest("tr").attr('id');
+                var id = $(this).closest("tr").find("#hdnId").val();
+
+
+                $.ajax({
+                    type: "GET",
+                    url: '/TradeRuleUniversalValues/TradeRuleUniversalValuesDelete',
+                    dataType: "json",
+                    data: { Id: id },
+                    success: function (res) {
+                        debugger;
+                        if (res[0].code == 200) {
+
+                            $("#" + tblid).remove();
+                            NotifyMsg('success', res[0].message);
+                        }
+                        else {
+                            NotifyMsg('error', res[0].message);
+                        }
+                    },
+                    error: function (errorTemp) {
+                        NotifyMsg('error', errorTemp);
+                        console.log('error', errorTemp);
+                    }
+                })
+            });
+
+        });
+
+        function UploadFile() {
+
+            var fdata = new FormData();
+
+            //var fileInput = $('#FileUpload');
+            var fileInput = document.getElementById('FileUpload');
+            fdata.append("FileUpload", fileInput.files[0]);
+
+
+            $.ajax({
+                type: "POST",
+                url: '/TradeRuleUniversalValues/ImportTradeRuleUniversalValuesExcel',
+                data: fdata,
+                processData: false,
+                contentType: false,
+                dataType: "json",
+                success: function (res) {
+                    debugger;
+                    if (res != null) {
+
+                        $('#FileUpload').val('');
+                        $('#lblRule').html('Choose File')
+                        NotifyMsg('success', res.message);
+                        location.reload();
+                    }
+                    else {
+                        NotifyMsg('error', res.message);
+                    }
+                },
+                error: function (errorTemp) {
+                    debugger;
+                    NotifyMsg('error', errorTemp);
+                    console.log('error', errorTemp);
+                }
+            })
+        }
+        function ExportTradeRuleUnivarsalValuesData() {
+            debugger;
+            updateProgress(0);
+            var table1 = $('#tblInstrument tr').length;
+
+            //$("#ProcessModal").modal({ backdrop: 'static', keyboard: false });
+            //$("#ProcessModal").focus();
+            $("#ProcessModal").modal('show');
+
+            var totalCnt = table1;//.fnSettings().fnRecordsTotal()
+            var counter = totalCnt / 100;
+            counter = Math.round(counter);
+            var intervalId = window.setInterval(function () {
+                if (counter < 90) {
+                    updateProgress(counter);
+                    counter = counter + 7;
+                }
+            }, 1000);
+
+            $.ajax({
+                type: "POST",
+                url: 'ExportTradeRuleUniversalValuesExcel',
+                //contentType: false,
+                dataType: "binary",
+                processData: false,
+                xhrFields: {
+                    'responseType': 'blob'
+                },
+                success: function (res) {
+
+                    const date = new Date();
+                    let day = date.getDate();
+                    let month = date.getMonth() + 1;
+                    let year = date.getFullYear();
+                    let currentDate = `${day}_${month}_${year}`;
+                    $("#ProcessModal").modal("hide");
+                    updateProgress(0);
+                    clearInterval(intervalId);
+                    //completeHandler();
+
+                    NotifyMsg('success', 'The file is exported');
+                    var link = document.createElement('a'),
+                        filename = "TradeRuleUniversalValues_" + currentDate + ".xlsx";
+                    link.href = URL.createObjectURL(res);
+                    link.download = filename;
+                    link.click();
+                    completeHandler();
+                },
+                error: function (errorTemp) {
+                    NotifyMsg('error', errorTemp);
+                    console.log('error', errorTemp);
+                }
+            })
+        }
+        function updateProgress(count) {
+            $('.bar').css('width', count + '%');
+            $('.percent').text(count + '%');
+        }
+        function completeHandler() {
+            $('.bar').width("100%");
+            $('.percent').html("100%");
+            $("#ProcessModal").modal('hide');
+        }
+    </script>
+}

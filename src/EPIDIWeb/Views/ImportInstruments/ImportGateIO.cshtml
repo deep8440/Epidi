@@ -1,0 +1,194 @@
+﻿@{
+    ViewBag.PageTitle = "Import Instrument";
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+    ViewBag.Method = "Instrument Mapping";
+}
+
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-6">
+                        @using (Html.BeginForm("UploadGateIOInstrumentsExcel", "ImportInstruments", FormMethod.Post, new { enctype = "multipart/form-data", id = "frmGATEIOExcelForm" }))//onsubmit = "return myFunction()"
+                        {
+                            <div class="custom-file form-group float-sm-left mr-3" style="width:230px">
+                                <input type="file" id="FileUpload" name="FileUpload" class="custom-file-input">
+                                <label id="GatelblName" class="custom-file-label" style="text-align:left" for="file">Choose GATEIO Instrument</label>
+                            </div>
+                            <button type="submit" class="btn btn-info form-group float-sm-left mr-3 ">Import GATEIO Instruments</button>
+                        }
+                    </div>
+                </div>
+
+            </div>
+            <div class="card-body">
+                <table id="gateIO" class="table table-bordered table-striped">
+                </table>
+            </div>
+        </div>
+        <!-- /.card -->
+    </div>
+    <!-- /.col -->
+</div>
+@section Scripts
+    {
+    <script src="~/js/jquery-validation/jquery.validate.min.js"></script>
+    <script src="~/js/jquery-validation/additional-methods.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+    
+    <script>
+        $(document).ready(() => {
+
+            GATEIOInstrumentDataTable.init();
+
+            $('#FileUpload').on('change', function (e) {
+                //get the file name
+                var fileName = e.target.files[0].name;
+                $(this).next('.custom-file-label').html(fileName);
+            })
+
+            $(document).on("submit", "#frmGATEIOExcelForm", function (e) {
+                e.preventDefault();
+                debugger
+                var form = $(this);
+                form.ajaxSubmit({
+                    beforeSubmit: function () {
+                        if (!form.valid()) {
+
+                            return false;
+                        }
+                        else {
+
+                            return true;
+                        }
+                    },
+                    success: function (res) {
+                        debugger
+                        if (res.statusCode == 200) {
+                            $('#FileUpload').val('');
+                            $('#GatelblName').html('Choose GATEIO Instrument')
+                            NotifyMsg('success', res.message);
+
+                        } else {
+                            NotifyMsg('error', res.message);
+                        }
+                    },
+                    Errors: function () {
+
+                        NotifyMsg('error', res.message);
+                    }
+                });
+                return false;
+            });
+
+        });
+
+        var GATEIOInstrumentDataTable = function () {
+            let initTable1 = function () {
+                let table = $('#gateIO');
+
+                let oTable = table.dataTable({
+                    "stateSave": true,
+                    "autoWidth": false,
+                    "paging": true,
+                    // Internationalisation. For more info refer to http://datatables.net/manual/i18n
+                    "language": {
+                        "aria": {
+                            "sortAscending": ": activate to sort column ascending",
+                            "sortDescending": ": activate to sort column descending"
+                        },
+                        "emptyTable": "No data available in table",
+                        "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+                        "infoEmpty": "No entries found",
+                        "infoFiltered": "(filtered1 from MAX total entries)",
+                        //"lengthMenu": "MENU entries",
+                        "search": "Search:",
+                        "zeroRecords": "No matching records found"
+                    },
+                    "pageLength": 10,
+                    "processing": true,
+                    "serverSide": true,
+                    "ajax": {
+                        async: false,
+                        url: '/ImportInstruments/All_Import_GATEIO',
+                        type: "post",
+                    },
+                    "columns": [
+
+                        {
+                            "title": "Name", "data": "name", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Base", "data": "base", "orderable": false, "width": "1%"
+                        },
+                        {
+                            "title": "Quote", "data": "quote", "orderable": false, "width": "1%"
+                        },
+                        {
+                            "title": "Fee", "data": "fee", "orderable": false, "width": "1%"
+                        },
+                        {
+                            "title": "MinBaseAmount", "data": "minBaseAmount", "orderable": false, "width": "1%"
+                        },
+                        {
+                            "title": "MinQuoteAmount", "data": "minQuoteAmount", "orderable": false, "width": "1%"
+                        },
+                        {
+                            "title": "AmountPrecision", "data": "amountPrecision", "orderable": false, "width": "1%"
+                        },
+                         {
+                            "title": "Precision", "data": "precision", "orderable": false, "width": "1%"
+                        },
+                        {
+                            "title": "SellStart", "data": "sellStart", "orderable": false, "width": "1%"
+                        },
+                        {
+                            "title": "BuyStart", "data": "buyStart", "orderable": false, "width": "1%"
+                        },
+                        {
+                            "title": "Action", "data": "id",
+                            "render": function (data, type, row) {
+                                let htmlData = "";
+
+                                htmlData += '<input type="hidden" value=' + row['id'] + ' />'
+                                htmlData += `<button title="Edit TradeTiming" class="btn btn-sm btn-success mr-1" onclick="GetTradeTimingById($(this));"><i class="fa fa-edit"></i></button>`;
+                                htmlData += `<button title="Delete TradeTiming" class="btn btn-sm btn-danger mr-1" onclick="DeleteTradeTiming($(this));"><i class="fa fa-trash"></i></button>`;
+                                return htmlData;
+                            }
+                            , "orderable": false, "width": "3%"
+                        },
+                    ],
+
+                    // setup responsive extension: http://datatables.net/extensions/responsive/
+                    responsive: true,
+
+                    "lengthMenu": [
+                        [5, 10, 15, 20, 1000],
+                        [5, 10, 15, 20, 1000] // change per page values here
+                    ],
+                    // set the initial value
+
+                    //"dom": "<'row' <'col-md-12'B>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'f>r><'table-scrollable't><'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>", // horizobtal scrollable datatable
+
+                    // Uncomment below line("dom" parameter) to fix the dropdown overflow issue in the datatable cells. The default datatable layout
+                    // setup uses scrollable div(table-scrollable) with overflow:auto to enable vertical scroll(see: assets/global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js).
+                    // So when dropdowns used the scrollable div should be removed.
+                    //"dom": "<'row' <'col-md-12'T>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'f>r>t<'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>",
+                });
+            }
+
+            return {
+                init: function () {
+                    if ($.fn.DataTable.isDataTable("#TradeTimingList")) {
+                        $('#TradeTimingList').dataTable().fnDestroy();
+                        //$('#divUserTable').html('<table class="table table-striped" width="100%" id="UserTable"></table>');
+                    }
+                    initTable1();
+                }
+            };
+        }();
+
+    </script>
+}

@@ -1,0 +1,33 @@
+﻿@model CountryWiseDocumentViewModel
+@{
+    Layout = null;
+}
+
+<div class="row">
+    <input type="hidden" id="countryWiseDocumentData" />
+    <div class="col-6">
+        <div class="form-group">
+            @Html.LabelFor(model => model.CountryName, "CountryName")
+            @Html.DropDownListFor(model => model.CountryId, new SelectList(ViewBag.CountryList, "Value", "Text", Model.CountryId), "-- Select Country --", new { @class = "form-control js-select2" ,@name="CountryName" })
+        </div>
+    </div>
+
+</div>
+<div class="row">
+    <div class="col-12">
+        <table id="tblDocuments" style="width:52%"></table>
+    </div>
+</div>
+<div class="row col-12 mt-1">
+    @*style="float: right;"*@
+    <div class="form-group">
+        <button type="button" onclick="AddMoreDocument();" id="addMoreDcoument" class="btn btn-primary">Add</button>
+    </div>
+</div>
+<div id="dvError" class="row col-12 mt-5 hide" style="display:none;">
+    <label id="lblDocumentError" class="error">Please add document/s.</label>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-primary" onclick="SaveCountryWiseDocumentData();">Save</button>
+</div>
+

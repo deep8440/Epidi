@@ -1,0 +1,571 @@
+﻿@{
+}
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <!-- Brand Logo -->
+    <a href="index3.html" class="brand-link">
+        <img src="~/lib/images/Logo.jpeg" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+        <span class="brand-text font-weight-light">EPIDI</span>
+    </a>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <!-- Sidebar Menu -->
+        <nav class="mt-2">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                <!-- Add icons to the links using the .nav-icon class
+                     with font-awesome or any other icon font library -->
+                <li class="nav-item">
+                    <a href="/ChangePassword/Index" class="nav-link">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>Change Password</p>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="/Home/Index" class="nav-link">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>Dashboard</p>
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="#" class="nav-link parent">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>
+                            Registration
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item" style="margin-left: 30px;">
+                            <a href="/Country/Index" class="nav-link">
+                                <i class="nav-icon far fa-map"></i>
+                                <p>
+                                    Country
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item" style="margin-left: 30px;">
+                            <a href="/Step/Index" class="nav-link">
+                                <i class="nav-icon fa fa-list-ol"></i>
+                                <p>
+                                    Steps
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item" style="margin-left: 30px;">
+                            <a href="/Questions/Index" class="nav-link">
+                                <i class="nav-icon fas fa-question"></i>
+                                <p>
+                                    Question
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item" style="margin-left: 30px;">
+                            <a href="/CountryWiseDocument/Index" class="nav-link">
+                                <i class="nav-icon far fa-image"></i>
+                                <p>
+                                    Documents per Country
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item" style="margin-left: 30px;">
+                            <a href="/TermsCondition/Index" class="nav-link">
+                                <i class="nav-icon far fa-image"></i>
+                                <p>
+                                    T&Cs
+                                </p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link parent">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>
+                            LP Instruments
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item" style="margin-left: 30px;">
+                            <a href="/MasterLP/Index" class="nav-link">
+                                <i class="nav-icon fa fa-hand-usd"></i>
+                                <p>
+                                    Master LP
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item" style="margin-left: 30px;">
+                            <a href="/InstrumentMapping/Index" class="nav-link">
+                                <i class="nav-icon fa fa-regular fa-money-bill"></i>
+                                <p>
+                                    Instrument Mapping
+                                </p>
+                            </a>
+                        </li>
+                         <li class="nav-item" style="margin-left: 30px;">
+                            <a href="/InstrumentSpecification/Index" class="nav-link">
+                                <i class="nav-icon fa fa-regular fa-money-bill"></i>
+                                <p>
+                                    LP Instrument Specification
+                                </p>
+                            </a>
+                        </li>
+                        @*<li class="nav-item" style="margin-left: 30px;">
+                        <a href="/TradeTiming/Index" class="nav-link">
+                        <i class="nav-icon fa fa-chart-line"></i>
+                        <p>
+                        Trade Timing
+                        </p>
+                        </a>
+                        </li>
+                        <li class="nav-item" style="margin-left: 30px;">
+                        <a href="/QuoteTiming/Index" class="nav-link">
+                        <i class="nav-icon fa fa-clock"></i>
+                        <p>
+                        Quote Timing
+                        </p>
+                        </a>
+                        </li>*@
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link parent">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>
+                            Internal Instruments
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item" style="margin-left: 30px;">
+                            <a href="/ImportInstruments/Index" class="nav-link">
+                                <i class="nav-icon fa fa-regular fa-money-bill"></i>
+                                <p>
+                                    Specifications
+                                </p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link parent">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>
+                            Quotes
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item" style="margin-left: 30px;">
+                            <a href="/Math/Index" class="nav-link">
+                                <i class="nav-icon far fa-image"></i>
+                                <p>
+                                    SkipRule
+                                </p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item" style="margin-left: 30px;">
+                            <a href="/QuoteMarkUpRule/Index" class="nav-link">
+                                <i class="nav-icon far fa-image"></i>
+                                <p>
+                                    Quote MarkUp Rule
+                                </p>
+                            </a>
+                        </li>
+                        @*<li class="nav-item" style="margin-left: 30px;">
+                        <a href="/LeverageRules/Index" class="nav-link">
+                        <i class="nav-icon fa fa-book"></i>
+                        <p>
+                        Leverage rules
+                        </p>
+                        </a>
+                        </li>*@
+                    </ul>
+                </li>
+
+                @*<li class="nav-item">
+                <a href="/TradeTiming/Index" class="nav-link">
+                <i class="nav-icon fa fa-chart-line"></i>
+                <p>
+                Trade Timing
+                </p>
+                </a>
+                </li>
+                <li class="nav-item">
+                <a href="/QuoteTiming/Index" class="nav-link">
+                <i class="nav-icon fa fa-clock"></i>
+                <p>
+                Quote Timing
+                </p>
+                </a>
+                </li>*@
+                <li class="nav-item">
+                    <a href="#" class="nav-link parent">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>
+                            Execution
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        @*<li class="nav-item" style="margin-left: 30px;">
+                            <a href="#" class="nav-link">
+                                <i class="nav-icon far fa-image"></i>
+                                <p>
+                                    Rule
+                                </p>
+                            </a>
+                        </li>*@
+                        <li class="nav-item" style="margin-left: 30px;">
+                            <a href="/TradeRule/Index" class="nav-link">
+                                <i class="nav-icon far fa-image"></i>
+                                <p>
+                                    Trade Rule
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item" style="margin-left: 30px;">
+                            <a href="/TradeRuleUniversalValues/Index" class="nav-link">
+                                <i class="nav-icon far fa-image"></i>
+                                <p>
+                                    TradeRule Universal Values
+                                </p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link parent">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>
+                            Payments
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item" style="margin-left: 30px;">
+                            <a href="/PayInoutRequest/Index" class="nav-link">
+                                <i class="fa fa-indent"></i>
+                                <p>
+                                    PayInout Request
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item" style="margin-left: 30px;">
+                            <a href="/UserTransactions/Index" class="nav-link">
+                                <i class="nav-icon far fa-image"></i>
+                                <p>
+                                    User Transactions
+                                </p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link parent">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>
+                            Leverage & Margin
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item" style="margin-left: 30px;">
+                            <a href="/LevarageRuleImport/Index" class="nav-link">
+                                <i class="nav-icon far fa-image"></i>
+                                <p>
+                                    Levarage
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item" style="margin-left: 30px;">
+                            <a href="/Margin/Index" class="nav-link">
+                                <i class="nav-icon far fa-image"></i>
+                                <p>
+                                    Margin
+                                </p>
+                            </a>
+                        </li>
+                         <li class="nav-item" style="margin-left: 30px;">
+                            <a href="/MarginRule/Index" class="nav-link">
+                                <i class="nav-icon far fa-image"></i>
+                                <p>
+                                    Margin Rule
+                                </p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link parent">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>
+                            IB & BDM
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item" style="margin-left: 30px;">
+                            <a href="/BDM/Index" class="nav-link">
+                                <i class="nav-icon fa fa-user-tie"></i>
+                                <p>
+                                    BDM
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item" style="margin-left: 30px;">
+                            <a href="/IB/IBListing" class="nav-link">
+                                <i class="nav-icon fa fa-sitemap"></i>
+                                <p>
+                                    IB
+                                </p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item" style="margin-left: 30px;">
+                            <a href="/IBLimit/index" class="nav-link">
+                                <i class="nav-icon fa fa-sitemap"></i>
+                                <p>
+                                    IBLimit
+                                </p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link parent">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>
+                            Swaps
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        @*<li class="nav-item" style="margin-left: 30px;">
+                            <a href="#" class="nav-link">
+                                <i class="nav-icon fa fa-user-tie"></i>
+                                <p>
+                                    Swaps
+                                </p>
+                            </a>
+                        </li>*@
+                         @*<li class="nav-item" style="margin-left: 30px;">
+                            <a href="/TradeRule/Index" class="nav-link">
+                                <i class="nav-icon fa fa-book"></i>
+                                <p>
+                                    Trade rules
+                                </p>
+                            </a>
+                        </li>*@
+                        <li class="nav-item" style="margin-left: 30px;">
+                            <a href="/SwapRule/Index" class="nav-link">
+                                <i class="nav-icon fa fa-book"></i>
+                                <p>
+                                    Swap rules
+                                </p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="nav-item">
+                    <a href="#" class="nav-link parent">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>
+                            Commissions
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item" style="margin-left: 30px;">
+                            <a href="/CommissionRule/Index" class="nav-link">
+                                <i class="nav-icon fa fa-user-tie"></i>
+                                <p>
+                                    Commissions & Fees
+                                </p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="" class="nav-link parent">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>
+                            Promotions
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item" style="margin-left: 30px;">
+                            <a href="/Promotion/Index" class="nav-link">
+                                <i class="nav-icon fa fa-user-tie"></i>
+                                <p>
+                                    Promotions
+                                </p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="" class="nav-link parent">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>
+                            Order Management
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item" style="margin-left: 30px;">
+                            <a href="/Orders/Index" class="nav-link">
+                                <i class="nav-icon fa fa-user-tie"></i>
+                                <p>
+                                    Orders
+                                </p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link parent">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>
+                            Corporate Actions
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item" style="margin-left: 30px;">
+                            <a href="/CorporateActions/Index" class="nav-link">
+                                <i class="nav-icon fa fa-user-tie"></i>
+                                <p>
+                                    Corporate Actions
+                                </p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                @*<li class="nav-item">
+                    <a href="#" class="nav-link parent">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>
+                            Fees
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item" style="margin-left: 30px;">
+                            <a href="#" class="nav-link">
+                                <i class="nav-icon fa fa-user-tie"></i>
+                                <p>
+                                    Fees
+                                </p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>*@
+                <li class="nav-item">
+                    <a href="#" class="nav-link parent">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>
+                            Users
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="/Users/Index" class="nav-link">
+                                <i class="fa fa-users"></i>
+                                <p>
+                                    Users
+                                </p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link parent">
+                        <i class="far fa-circle nav-icon"></i>
+                        <p>
+                            CRM
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item" style="margin-left: 30px;">
+                            <a href="/CRM/Index" class="nav-link">
+                                <i class="nav-icon fa fa-hand-usd"></i>
+                                <p>
+                                    CRM
+                                </p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="/LegalEntity/Index" class="nav-link">
+                        <i class="nav-icon far fa-image"></i>
+                        <p>
+                            Legal Entity
+                        </p>
+                    </a>
+                </li>
+                @*<li class="nav-item">
+                    <a href="/Promotion/Index" class="nav-link">
+                        <i class="nav-icon far fa-image"></i>
+                        <p>
+                            Promotion
+                        </p>
+                    </a>
+                </li>*@
+                <li class="nav-item">
+                    <a href="/" class="nav-link">
+
+                        <i class="nav-icon fa fa-power-off"></i>
+                        <p>
+                            Log out
+                        </p>
+                    </a>
+                </li>
+
+                @*<li class="nav-item">
+                    <a href="/IB/IBCommMarkUpSettingInstWise" class="nav-link">
+                        <a href="/LPWiseInstrumentPriority/Index" class="nav-link">
+                            <i class="nav-icon far fa-image"></i>
+                            <p>
+                                LP Wise Instrument Priority
+                            </p>
+                        </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/MarkupRuleVsUserId/Index" class="nav-link">
+                        <i class="nav-icon far fa-image"></i>
+                        <p>
+                            Markup Rule Vs UserId
+                        </p>
+                    </a>
+                </li>*@
+
+            </ul>
+        </nav>
+        <!-- /.sidebar-menu -->
+    </div>
+    <!-- /.sidebar -->
+</aside>
+<script src="https://code.jquery.com/jquery-3.6.3.slim.min.js" integrity="sha256-ZwqZIVdD3iXNyGHbSYdsmWP//UBokj2FHAxKuSBKDSo=" crossorigin="anonymous"></script>
+<script>
+    var url = window.location;
+    const allLinks = document.querySelectorAll('.nav-item a');
+    const currentLink = [...allLinks].filter(e => {
+        return e.href == url;
+    });
+
+    //currentLink[0].classList.add("active")
+    if (currentLink[0].closest(".nav-treeview") != null) {
+        currentLink[0].closest(".nav-treeview").style.display = "block";
+        currentLink[0].closest(".nav-treeview").parentNode.classList.add("menu-is-opening", "menu-open");
+        currentLink[0].closest(".nav-treeview").parentNode.children[0].classList.add("active");
+    }
+</script>

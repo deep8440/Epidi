@@ -1,0 +1,77 @@
+﻿@model TradeRuleUniversalValuesViewModel
+@{
+    Layout = null;
+}
+
+@using (Html.BeginForm("SaveTradeRuleUniversalValues", "TradeRuleUniversalValues", FormMethod.Post, new { id = "tradeRuleUniversalValuesForm" }))
+{
+    <div class="row">
+        <div class="col-6">
+            <div class="form-group">
+                @Html.HiddenFor(p => p.Id)
+                @Html.LabelFor(model => model.Priority,"Priority")
+                @Html.TextBoxFor(p => p.Priority, new { @class = "form-control", @placeholder = "Priority" ,@name="Priority" })
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.Values,"Values")
+                @Html.TextBoxFor(p => p.Values, new { @class = "form-control", @placeholder = "Values" ,@name="Values"})
+            </div>
+        </div>
+        <div class="col-11">
+            <div class="form-group">
+                @Html.LabelFor(model => model.Formulas, "Formulas")
+                @Html.TextBoxFor(p => p.Formulas, new { @class = "form-control", @placeholder = "Formulas" ,@name="Values"})
+            </div>
+        </div>
+        <div class="col-1">
+            <div class="form-group">
+                <span data-toggle="tooltip" title="Client Open Req Price &#10 Current Market Price &#10 Symbol Points &#10 LPHedgeOrderperClientID &#10 Current Price &#10 SL Req Price &#10 TP Req Price &#10 Client Open Price &#10 Floating &#10 Available Balance &#10 LPOpenPrice &#10 LPCurrent Price"><i class="fa fa-info-circle" style="margin-top:40px"></i></span>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.ActionDefinationName, "Action Defination")
+                @Html.DropDownListFor(model => model.ActionsDefintiionsId, new SelectList(ViewBag.ActionsDefintiions, "Value", "Text", Model.ActionsDefintiionsId), "-- Select ActionsDefintiions --", new { @class = "form-control js-select2" ,onchange = "",@name="ActionsDefintiions" })
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.FunctionsId, "Functions")
+                @Html.DropDownListFor(model => model.FunctionsId, new SelectList(ViewBag.Functions, "Value", "Text", Model.FunctionsId), "-- Select Function --", new { @class = "form-control js-select2" ,onchange = "",@name="Functions" })
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.TablesId, "Tables")
+                @Html.DropDownListFor(model => model.TablesId, new SelectList(ViewBag.Tables, "Value", "Text", Model.TablesId), "-- Select Table --", new { @class = "form-control js-select2" ,onchange = "",@name="Tables" })
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.WhenToCheck, "WhenToCheck")
+                @Html.DropDownListFor(model => model.WhenToCheckId, new SelectList(ViewBag.WhenToCheck, "Value", "Text", Model.WhenToCheckId), "-- Select WhenToCheck --", new { @class = "form-control js-select2" ,onchange = "",@name="WhenToCheck" })
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="form-group">
+                @Html.LabelFor(model => model.Comment,"Comment")
+                @Html.TextAreaFor(p => p.Comment, new { @class = "form-control", @placeholder = "Comment" ,@name="Comment"})
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.Action, "Action")
+                @Html.TextBoxFor(p => p.Action, new { @class = "form-control", @placeholder = "Action" ,@name="Action"})
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+}
+<script type="text/javascript">
+
+</script>

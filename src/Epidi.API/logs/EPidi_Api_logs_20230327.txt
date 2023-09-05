@@ -1,0 +1,10 @@
+2023-03-27 15:24:55.431 +05:30 [INF] User profile is available. Using 'C:\Users\Lenovo\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2023-03-27 15:24:57.088 +05:30 [INF] Creating key {feb87070-2d15-4bef-b6ce-ba78b58cb4cb} with creation date 2023-03-27 09:54:57Z, activation date 2023-03-27 09:54:56Z, and expiration date 2023-06-25 09:54:56Z.
+2023-03-27 15:24:57.111 +05:30 [INF] Writing data to file 'C:\Users\Lenovo\AppData\Local\ASP.NET\DataProtection-Keys\key-feb87070-2d15-4bef-b6ce-ba78b58cb4cb.xml'.
+2023-03-27 15:24:57.617 +05:30 [INF] Application started. Press Ctrl+C to shut down.
+2023-03-27 15:24:57.640 +05:30 [INF] Hosting environment: Development
+2023-03-27 15:24:57.640 +05:30 [INF] Content root path: C:\Projects\EPIDI\src\Epidi.API\
+2023-03-27 15:24:57.848 +05:30 [INF] Request starting HTTP/2 GET https://localhost:44395/weatherforecast - -
+2023-03-27 15:24:58.748 +05:30 [INF] Request finished HTTP/2 GET https://localhost:44395/weatherforecast - - - 404 - - 905.5880ms
+2023-03-27 15:25:40.778 +05:30 [INF] Request starting HTTP/2 GET https://localhost:44395/home - -
+2023-03-27 15:25:40.848 +05:30 [INF] Request finished HTTP/2 GET https://localhost:44395/home - - - 404 - - 69.7810ms

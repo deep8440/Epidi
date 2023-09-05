@@ -1,0 +1,267 @@
+﻿@model DelistingViewModel
+@{
+    Layout = null;
+}
+
+<div class="row">
+    <div class="col-6">
+        <div class="form-group">
+            @Html.LabelFor(model => model.EquityName,"Equity Name*")
+            <select id="ddlDelistingEquity" class="form-control"></select>
+            <label id="lblDelistingEquity" class="error">Please select equity name.</label>
+        </div>
+    </div>
+</div>
+
+<div class="col-12">
+    <button type="button" onclick="GetCalculatedDelistingOrderDetails();" class="btn btn-primary">Show Orders</button>
+    <div />
+</div>
+<div class="row">
+    <div class="col-12">
+        <table id="tblDelistingEquityStockDetails" class="table table-responsive">
+            <thead>
+                <tr>
+                    <th><input type="checkbox" id="checkBoxAllDelisting"></th>
+                    <th>Client Id</th>
+                    <th>Trading Account</th>
+                    <th>Order Id</th>
+                    <th>Side Name</th>
+                    <th>Equity Name</th>
+                    <th>Open DateTime</th>
+                    <th>Legal Entity</th>
+                    <th>Open Price</th>
+                    <th>Open Units</th>
+                    <th>Close Price</th>
+                    <th>Swap</th>
+                    <th>Commission</th>
+                    <th>Profit</th>
+                    <th>Leverage</th>
+                    <th>Position</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="modal-footer">
+    <button id="btnDelistingSave" type="button" onclick="AddUpdateDelistingValue();" class="btn btn-primary">Apply Changes On Position</button>
+</div>
+
+<script type="text/javascript">
+    var countDelistingOrder = 1;
+    var CheckboxIdCount;
+    var CheckboxIdTotalCount = 0;
+
+    var selectedRows = [];
+    var AllselectedRows = [];
+
+    $(document).ready(() => {
+        $("#tblDelistingEquityStockDetails").hide();
+        $("#lblDelistingEquity").hide();
+        $("#btnDelistingSave").hide();
+
+        BindIntruments();
+    });
+    function BindIntruments() {
+        $.ajax({
+            async: false,
+            type: "POST",
+            url: '/CorporateActions/GetInstrumentsDropDown',
+            dataType: 'json',
+            data: {},
+            success: function (response) {
+                $("#ddlDelistingEquity").append(`<option value = "" > --Select--</option>`)
+                for (var i = 0; i < response.length; i++) {
+                    $("#ddlDelistingEquity").append(`<option value = "${response[i].value}"> ${response[i].text}</option>`)
+                }
+                $('#Loader').hide();
+            },
+            error: function (errorTemp) {
+                console.log('error', errorTemp);
+            }
+        });
+    }
+
+    function GetCalculatedDelistingOrderDetails() {
+        $("#lblDelistingEquity").hide();
+
+        if (IsValidate()) {
+            $('#Loader').show();
+            debugger;
+            var instrumentId = $("#ddlDelistingEquity").val();
+
+            var param = {};
+            param.InstrumentId = instrumentId;
+
+            $.ajax({
+                async: false,
+                type: "GET",
+                url: '/CorporateActions/GetCalculatedDelistingOrderDetails',
+                dataType: 'json',
+                data: param,
+                success: function (response) {
+                    console.log(response);
+                    debugger
+
+                    $("#tblDelistingEquityStockDetails tbody").empty();
+                    $("#lblDelistingEquity").hide();
+                    for (var i = 0; i < response.length; i++) {
+                        CheckboxIdCount = i;
+                        CheckboxIdTotalCount = CheckboxIdTotalCount + 1;
+                        BindGridWithDelistingStockDetails(response[i]);
+                    }
+                    $('#Loader').hide();
+                },
+                error: function (errorTemp) {
+                    console.log('error', errorTemp);
+                }
+            });
+        }
+    }
+
+    function BindGridWithDelistingStockDetails(response, equityType) {
+
+        $("#tblDelistingEquityStockDetails > thead > tr > th").removeAttr("style");
+
+        if (response != null) {
+
+            AllselectedRows.push(response.orderId);
+            var sdEquityData = "";
+
+            sdEquityData += '<tr>';
+            sdEquityData += '<td><input type="checkbox" onclick="unCheckValue(' + response.orderId + ',' + CheckboxIdCount + ')" id="checkDelisting' + CheckboxIdCount + '"></td>';
+            //sdEquityData += '<td>';
+            //sdEquityData += '<input style="width:30%" class="form-control" type="hidden" id ="orderId_' + countDelistingOrder + '">';
+            //sdEquityData += '<input style="width:30%" class="form-control" type="hidden" id ="position_' + countDelistingOrder + '">';
+            //sdEquityData += '<input style="width:30%" class="form-control" type="hidden" id ="openPrice_' + countDelistingOrder + '">';
+            //sdEquityData += '<input style="width:30%" class="form-control" type="hidden" id ="splitAdjustment_' + countDelistingOrder + '">';
+            //sdEquityData += '<input style="width:30%" class="form-control" type="hidden" id ="openUnitsAfterSplit_' + countDelistingOrder + '">';
+            //sdEquityData += '</td>';
+            sdEquityData += '<td>' + response.clientId + '</td>';
+            sdEquityData += '<td>' + response.tradingAccount + '</td>';
+            sdEquityData += '<td>' + response.orderId + '</td>';
+            sdEquityData += '<td>' + response.sideName + '</td>';
+            sdEquityData += '<td>' + response.equityName + '</td>';
+            sdEquityData += '<td>' + response.openTiming + '</td>';
+            sdEquityData += '<td>' + response.legalEntity + '</td>';
+            sdEquityData += '<td>' + response.openPrice + '</td>';
+            sdEquityData += '<td>' + response.openUnits + '</td>';
+            sdEquityData += '<td>' + response.closePrice + '</td>';
+            sdEquityData += '<td>' + response.swap + '</td>';
+            sdEquityData += '<td>' + response.commission + '</td>';
+            sdEquityData += '<td>' + response.profit + '</td>';
+            sdEquityData += '<td>' + response.leverage + '</td>';
+
+            if (response.position == "Open")
+                sdEquityData += '<td><span class="badge badge-success">' + response.position + '</span></td>';
+            else
+                sdEquityData += '<td><span class="badge badge-danger">' + response.position + '</span></td>';
+
+            sdEquityData += '</tr>';
+
+            debugger;
+
+            $("#tblDelistingEquityStockDetails tbody").append(sdEquityData);
+            $("#tblDelistingEquityStockDetails").show();
+            $("#btnDelistingSave").show();
+
+            $("#orderId_" + countDelistingOrder + "").val(response.orderId);
+            $("#position_" + countDelistingOrder + "").val(response.position);
+            $("#openPrice_" + countDelistingOrder + "").val(response.openPriceAfterSplit);
+            $("#splitAdjustment_" + countDelistingOrder + "").val(response.splitAdjustment);
+            $("#openUnitsAfterSplit_" + countDelistingOrder + "").val(response.openUnitsAfterSplit);
+
+            countDelistingOrder = countDelistingOrder + 1;
+
+
+        }
+        else {
+            $("#tblDelistingEquityStockDetails tbody").empty();
+            $("#tblDelistingEquityStockDetails tbody").append('<tr><td class="text-center" colspan="10">No data found</td></tr>');
+            $("#tblDelistingEquityStockDetails").show();
+            $("#tblDelistingEquityStockDetails > thead > tr > th").attr("style", "width: 120px;");
+
+        }
+    }
+
+
+    $('#checkBoxAllDelisting').change(function () {
+        if ($(this).is(':checked')) {
+            for (var i = 0; i < CheckboxIdTotalCount + 1; i++) {
+                $('#checkDelisting' + i).prop('checked', true);
+                selectedRows = AllselectedRows;
+            }
+        } else {
+            for (var i = 0; i < CheckboxIdTotalCount + 1; i++) {
+                $('#checkDelisting' + i).prop('checked', false);
+                selectedRows = [];
+            }
+        }
+    });
+
+    function unCheckValue(orderid, id) {
+       
+        if ($("#checkDelisting" + id).prop('checked') == true) {
+            selectedRows.push(orderid);
+        }
+        else {
+            var filteredArray = selectedRows.filter(function (element) {
+                return element !== orderid;
+            });
+            selectedRows = filteredArray;
+        }
+
+        $('#checkBoxAllDelisting').prop('checked', true);
+        for (var i = 0; i < CheckboxIdTotalCount; i++) {
+            if ($("#checkDelisting" + i).prop('checked') == false) {
+                $('#checkBoxAllDelisting').prop('checked', false);
+            }
+        }
+    }
+
+    function AddUpdateDelistingValue() {
+        var orderIds = selectedRows.join(',');
+        $.ajax({
+            async: false,
+            type: "POST",
+            url: '/CorporateActions/SaveDelstingComment',
+            dataType: 'json',
+            data: { OrderIds: orderIds },
+            success: function (res) {
+                if (res.statusCode == 200) {
+                    NotifyMsg('success', res.message);
+                    GetCalculatedDelistingOrderDetails();
+                }
+                else {
+                    NotifyMsg('error', res.message);
+                }
+            },
+            error: function (res) {
+                console.log('error', response);
+                NotifyMsg('error', res.message);
+            }
+        });
+
+    }
+
+    
+
+    function IsValidate() {
+        $("#lblDelistingEquity").hide();
+
+
+        var errorCount = 0;
+        if ($("#ddlDelistingEquity").val() == "") {
+            $("#lblDelistingEquity").show();
+            errorCount++;
+        }
+        if (errorCount > 0) {
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+</script>

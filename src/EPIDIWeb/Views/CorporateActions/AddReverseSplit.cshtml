@@ -1,0 +1,458 @@
+﻿@model ReverseSplitViewModel
+@{
+    Layout = null;
+}
+
+<div class="row">
+    <div class="col-6">
+        <div class="form-group">
+            @Html.LabelFor(model => model.EquityName,"Equity Name*")
+            <select id="ddlReverseSplitEquity" class="form-control"></select>
+            <label id="lblReverseSplitEquity" class="error">Please select equity name.</label>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-6">
+        <div class="form-group">
+            @Html.LabelFor(model => model.ReverseSplitOldValue,"OldValue*")
+            @Html.TextBoxFor(p => p.ReverseSplitOldValue, new { @class = "form-control", @placeholder = "OldValue" ,@name="OldValue" })
+            <label id="lblReverseSplitOldValue" class="error">Please enter old value.</label>
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="form-group">
+            @Html.LabelFor(model => model.ReverseSplitValue, "New Reverse SplitValue*")
+            @Html.TextBoxFor(p => p.ReverseSplitValue, new { @class = "form-control", @placeholder = "SplitValue" ,@name="SplitValue"})
+            <label id="lblReverseSplitValue" class="error">Please enter reverse split value.</label>
+        </div>
+    </div>
+
+</div>
+<div class="row">
+    <div class="col-3">
+        <div class="form-group">
+            @Html.LabelFor(model => model.ReverseSplitMDU,"MDU (Max Decimals Units)*")
+            @Html.TextBoxFor(p => p.ReverseSplitMDU, new { @class = "form-control", @placeholder = "Max Decimals Units" ,@name="MDU" })
+            <label id="lblReverseSplitMDU" class="error">Please enter max decimal units.</label>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="form-group">
+            @Html.LabelFor(model => model.ReverseSplitIsAdjustment,"Adjustment*")
+            <div class="row" style="margin-top: 6px;">
+                <div class="col-4">
+                    <input id="rdYes" name="reverseSplitadjustment" type="radio" value="1">
+                    <label for="rdYes">Yes</label>
+                </div>
+                <div class="col-4">
+                    <input id="rdNo" name="reverseSplitadjustment" type="radio" value="0">
+                    <label for="rdNo">No</label>
+                </div>
+            </div>
+            <label id="lblReverseSplitAdjustment" class="error">Please select adjustment.</label>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="form-group">
+            @Html.LabelFor(model => model.ReverseSplitRoundPriceNUnitsBuy, "Round Price & Units Buy*")
+            <select id="ddlReverseSplitRoundPriceNUnitsBuy" class="form-control">
+                <option value="">select</option>
+                <option value="up">Up</option>
+                <option value="down">Down</option>
+            </select>
+            <label id="lblReverseSplitRoundPriceNUnitsBuy" class="error">Please select one option.</label>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="form-group">
+            @Html.LabelFor(model => model.ReverseSplitRoundPriceNUnitsSell, "Round Price & Units Sell*")
+            <select id="ddlReverseSplitRoundPriceNUnitsSell" class="form-control">
+                <option value="">select</option>
+                <option value="up">Up</option>
+                <option value="down">Down</option>
+            </select>
+            <label id="lblReverseSplitRoundPriceNUnitsSell" class="error">Please select one option.</label>
+        </div>
+    </div>
+    <div class="col-12">
+        <button type="button" onclick="GetCalculatedReverseSplitOrderDetails();" class="btn btn-primary">Show Orders</button>
+        <div />
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <table id="tblReverseSplitEquityStockDetails" class="table table-responsive">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="checkBoxAllReverseSplitEquity"></th>
+                        <th>Client Id</th>
+                        <th>Trading Account</th>
+                        <th>Order Id</th>
+                        <th>Side Name</th>
+                        <th>Equity Name</th>
+                        <th>Open DateTime</th>
+                        <th>Legal Entity</th>
+                        <th>Open Price Before</th>
+                        <th>Open Units before</th>
+                        <th>Open Price After Reverse Split</th>
+                        <th>Open Units After Reverse Split</th>
+                        <th>Leverage</th>
+                        <th>Price No Round</th>
+                        <th>Units No Round</th>
+                        <th>Diff Price</th>
+                        <th>Diff units</th>
+                        <th>Adjustment in $</th>
+                        <th>Position</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button id="btnReverseSplitSave" type="button" onclick="AddUpdateReverseSplitValue();" class="btn btn-primary">Apply Changes On Position</button>
+    </div>
+
+    <script type="text/javascript">
+        var countReverseSplitOrder = 1;
+        var CheckboxCount;
+        var CheckboxTotalCount = 0;
+        var selectedRows = [];
+        var AllselectedRows = [];
+
+        $(document).ready(() => {
+            debugger;
+
+            $('#Loader').show();
+            $("#tblReverseSplitEquityStockDetails").hide();
+            $("#lblReverseSplitEquity").hide();
+            $("#lblReverseSplitOldValue").hide();
+            $("#lblReverseSplitValue").hide();
+            $("#lblReverseSplitMDU").hide();
+            $("#lblReverseSplitAdjustment").hide();
+            $("#lblReverseSplitRoundPriceNUnitsBuy").hide();
+            $("#lblReverseSplitRoundPriceNUnitsSell").hide();
+            $("#btnReverseSplitSave").hide();
+
+            $("body").on("change", "#csReverseAll", function () {
+                debugger;
+                var isChecked = $(this).is(":checked");
+                $(".reverse-chk-per").each(function () {
+                    if (isChecked)
+                        $(this).prop("checked", true);
+                    else
+                        $(this).prop("checked", false);
+                });
+            });
+
+            $("body").on("change", ".reverse-chk-per", function () {
+                debugger;
+                var mode = 0;
+                var clsName = "";
+                var mainclass = "";
+                if ($(this).hasClass("reverse-chk-per")) {
+                    mode = 1;
+                    clsName = ".reverse-chk-per";
+                    mainclass = "#csReverseAll";
+                }
+                if (mode > 0) {
+                    var total = $(clsName).length;
+                    var totalchecked = $(clsName + ":Checked").length;
+                    if (total == totalchecked) {
+                        $(mainclass).prop("checked", true);
+                    } else {
+                        $(mainclass).prop("checked", false);
+                    }
+                }
+            });
+
+            BindIntruments();
+        });
+
+
+        function BindIntruments() {
+            $.ajax({
+                async: false,
+                type: "POST",
+                url: '/CorporateActions/GetInstrumentsDropDown',
+                dataType: 'json',
+                data: {},
+                success: function (response) {
+                    $("#ddlReverseSplitEquity").append(`<option value = "" > --Select--</option>`)
+                    for (var i = 0; i < response.length; i++) {
+                        $("#ddlReverseSplitEquity").append(`<option value = "${response[i].value}"> ${response[i].text}</option>`)
+                    }
+                    $('#Loader').hide();
+                },
+                error: function (errorTemp) {
+                    console.log('error', errorTemp);
+                }
+            });
+        }
+
+        function GetCalculatedReverseSplitOrderDetails() {
+            debugger;
+
+            $("#lblReverseSplitEquity").hide();
+            $("#lblReverseSplitOldValue").hide();
+            $("#lblReverseSplitValue").hide();
+            $("#lblReverseSplitMDU").hide();
+            $("#lblReverseSplitAdjustment").hide();
+            $("#lblReverseSplitRoundPriceNUnitsBuy").hide();
+            $("#lblReverseSplitRoundPriceNUnitsSell").hide();
+
+            if (IsValidate()) {
+                $('#Loader').show();
+                debugger;
+                var instrumentId = $("#ddlReverseSplitEquity").val();
+
+                var param = {};
+                param.InstrumentId = instrumentId;
+                param.OldValue = $("#ReverseSplitOldValue").val();
+                param.SplitValue = $("#ReverseSplitValue").val();
+                param.MDU = $("#ReverseSplitMDU").val();
+                param.IsAdjustment = ($("input[name='reverseSplitadjustment']:checked").val() == '1' ? true : false);
+                param.RoundPriceNUnitsBuy = $("#ddlReverseSplitRoundPriceNUnitsBuy").val();
+                param.RoundPriceNUnitsSell = $("#ddlReverseSplitRoundPriceNUnitsSell").val();
+
+                $.ajax({
+                    async: false,
+                    type: "GET",
+                    url: '/CorporateActions/GetCalculatedReverseSplitOrderDetails',
+                    dataType: 'json',
+                    data: param,
+                    success: function (response) {
+                        console.log(response);
+                        debugger
+
+                        $("#tblReverseSplitEquityStockDetails tbody").empty();
+                        $("#lblReverseSplitEquity").hide();
+                        for (var i = 0; i < response.length; i++) {
+                            CheckboxCount = i;
+                            CheckboxTotalCount = CheckboxTotalCount + 1;
+
+                            BindGridWithStockDetails(response[i]);
+                        }
+                        //BindGridWithStockDetails(response);
+                        $('#Loader').hide();
+                    },
+                    error: function (errorTemp) {
+                        console.log('error', errorTemp);
+                    }
+                });
+            }
+        }
+
+        function BindGridWithStockDetails(response, equityType) {
+
+            $("#tblReverseSplitEquityStockDetails > thead > tr > th").removeAttr("style");
+
+            if (response != null) {
+
+
+                var sdEquityData = "";
+
+                sdEquityData += '<tr>';
+                sdEquityData += '<td><input type="checkbox" onclick="CheckValue(' + response.id + ',' + CheckboxCount + ')" id="checkReverseSplitEquity' + CheckboxCount + '"></td>';
+                sdEquityData += '<td>' + response.clientId + '</td>';
+                sdEquityData += '<td>' + response.tradingAccount + '</td>';
+                sdEquityData += '<td>' + response.id + '</td>';
+                sdEquityData += '<td>' + response.sideName + '</td>';
+                sdEquityData += '<td>' + response.equityName + '</td>';
+                sdEquityData += '<td>' + response.openTiming + '</td>';
+                sdEquityData += '<td>' + response.legalEntity + '</td>';
+                sdEquityData += '<td>' + response.openPriceBefore + '</td>';
+                sdEquityData += '<td>' + response.openUnitsBefore + '</td>';
+                sdEquityData += '<td>' + response.openPriceAfterSplit + '</td>';
+                sdEquityData += '<td>' + response.openUnitsAfterSplit + '</td>';
+                sdEquityData += '<td>' + response.leverage + '</td>';
+                sdEquityData += '<td>' + response.priceNoRound + '</td>';
+                sdEquityData += '<td>' + response.unitsNoRound + '</td>';
+                sdEquityData += '<td>' + response.priceDiff + '</td>';
+                sdEquityData += '<td>' + response.unitsDiff + '</td>';
+
+                sdEquityData += '<td>' + response.splitAdjustment + '</td>';
+
+                if (response.position == "Open")
+                    sdEquityData += '<td><span class="badge badge-success">' + response.position + '</span></td>';
+                else
+                    sdEquityData += '<td><span class="badge badge-danger">' + response.position + '</span></td>';
+
+                sdEquityData += '</tr>';
+
+                debugger;
+
+                $("#tblReverseSplitEquityStockDetails tbody").append(sdEquityData);
+                $("#tblReverseSplitEquityStockDetails").show();
+                $("#btnReverseSplitSave").show();
+
+                $("#orderId_" + countReverseSplitOrder + "").val(response.orderId);
+                $("#position_" + countReverseSplitOrder + "").val(response.position);
+                $("#openPrice_" + countReverseSplitOrder + "").val(response.openPriceAfterSplit);
+                $("#splitAdjustment_" + countReverseSplitOrder + "").val(response.splitAdjustment);
+                $("#openUnitsAfterSplit_" + countReverseSplitOrder + "").val(response.openUnitsAfterSplit);
+
+                countReverseSplitOrder = countReverseSplitOrder + 1;
+
+
+            }
+            else {
+                $("#tblReverseSplitEquityStockDetails tbody").empty();
+                $("#tblReverseSplitEquityStockDetails tbody").append('<tr><td class="text-center" colspan="10">No data found</td></tr>');
+                $("#tblReverseSplitEquityStockDetails").show();
+                $("#tblReverseSplitEquityStockDetails > thead > tr > th").attr("style", "width: 120px;");
+
+            }
+        }
+
+        function AddUpdateReverseSplitValue() {
+            debugger;
+            var ordersData = [];
+            for (var i = 1; i <= countReverseSplitOrder; i++) {
+
+                var isChecked = $("#chk-" + i + "").is(":checked");
+                if (isChecked) {
+                    var obj = {
+
+                        OrderId: $("#orderId_" + i).val(),
+                        Position: $("#position_" + i).val(),
+                        OpenPrice: $("#openPrice_" + i).val(),
+                        SplitAdjustment: $("#splitAdjustment_" + i).val(),
+                        OpenUnits: $("#openUnitsAfterSplit_" + i).val()
+
+                    }
+                    ordersData.push(obj);
+
+                }
+            }
+
+            if (ordersData != null) {
+                $.ajax({
+                    async: false,
+                    type: "POST",
+                    url: '/CorporateActions/AddUpdateReverseSplitValue',
+                    dataType: 'json',
+                    data: { model: ordersData },
+                    success: function (response) {
+                        debugger
+                        NotifyMsg('success', response.message);
+                        $("#custom-tabs-five-overlay-dark-tab").trigger("click");
+                    },
+                    error: function (errorTemp) {
+                        console.log('error', errorTemp);
+                    }
+                });
+            }
+        }
+
+        $('#checkBoxAllReverseSplitEquity').change(function () {
+            debugger;
+            if ($(this).is(':checked')) {
+                for (var i = 0; i < CheckboxTotalCount + 1; i++) {
+                    $('#checkReverseSplitEquity' + i).prop('checked', true);
+                    selectedRows = AllselectedRows;
+                }
+            } else {
+                for (var i = 0; i < CheckboxTotalCount + 1; i++) {
+                    $('#checkReverseSplitEquity' + i).prop('checked', false);
+                    selectedRows = [];
+                }
+            }
+        });
+
+        //function CheckValue(id, ChkBoxId) {
+        //    debugger;
+
+        //    if ($("#checkReverseSplitEquity" + ChkBoxId).prop('checked') == true) {
+        //        selectedRows.push(id);
+        //    }
+        //    else {
+        //        var filteredArray = selectedRows.filter(function (element) {
+        //            return element !== id;
+        //        });
+        //        selectedRows = filteredArray;
+        //    }
+
+        //    $('#checkBoxAllReverseSplitEquity').prop('checked', true);
+        //    for (var i = 0; i < CheckboxTotalCount; i++) {
+        //        if ($("#checkReverseSplitEquity" + i).prop('checked') == false) {
+        //            $('#checkBoxAllReverseSplitEquity').prop('checked', false);
+        //        }
+        //    }
+        //}
+
+        function CheckValue(id, ChkBoxId) {
+            debugger;
+
+            var isChecked = $("#checkReverseSplitEquity" + ChkBoxId).prop('checked');
+            var index = selectedRows.indexOf(id);
+
+            if (isChecked && index === -1) {
+                selectedRows.push(id);
+            } else if (!isChecked && index !== -1) {
+                selectedRows.splice(index, 1);
+            }
+
+            var allChecked = true;
+            for (var i = 0; i < CheckboxTotalCount; i++) {
+                if (!$("#checkReverseSplitEquity" + i).prop('checked')) {
+                    allChecked = false;
+                    break;
+                }
+            }
+
+            $('#checkBoxAllReverseSplitEquity').prop('checked', allChecked);
+        }
+
+
+
+
+
+
+        function IsValidate() {
+            $("#lblReverseSplitEquity").hide();
+
+
+            var errorCount = 0;
+            if ($("#ddlReverseSplitEquity").val() == "") {
+                $("#lblReverseSplitEquity").show();
+                errorCount++;
+            }
+            if ($("#ReverseSplitOldValue").val() == "" || $("#ReverseSplitOldValue").val() == "0") {
+                $("#lblReverseSplitOldValue").show();
+                errorCount++;
+            }
+            if ($("#ReverseSplitValue").val() == "" || $("#ReverseSplitValue").val() == "0") {
+                $("#lblReverseSplitValue").show();
+                errorCount++;
+            }
+            if ($("#ReverseSplitMDU").val() == "" || $("#ReverseSplitMDU").val() == "0") {
+                $("#lblReverseSplitMDU").show();
+                errorCount++;
+            }
+            if ($("input[name='reverseSplitadjustment']").is(":checked") == false) {
+                $("#lblReverseSplitAdjustment").show();
+                errorCount++;
+            }
+            if ($("#ddlReverseSplitRoundPriceNUnitsBuy").val() == "") {
+                $("#lblReverseSplitRoundPriceNUnitsBuy").show();
+                errorCount++;
+            }
+            if ($("#ddlReverseSplitRoundPriceNUnitsSell").val() == "") {
+                $("#lblReverseSplitRoundPriceNUnitsSell").show();
+                errorCount++;
+            }
+            else if ($("#tblReverseSplitEquityStockDetails tbody tr").length == 1) {
+                NotifyMsg('error', "No data found.");
+                errorCount++;
+            }
+
+            if (errorCount > 0) {
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+    </script>

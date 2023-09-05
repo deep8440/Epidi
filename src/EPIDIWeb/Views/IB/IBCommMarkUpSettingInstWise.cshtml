@@ -1,0 +1,72 @@
+﻿@model IBCommisionMarkUpSettingInstrumentWiseViewModel
+@{
+    Layout = null;
+}
+@using (Html.BeginForm("SaveIBMCommision", "IB", FormMethod.Post, new { id = "ibForm" }))
+{
+    <div class="row">
+        <div class="col-12">
+            <div class="form-group">
+                @Html.HiddenFor(model => model.IBID ,new {@Id="IBID"})
+                @Html.HiddenFor(model => model.BDMID ,new {@Id="BDMID"})
+                @Html.HiddenFor(model => model.ib_name,new {@Id="IBName"})
+                @Html.HiddenFor(model => model.Id)
+                @Html.LabelFor(model => model.InstrumentalName, "Instrumental Name")
+                @Html.DropDownListFor(model => model.MasterInstrumentalId, new SelectList(ViewBag.InstrumentList, "Value", "Text", Model.MasterInstrumentalId), "-- Select Instrumental --", new { @class = "form-control" ,@name="InstrumentalName" })
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.MarkUpPer1000 , "Mark Up Per1000")
+                @Html.TextBoxFor(p => p.MarkUpPer1000 , new { @class = "form-control", @placeholder = "Mark Up Per1000" ,@name="MarkUpPer1000",type = "number",step="any"})
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.MarkUpPer , "Mark Up Per%")
+                @Html.TextBoxFor(p => p.MarkUpPer , new { @class = "form-control", @placeholder = "Mark Up Per%" ,@name="MarkUpPer",type = "number",step="any"})
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.BuySwapPer1000 , "Buy Swap Per1000")
+                @Html.TextBoxFor(p => p.BuySwapPer1000, new { @class = "form-control", @placeholder = "Buy Swap Per1000" ,@name="BuySwapPer1000",type = "number",step="any"})
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.BuySwapPer , "Buy Swap Per%")
+                @Html.TextBoxFor(p => p.BuySwapPer, new { @class = "form-control", @placeholder = "Buy Swap Per%" ,@name="BuySwapPer",type = "number",step="any"})
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.SellSwapPer1000, "Sell Swap Per1000")
+                @Html.TextBoxFor(p => p.SellSwapPer1000, new { @class = "form-control", @placeholder = "Sell Swap Per1000" ,@name="SellSwapPer1000",type = "number",step="any"})
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.SellSwapPer, "Sell Swap Per%")
+                @Html.TextBoxFor(p => p.SellSwapPer, new { @class = "form-control", @placeholder = "Sell Swap Per%" ,@name="SellSwapPer",type = "number"})
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+}
+<script>
+    $(document).ready(() => {
+        //document.getElementsByClassName("modal-title")[0].textContent = 'Testing here';
+        var ibname = $("#IBName").val();
+        var bdmId=$("#BDMID").val();
+        if (bdmId > 0) {
+            $(".modal-title").text("IB - " + ibname + " - BDM Commision");
+        }
+        else { 
+            $(".modal-title").text("IB - " + ibname + " - Commision");
+        }
+        
+    });
+</script>

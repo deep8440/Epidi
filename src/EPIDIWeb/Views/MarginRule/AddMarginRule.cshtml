@@ -1,0 +1,361 @@
+﻿@model Epidi.Models.ViewModel.MarginRuleViewModel.MarginRuleViewModel
+@{
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+    ViewBag.PageTitle = "Add Margin Rule";
+    ViewBag.Method = "Add Margin Rule";
+
+    ViewBag.DetailName = " Margin Rule";
+    ViewBag.DetailURL = "/MarginRule/Index";
+
+
+}
+<style>
+    .select2-container {
+        display: block;
+    }
+
+    h3 {
+        color: #dc3545 !important;
+        font-weight: bold;
+    }
+</style>
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3>Add Margin Rule</h3>
+            </div>
+            @using (Html.BeginForm("AddMarginRule", "MarginRule", FormMethod.Post, new { enctype = "multipart/form-data", id = "frmAddMarginForm" }))//onsubmit = "return myFunction()"
+            {
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                               
+                                @Html.HiddenFor(model => model.MarginRuleId,"Id")
+                                @Html.LabelFor(model => model.RuleName, "Rule Name")
+                                @Html.TextBoxFor(p => p.RuleName, new { @class = "form-control", @placeholder = "Rule Name" ,@name="RuleName"})
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.Priority, "Priority")
+                                @Html.TextBoxFor(p => p.Priority, new { @class = "form-control", @placeholder = "Priority" ,@name="Priority", type="number"})
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.StopOutPercent, "StopOut %")
+                                @Html.TextBoxFor(p => p.StopOutPercent, new { @class = "form-control", @placeholder = "StopOut %" ,@name="StopOutPercent"})
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.MarginCallPercent, "MarginCall %")
+                                @Html.TextBoxFor(p => p.MarginCallPercent, new { @class = "form-control", @placeholder = "MarginCall %" ,@name="MarginCallPercent"})
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.LeveltotheStopOut, "Level to the StopOut")
+                                @Html.TextBoxFor(p => p.LeveltotheStopOut, new { @class = "form-control", @placeholder = "Level to the StopOut" ,@name="LeveltotheStopOut"})
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.IsPartialCloseoutonStopOut, "Is Partial Closeout on StopOut")
+                                <div class="col-3">
+                                    <input type="checkbox" id="IsPartial" name="IsPartial" onchange="CheckEvent()" class="form-check-input" style="margin-left: 10px;" />
+                                    <input type="hidden" id="IsPartialCloseoutonStopOut" name="IsPartialCloseoutonStopOut" />
+                                </div>
+                            </div>
+
+                        </div>
+                        
+                    </div>
+                    
+                    <div class="card-header" id="divRuleCondition" style="display:none;">
+                        <div class="row">
+                            <div class="col-6">
+                                <h3>Rule Condition</h3>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="row" id="divRuleDetails">
+                                <div class="col-4">
+                                    <div class="form-group">
+                                        <label>Fields Name</label>
+                                        @if (Model.objRuleConditionViewModel != null && Model.objRuleConditionViewModel.conditionRulesDtlObj != "")
+                                        {
+                                            <input type="hidden" id="ruleconditionjson" value="@Model.objRuleConditionViewModel.conditionRulesDtlObj" />
+                                        }
+                                        <select id="FieldName_0" name="FieldName_0" class="form-control" onchange="FieldsNameOnChange(0);">
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="form-group">
+                                        <label>Operation</label>
+                                        <select id="Opration_0" name="Opration" class="form-control"></select>
+                                    </div>
+                                </div>
+                                <div class="col-4" id="ddlOprationValue_0">
+                                    <div class="form-group">
+                                        <label>Operation Value</label>
+                                        <input type="text" id="OprationValue_0" name="OprationValue_0" class="form-control" placeholder="Operation Value" />
+                                        @*@Html.TextBoxFor(p => p.OprationValue, new { @class = "form-control", @placeholder = "Opration Value"
+                                    ,@name="OprationValue",Id = "OprationValue_0"})*@
+                                    </div>
+                                </div>
+                                <div class="col-4" id="ddlOprationValueTemp_0" style="display:none;">
+                                    <div class="form-group">
+                                        <label>Operation Value</label>
+                                        <select id="OprationIdTemp_0" onchange="ddlOprationValueTempOnChange(0)" name="OprationIdTemp" class="form-control"></select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row col-12 mt-1" style="float: right;">
+                                <div class="form-group">
+                                    <button type="button" onclick="AddNewRuleDtl();" id="addnewCondition" class="btn btn-primary">Add Condition</button>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button onclick="SaveRuleCondition()" class="btn btn-primary">Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button onclick="SaveRuleCondition()" class="btn btn-primary">Save</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script>
+
+        $(document).ready(() => {
+            BindFiledNameDynamic(0);
+            $('#FileUpload').on('change', function (e) {
+                //get the file name
+                var fileName = e.target.files[0].name;
+                $(this).next('.custom-file-label').html(fileName);
+            })
+            $(document).on("submit", "#frmAddMarginForm", function (e) {
+                e.preventDefault();
+                var form = $(this);
+                form.ajaxSubmit({
+                    beforeSubmit: function () {
+                        if (!form.valid()) {
+                            return false;
+                        }
+                        else {
+                            return true;
+                        }
+                    },
+                    success: function (res) {                        
+                        if (res.statusCode == 200) {
+                            $('#FileUpload').val('');
+                            $('#lblRule').html('Choose File')
+                            NotifyMsg('success', res.message);
+                            
+                             setTimeout(function(){
+                                NotifyMsg('success', res.message);
+                            }, 2000);
+                            window.location.href = "/MarginRule/index";
+                        } else {
+                            NotifyMsg('error', res.message);
+                        }
+                    },
+                    Errors: function () {
+                        console.log('error', res.message);
+                        NotifyMsg('error', res.message);
+                    }
+                });
+                return false;
+            });
+        });
+
+        function CheckEvent() {
+            var isChecked = $("#IsPartial").prop("checked");
+            $("#IsPartialCloseoutonStopOut").val(isChecked ? "true" : "false");
+        }
+
+        function BindFiledNameDynamic(count, defaultVal = "", defaultOp = "", defaultOpValue = "") {
+            $.ajax({
+                async: true,
+                type: "POST",
+                url: "@Url.Action("GetUserFieldsForDynamic","LeverageRules")",
+                dataType: 'json',
+                data: { tblName: 'Users' },
+                success: function (response) {
+                    $("#FieldName_" + count).append(`<option value="">--Select--</option>`)
+                    for (var i = 0; i < response.length; i++) {
+                        $("#FieldName_" + count).append(`<option value="${response[i].value}">${response[i].text}</option>`)
+                    }
+                    if (defaultVal != "") {
+                        $("#FieldName_" + count).val(defaultVal);
+                        FieldsNameOnChange(count, defaultOp, defaultOpValue);
+                    }
+                },
+                error: function (errorTemp) {
+                    console.log('error', errorTemp);
+                }
+            })
+        }
+        function FieldsNameOnChange(count, defaultValue = "", defaultOpValue = "") {
+
+            $("#Opration_" + count).html("");
+            var selectedVal = $("#FieldName_" + count).val();
+            if (selectedVal != undefined) {
+                const myArray = selectedVal.split("|");
+                var FieldName = myArray[0];
+                var DataType = myArray[1];
+                var FkKey = myArray[2];
+
+                $.ajax({
+                    async: true,
+                    type: "POST",
+                    url: "@Url.Action("GetOprationDropDown","LeverageRules")",
+                    data: { FieldsName: FieldName, DataType: DataType, FkKey: FkKey },
+                    dataType: 'json',
+                    success: function (response) {
+                        $("#Opration_" + count).append(`<option value="">--Select--</option>`)
+                        for (var i = 0; i < response.length; i++) {
+                            $("#Opration_" + count).append(`<option value="${response[i].value}">${response[i].text}</option>`)
+                        }
+
+                        if (defaultValue != "") {
+                            $("#Opration_" + count).val(defaultValue);
+                        }
+
+                        $("#ddlOprationValue_" + count).show();
+                        $("#ddlOprationValueTemp_" + count).hide();
+                        if (FkKey == "1") {
+                            $("#ddlOprationValue_" + count).hide();
+                            $("#ddlOprationValueTemp_" + count).show();
+                            //}
+                            $("#OprationIdTemp_" + count).html("");
+                            $.ajax({
+                                async: true,
+                                type: "POST",
+                                url: "@Url.Action("GetTempOprationDropDown","LeverageRules")",
+                                data: { FieldsName: FieldName, DataType: DataType, FkKey: FkKey },
+                                dataType: 'json',
+                                success: function (responseTemp) {
+                                    $("#OprationIdTemp_" + count).append(`<option value="">--Select--</option>`)
+                                    for (var i = 0; i < responseTemp.length; i++) {
+                                        $("#OprationIdTemp_" + count).append(`<option value="${responseTemp[i].value}">${responseTemp[i].text}</option>`)
+                                    }
+                                    if (defaultOpValue != "") {
+                                        $("#OprationIdTemp_" + count).val(defaultOpValue);
+                                    }
+                                },
+                                error: function (errorTemp) {
+                                    console.log('error', errorTemp);
+                                }
+                            })
+                        }
+                    },
+                    error: function (error) {
+                        console.log('error', error);
+
+                    }
+                })
+            }
+        }
+        ///Add New rule Dtl
+        var countDetails = 0;
+        function AddNewRuleDtl() {
+            countDetails = countDetails + 1;
+            $("#divRuleDetails").append(`
+                                    <div class="col-4" id="divField_${countDetails}">
+                                        <div class="form-group">
+                                        <label>Fields Name</label>
+                                        <select id="FieldName_${countDetails}" class="form-control" onchange="FieldsNameOnChange(${countDetails});">
+                                        </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-4" id="divOpration_${countDetails}">
+                                        <div class="form-group">
+                                        <label>Operation</label>
+                                        <select id="Opration_${countDetails}" class="form-control">
+                                        </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-4" id="ddlOprationValue_${countDetails}">
+                                        <div class="form-group">
+                                        <label>Operation Value</label>
+                                        <input class="form-control" id="OprationValue_${countDetails}" placeholder="Operation Value" type="text" value="" style="width: 85%;display: inline;">
+                                        <a href="javascript:void(0)" value="Delete" onclick="DeleteRule(${countDetails})"><i class="fa fa-trash" style="font-size: large;margin-top: 8px;" aria-hidden="true"></i></a>
+                                        </div>
+                                    </div>
+                                    <div class="col-4" id="ddlOprationValueTemp_${countDetails}" style="display:none;">
+                                        <div class="form-group">
+                                            <label>Operation Value</label>
+                                            <select id="OprationIdTemp_${countDetails}" name="OprationIdTemp" class="form-control" onchange="ddlOprationValueTempOnChange(${countDetails})" style="width: 85%;display: inline;"></select>
+                                            <a href="javascript:void(0)" value="Delete" onclick="DeleteRule(${countDetails})"><i class="fa fa-trash" style="font-size: large;margin-top: 8px;" aria-hidden="true"></i></a>
+                                        </div>
+                                    </div>
+                                        `);
+            BindFiledNameDynamic(countDetails)
+        };
+        function SaveRulesCondiDtl() {            
+            IsValid = true;
+            if (countDetails > 0) {
+                var rulesDetails = [];
+                for (var i = 0; i <= countDetails; i++) {
+                    if (
+                        ($("#FieldName_" + i).val() != "")
+                        &&
+                        ($("#FieldName_" + i).val() != null)
+                    ) {
+                        var obj = {
+                            FieldName: $("#FieldName_" + i).val(),
+                            Opration: $("#Opration_" + i).val(),
+                            OprationValue: $("#OprationValue_" + i).val(),
+                        }
+                        rulesDetails.push(obj);
+                    }
+                }
+                $("#rulesDetailsData").val(JSON.stringify(rulesDetails));
+            }
+        }
+        function SaveRuleCondition() {            
+            SaveRulesCondiDtl();
+            var formData = new FormData();
+            formData.append("RuleId", $("#Id").val());
+            //formData.append("Id", $("#Id").val());
+            formData.append("conditionRulesDtlObj", $("#rulesDetailsData").val());
+
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("SaveRuleCondition","RuleCondition")",
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function (res) {
+                    //if (res.code == 200) {
+                    //    //$("#frmModel").modal('hide');
+                    //    //$("#rulesDetailsData").resetForm();
+                    //    NotifyMsg('success', res.message);
+                    //    window.location.href = "/MarginRule/index";
+
+                    //} else {
+                    //    NotifyMsg('error', res.message);
+                    //}
+                },
+                error: function (errorTemp) {
+                    NotifyMsg('error', errorTemp);
+                    console.log('error', errorTemp);
+                }
+            })
+        }
+        function ddlOprationValueTempOnChange(cnt) {
+            //OprationValue
+            var selectOprationIdTemp = $("#OprationIdTemp_" + cnt).val();
+            $("#OprationValue_" + cnt).val(selectOprationIdTemp);
+        }
+    </script>
+}

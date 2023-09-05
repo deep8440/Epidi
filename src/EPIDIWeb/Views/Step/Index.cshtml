@@ -1,0 +1,270 @@
+﻿@model List<Epidi.Models.ViewModel.Steps.StepsViewModel>
+@{
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+    ViewBag.PageTitle = "Steps";
+    ViewBag.Method = "Steps";
+}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="col-12">
+                    <button id="btnAddstep" type="button" class="btn btn-outline-primary btn-uppercase float-right">
+                        <i class="ti-plus mr-2"></i> Add Step
+                    </button>
+                    @*<button id="btnCopystep" type="button" class="btn btn-outline-secondary btn-uppercase float-right">
+                    <i class="ti-plus mr-2"></i> Copy Step
+                    </button>*@
+                </div>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+                <table id="StepList" class="table table-bordered table-striped">
+                </table>
+            </div>
+            <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+    </div>
+    <!-- /.col -->
+</div>
+
+@section Scripts{
+
+    <script>
+        $(document).ready(() => {
+             
+            StepDataTable.init();
+        });
+ 
+
+        $("body").on("click", "#btnAddstep", function () {
+            AddModal("/Step/AddSteps", "Add New Steps")
+        });
+        $("body").on("click", "#btnCopystep", function () {
+
+            AddModal("/Step/CopySteps", "Copy Steps")
+        });
+
+        $(document).on("submit", "#StepForm", function (e) {
+            e.preventDefault();
+            StepValidation();
+
+            var form = $(this);
+            form.ajaxSubmit({
+                beforeSubmit: function () {
+                    if (!form.valid()) {
+
+                        return false;
+                    }
+                    else {
+
+                        return true;
+                    }
+                },
+                success: function (res) {
+                    if (res.result.code == 200) {
+                        $("#frmModel").modal('hide');
+                        $("#StepForm").resetForm();
+                        
+
+                        Toast.fire({
+                            icon: 'success',
+                            title: " " + res.result.message
+                        })
+
+                    } else {
+                        //$("#Loader").hide();
+                        Toast.fire({
+                            icon: 'error',
+                            title: " " + res.result.message
+                        })
+                    }
+                    StepDataTable.init();
+                },
+                Errors: function () {
+                    //$("#Loader").hide();
+                    Toast.fire({
+                        icon: 'error',
+                        title: " " + res.result.message
+                    })
+                }
+            });
+            return false;
+        });
+
+        
+
+        function StepValidation() {
+
+            $('#StepForm').validate({
+                rules: {
+                    Title: {
+                        required: true
+                    },
+                    CountryId: {
+                        required: true
+                    },
+                    FooterTitle: {
+                        required: true
+                    },
+                    FooterDescription: {
+                        required: true
+                    },
+
+                },
+                messages: {
+                    Title: "Please enter title"
+                },
+                messages: {
+                    CountryId: "Please select country Name"
+                },
+                messages: {
+                    FooterTitle: "Please select Footer Title"
+                },
+                messages: {
+                    FooterDescription: "Please select Footer Description"
+                },
+                errorElement: 'span',
+                errorPlacement: function (error, element) {
+                    error.addClass('invalid-feedback');
+                    element.closest('.form-group').append(error);
+                },
+                highlight: function (element, errorClass, validClass) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function (element, errorClass, validClass) {
+                    $(element).removeClass('is-invalid');
+                }
+            });
+        }
+
+        function fnChangeSelectedValue(obj)
+        {
+            $("#SelectionTitle").val("");
+            if ($(obj).is(':checked')) {
+                $("#SelectionTitle").val($(obj).val());
+            }
+        }
+        var StepDataTable = function () {
+            let initTable1 = function () {
+                let table = $('#StepList');
+
+                let oTable = table.dataTable({
+                    "order": [[1, 'asc']],
+                    "stateSave": true,
+                    "autoWidth": false,
+                    "paging": true,
+                    // Internationalisation. For more info refer to http://datatables.net/manual/i18n
+                    "language": {
+                        "aria": {
+                            "sortAscending": ": activate to sort column ascending",
+                            "sortDescending": ": activate to sort column descending"
+                        },
+                        "emptyTable": "No data available in table",
+                        "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+                        "infoEmpty": "No entries found",
+                        "infoFiltered": "(filtered1 from MAX total entries)",
+                        //"lengthMenu": "MENU entries",
+                        "search": "Search:",
+                        "zeroRecords": "No matching records found"
+                    },
+                    "pageLength": 10,
+                    "start": 0,
+                    "processing": true,
+                    "serverSide": true,
+                    "ajax": {
+                        async: true,
+                        url: '/Step/Step_All',
+                        type: "post",
+                    },
+                    "columns": [
+
+                        {
+                            "title": "Step title <i class='fa fa-info-circle' title='This is step title'></i>", "data": "title", "width": "3%", "name": "Title"
+                        },
+                        {
+                            "title": "Country Name", "data": "countryName", "width": "3%", "name": "CountryName"
+                        },
+                        {
+                            "title": "Priority", "data": "priority", "name": "Priority", "width": "1%"
+                        },
+                        {
+                            "title": "Page Size <i class='fa fa-info-circle' title='No.of pages in step'></i>", "data": "pageSize", "name": "PageSize", "width": "1%"
+                        },
+                        {
+                            "title": "Action", "data": "id",
+                            "render": function (data, type, row) {
+                                let htmlData = "";
+                                htmlData += "<a class='btn btn-success edt-rcd mr-1' href='javascript:void(0);'  data-uri='/Step/Edit?StepId=" + row.id + "' ><i class='fa fa-edit'></i></a>";
+                                htmlData += "<a class='btn btn-danger edt-dlt mr-1' href='javascript:void(0);' data-uri='/Step/DeleteStep?StepId=" + row.id + "' ><i class='fa fa-trash'></i></a>";
+                                htmlData += "<a class='btn btn-primary edt-rcd mr-1' href='javascript:void(0);' data-uri='/Step/CopySteps?CountryId=" + row.countryId + "' ><i class='fa fa-copy'></i></a>";
+                                return htmlData;
+                            }
+                            , "orderable": false, "width": "3%"
+                        },
+                    ],
+
+                    // setup responsive extension: http://datatables.net/extensions/responsive/
+                    responsive: true,
+
+                    "lengthMenu": [
+                        [5, 10, 15, 20, 500],
+                        [5, 10, 15, 20, 500] // change per page values here
+                    ],
+                    // set the initial value
+
+                    //"dom": "<'row' <'col-md-12'B>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'f>r><'table-scrollable't><'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>", // horizobtal scrollable datatable
+
+                    // Uncomment below line("dom" parameter) to fix the dropdown overflow issue in the datatable cells. The default datatable layout
+                    // setup uses scrollable div(table-scrollable) with overflow:auto to enable vertical scroll(see: assets/global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js).
+                    // So when dropdowns used the scrollable div should be removed.
+                    //"dom": "<'row' <'col-md-12'T>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'f>r>t<'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>",
+                });
+            }
+
+            return {
+                init: function () {
+                    if ($.fn.DataTable.isDataTable("#StepList")) {
+                        $('#StepList').dataTable().fnDestroy();
+                        //$('#divUserTable').html('<table class="table table-striped" width="100%" id="UserTable"></table>');
+                    }
+                    initTable1();
+                }
+            };
+        }();
+        function SaveStepCopyClick() {
+            var fromCountry = $("#ddlFromCountry").val();
+            var toCountry = $("#ddlToCountry").val();
+            var selectedStep = $("#ddlSteps").val();
+            $.ajax({
+                async: false,
+                type: "POST",
+                url: '/Step/Step_CopyByCountry',
+                dataType: 'json',
+                data: { FromCountry: fromCountry, SelectedStep: selectedStep, ToCountry: toCountry },
+                success: function (response) {
+                    $("#frmModel").modal('hide');
+                    if (response.statusCode == 200) {
+                        StepDataTable.init();
+                        Toast.fire({
+                            icon: 'success',
+                            title: " " + response.message
+                        })
+                    }
+                    else {
+                        //$("#Loader").hide();
+                        Toast.fire({
+                            icon: 'error',
+                            title: " " + response.message
+                        })
+                    }
+                },
+                error: function (errorTemp) {
+                    console.log('error', errorTemp);
+                }
+            })
+        }
+
+    </script>
+}

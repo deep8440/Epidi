@@ -1,0 +1,100 @@
+﻿@model Epidi.Models.ViewModel.IB.IBCommissionInstrument;
+@{
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+}
+<style>
+    .select2-container {
+        display: block;
+    }
+
+    h3 {
+        color: #dc3545 !important;
+        font-weight: bold;
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th, td {
+        text-align: left;
+        padding: 8px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+</style>
+@using (Html.BeginForm("SaveIBInstrumentRule", "IB", FormMethod.Post, new { id = "IBCommissionInstrumentForm" }))
+{
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-12">
+                            <h3>Add IB Instrument Rule</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                @Html.HiddenFor(p => p.IBID)
+                                @Html.LabelFor(model => model.MasterInstrumentName, "MasterInstrumentName")
+                                @Html.DropDownListFor(model => model.MasterInstrumentId, new SelectList(ViewBag.InstrumentList, "Value", "Text", Model.MasterInstrumentId), "-- Select GetInstrument --", new { @class = "form-control js-select2" ,@name="MasterInstrumentName" })
+                                @*@Html.HiddenFor(p => p.IBID)
+                                @Html.HiddenFor(p => p.MasterInstrumentId)
+                                @Html.LabelFor(model => model.MasterInstrumentId, "MasterInstrumentName")
+                                @Html.DropDownListFor(model => model.MasterInstrumentId, new SelectList(ViewBag.InstrumentList, "Value", "Text", Model.MasterInstrumentId), "-- Select Master Instrument --", new { @class = "form-control" ,@name="MasterInstrumentName" })*@
+                                @* @Html.LabelFor(model => model.MasterInstrumentName,"MasterInstrumentName")
+                            @Html.TextBoxFor(p => p.MasterInstrumentName, new { @class = "form-control", @placeholder = "MasterInstrumentName" ,@name="MasterInstrumentName",@readonly = "readonly"})*@
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.MarkUpPer1000,"MarkUpPer1000")
+                                @Html.TextBoxFor(p => p.MarkUpPer1000, new { @class = "form-control", @placeholder = "MarkUpPer1000" ,@name="MarkUpPer1000" })
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.MarkUpPer,"MarkUpPer")
+                                @Html.TextBoxFor(p => p.MarkUpPer, new { @class = "form-control", @placeholder = "MarkUpPer" ,@name="MarkUpPer" })
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.BuySwapPer,"BuySwapPer")
+                                @Html.TextBoxFor(p => p.BuySwapPer, new { @class = "form-control", @placeholder = "BuySwapPer" ,@name="BuySwapPer" })
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.BuySwapPer1000,"BuySwapPer1000")
+                                @Html.TextBoxFor(p => p.BuySwapPer1000, new { @class = "form-control", @placeholder = "BuySwapPer1000" ,@name="BuySwapPer1000" })
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.SellSwapPer1000,"SellSwapPer1000")
+                                @Html.TextBoxFor(p => p.SellSwapPer1000, new { @class = "form-control", @placeholder = "SellSwapPer1000" ,@name="SellSwapPer1000" })
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.SellSwapPer,"SellSwapPer")
+                                @Html.TextBoxFor(p => p.SellSwapPer, new { @class = "form-control", @placeholder = "SellSwapPer" ,@name="SellSwapPer" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+}

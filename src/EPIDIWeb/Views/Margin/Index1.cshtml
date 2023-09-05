@@ -1,0 +1,94 @@
+﻿@{
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+    ViewBag.PageTitle = "Margin ";
+    ViewBag.Method = "Margin ";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-12">
+                        <button id="btnAddQuoteMarkUpRule" onclick="AddEditMappingModal();" type="button" class="btn btn-outline-secondary btn-uppercase float-right">
+                            <i class="ti-plus mr-2"></i> Add Margin Rule
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+                <table id="MarginRuleList" class="table table-bordered table-striped">
+                </table>
+            </div>
+            <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+    </div>
+</div>
+
+<div class="modal marginmodal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Margin</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label>Rule Name</label>
+                        <input type="hidden" value="" id="marginRulId" />
+                        <input type="text" class="form-control" id="txtRuleName" />
+                    </div><br />
+                    <div class="col-md-6 form-group">
+                        <label id="lblmargintypecontrol">Stop Out %</label>
+                        <select id="ddlmargintypeval" class="form-control" style="display:none;"></select>
+                        <input type="text" class="form-control" id="txtStopOut" />
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label>MarginCall %</label>
+                        <input type="text" class="form-control" id="txtMarginCall" />
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label>Is Partial Closeout on Stop Out</label>
+                        <input type="checkbox" class="" id="chkIsPartialCloseoutonStopOut" />
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label>Level to the Stop Out</label>
+                        <input type="text" class="form-control" id="txtLeveltotheStopOut" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="SaveMapping();">Save changes</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+function AddEditMappingModal(obj) {
+            $('#ddlmargintype').val($(obj).closest('tr').find('input[name="marginTypeId"]').val());
+            $('#ddlmargintype').change();
+            $('.marginmodal').modal('show');
+            $('#masteritem').val($(obj).closest('tr').find('td:eq(0)').text());
+            $('#marginid').val($(obj).closest('tr').find('input[type="hidden"]').val());
+
+
+            if ($('#ddlmargintype').val() == 2) {
+                $('#ddlmargintypeval').val($(obj).closest('tr').find('input[name="masterInstrumentId"]').val());
+            }
+            if ($('#ddlmargintype').val() == 3) {
+                $('#ddlmargintypeval').val($(obj).closest('tr').find('input[name="symbolGroupId"]').val());
+            }
+            debugger;
+            $('#InstrumentConversiontoUSD').val($(obj).closest('tr').find('td:eq(3)').html());
+            $('#InstrumentConversiontoEUR').val($(obj).closest('tr').find('td:eq(4)').html());
+        }
+    </script>
+}

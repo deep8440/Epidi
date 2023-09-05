@@ -1,0 +1,652 @@
+﻿@model IBLimitViewModel
+@{
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+    ViewBag.PageTitle = "IBLimit";
+    ViewBag.Method = "IBLimit";
+}
+<style>
+    .progress {
+        display: block;
+        position: relative;
+        margin: 20px;
+        width: 425px;
+        background-color: #ddd;
+        border: 1px solid blue;
+        padding: 1px;
+        left: 40px;
+        border-radius: 3px;
+    }
+
+    .percent {
+        position: absolute;
+        display: inline-block;
+        color: #fff;
+        font-weight: bold;
+        top: 100%;
+        left: 50%;
+        margin-top: -9px;
+        margin-left: -20px;
+        -webkit-border-radius: 4px;
+    }
+
+    .bar {
+        background-color: #007bff;
+        width: 0%;
+        height: 30px;
+        border-radius: 4px;
+        -webkit-border-radius: 4px;
+        -moz-border-radius: 4px;
+    }
+</style>
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-6">
+                        @using (Html.BeginForm("UploadIBLimitData", "IBLimit", FormMethod.Post, new { enctype = "multipart/form-data", id = "frmExcelForm" }))//onsubmit = "return myFunction()"
+                        {
+                            <div class="custom-file form-group float-sm-left mr-3" style="width:230px">
+                                  <input type="file" id="fileupload" name="fileupload" class="custom-file-input">
+                            <label id="gatelblname" class="custom-file-label" style="text-align:left" for="file">Choose IBLimit</label>
+                          
+                            </div>
+                            <button type="submit" class="btn btn-info form-group float-sm-left mr-3 ">Import IBLimit</button>
+                        }
+                    </div>
+
+                    <div class="col-6">
+                        <button id="btnAddIBLimit" type="button" onclick="AddIBLimit();" class="btn btn-outline-primary btn-uppercase float-right">
+                            <i class="ti-plus mr-2"></i> Create IBLimit
+                        </button>
+
+                        @*<button type="button" class="btn btn-info form-group float-sm-left mr-3 " onclick="ExportInstrumentMapping()">Export Instruments Mapping</button>*@
+                    </div>
+                </div>
+                <div>
+                    @*<a href="/Margin/ExportMargin" class="btn btn-info float-sm-left">Export Margin</a>*@
+                    <button type="button" class="btn btn-info float-sm-left mt-3" onclick="ExportIBLimit_Data()">Export IBLimit</button>
+                </div>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+                <table id="iblimitList" class="table table-bordered table-striped">
+                </table>
+            </div>
+            <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+    </div>
+</div>
+
+<div class="modal fade iblimitmodal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">IBLimit</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <input type="hidden" id="Id" />
+                    <div class="col-md-6 form-group">
+                        <label>MarkUpPer1000</label>
+                        <input type="hidden" value="" id="MarkUpPer1000" />
+                        <input type="text" class="form-control" id="MarkUpPer1000" />
+                    </div><br />
+                    <div class="col-md-6 form-group">
+                        <label id="lblmasterinstrument">Master Instrument </label>
+                        <select id="ddlmasterinstrument" class="form-control" style="display:none;"></select>
+                        <input type="text" class="form-control" id="txtmasterinstrument" />
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label id="lblsymbolgroup">Symbol Group</label>
+                        <select id="ddlsymbolgroup" class="form-control" style="display:none;"></select>
+                        <input type="text" class="form-control" id="txtsymbolgroup" />
+                    </div>
+                    <table id="tblInstrument">
+                        @*<tr>
+                        <th>Instrument Name</th>
+                        <th>Manual Conversion</th>
+                        <th>Action</th>
+                        </tr>
+                        <tr>
+                        <td>
+                        <div class="form-group" style="width:200px;">
+                        <input id="MarginDtl_Id_0" type="hidden" value="1">
+                        <select class="form-control" id="instrumentid_0" style="border:1px solid;">
+                        </select>
+                        </div>
+                        </td>
+                        <td>
+                        <div class="form-group" style="width:200px;">
+                        <input class="form-control" id="manualConversion_0" placeholder="Manual Conversion" type="number">
+                        </div>
+                        </td>
+                        <td>
+                        <div class="form-group">
+                        <a href="javascript:void(0)" value="Delete" onclick="DeleteConversion(1)" style=" display: block; width: 100%; height: calc(2.25rem + 2px); padding: 0.375rem 0.75rem;">
+                        <i class="fa fa-trash" style="font-size: large;margin-top: 8px;" aria-hidden="true"></i>
+                        </a>
+                        </div>
+                        </td>
+                        </tr>*@
+                    </table>
+                </div>
+                @*<div class="row col-12 mt-1" style="float: right;">
+                <div class="form-group">
+                <button type="button" onclick="AddConversion();" id="addnewConversion" class="btn btn-primary">Add Conversion</button>
+                </div>
+                </div>*@
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="SaveIBLimit();">Save</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ProcessModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <h1>Processing...</h1>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="col-6">
+                    <div class="progress">
+                        <div class="bar"></div>
+                        <div class="percent">0%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+@section Scripts{
+    <script>
+        $(document).ready(() => {
+
+            $("body").on("click", "#btnAddIBLimit", function () {
+
+                AddModal("/IBLimit/AddIBLimit", "Add New IBLimit")
+                $(document).ready(function () {
+                    $("#MasterInstrumentId").select2();
+                    $("#SymbolGroupId").select2();
+                });
+
+            });
+
+
+            IBLimitDataTable.init();
+            $('#FileUpload').on('change', function (e) {
+                //get the file name
+                debugger
+                var fileName = e.target.files[0].name;
+                $(this).next('.custom-file-label').html(fileName);
+            })
+
+
+            $(document).on("submit", "#iblimitForm", function (e) {
+                e.preventDefault();
+                IBValidation();
+                var form = $(this);
+                form.ajaxSubmit({
+                    beforeSubmit: function () {
+                        if (!form.valid()) {
+
+                            return false;
+                        }
+                        else {
+
+                            return true;
+                        }
+                    },
+                    success: function (res) {
+                        if (res.code == 200) {
+                            $("#frmModel").modal('hide');
+                            $("#iblimitForm").resetForm();
+
+                            IBLimitDataTable.init(0);
+
+                            NotifyMsg('success', res.message);
+
+                        } else {
+
+                            NotifyMsg('error', res.message);
+                        }
+                    },
+                    Errors: function () {
+
+                        NotifyMsg('error', res.message);
+                    }
+                });
+                return false;
+            });
+
+        });
+
+        function IBValidation() {
+            $('#iblimitForm').validate({
+                rules: {
+                    MarkUpPer1000: {
+                        required: true
+                    },
+                    MasterInstrumentName:
+                    {
+                        required: true
+                    }
+                },
+                messages: {
+                    MarkUpPer1000: {
+                        required: "Please enter MarkUpPer1000"
+                    },
+                    MasterInstrumentName: {
+                        required: "Please enter MasterInstrumentName"
+                    },
+                },
+                errorElement: 'span',
+                errorPlacement: function (error, element) {
+                    error.addClass('invalid-feedback');
+                    element.closest('.form-group').append(error);
+                },
+                highlight: function (element, errorClass, validClass) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function (element, errorClass, validClass) {
+                    $(element).removeClass('is-invalid');
+                }
+            });
+        }
+
+        var IBLimitDataTable = function () {
+            
+            let initTable1 = function () {
+                debugger;
+                let table = $('#iblimitList');
+
+                let oTable = table.dataTable({
+                    "columnDefs": [{
+                        "orderable": false,
+                        "className": 'select-checkbox',
+                        "targets": 0
+                    }],
+                    "select": {
+                        "style": 'os',
+                        "selector": 'td:first-child'
+                    },
+                    "order": [[0, 'asc']],
+                    "stateSave": true,
+                    "autoWidth": false,
+                    "paging": true,
+                    "bFilter": true,
+                    // Internationalisation. For more info refer to http://datatables.net/manual/i18n
+                    "language": {
+                        "aria": {
+                            "sortAscending": ": activate to sort column ascending",
+                            "sortDescending": ": activate to sort column descending"
+                        },
+                        "emptyTable": "No data available in table",
+                        "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+                        "infoEmpty": "No entries found",
+                        "infoFiltered": "(filtered1 from MAX total entries)",
+                        //"lengthMenu": "MENU entries",
+                        "search": "Search:",
+                        "zeroRecords": "No matching records found"
+                    },
+                    "pageLength": 10,
+                    "processing": true,
+                    "serverSide": true,
+                    "ajax": {
+                        async: true,
+                        url: '/IBLimit/Get_All',
+                        type: "POST"
+                    },
+                    columnDefs: [{
+                        //"targets": [0],
+                        "visible": false,
+                        "searchable": false
+                    }],
+                    "columns": [
+                        {
+                            "title": "MasterInstrument Name", "data": "masterInstrumentName", "name": "masterInstrumentName", "orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "Symbol Name", "data": "symbolName", "name": "symbolName", "orderable": true, "width": "3%"
+                        },
+
+                        {
+                            "title": "MarkUpPer1000", "data": "markUpPer1000", "name": "markUpPer1000", "orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "MarkUpPer%", "data": "markUpPer", "name": "markUpPer", "orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "BuySwapPer1000", "data": "buySwapPer1000", "name": "buySwapPer1000", "orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "BuySwapPer%", "data": "buySwapPer", "name": "buySwapPer", "orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "SellSwapPer1000", "data": "sellSwapPer1000", "name": "sellSwapPer1000", "orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "SellSwapPer%", "data": "sellSwapPer", "name": "sellSwapPer", "orderable": true, "width": "3%"
+                        },
+                        
+                        {
+                            "title": "Action", "data": "MasterInstrumentId",
+                            "render": function (data, type, row) {
+                                let htmlData = "<div class='btn-group dropleft'>";
+                                htmlData += "<a class='btn btn-success edt-rcd mr-1' href='javascript:void(0);' data-uri='/IBLimit/Edit?Id=" + row.id + "' ><i class='fa fa-edit'></i></a>";
+                                htmlData += "<a class='btn btn-danger edt-dlt mr-1' href='javascript:void(0);' data-uri='/IBLimit/Delete?Id=" + row.id + "' ><i class='fa fa-trash'></i></a>";
+                                htmlData += "</div>";
+                                return htmlData;
+                            //"render": function (data, type, row) {
+                            //    let htmlData = "";
+
+                            //    htmlData += '<input type="hidden" value=' + row['id'] + ' />'
+
+                            //    // html += "<a class='btn btn-success edt-rcd mr-1' href='javascript:void(0);' data-uri='/IBLimit/Edit?Id=" + row.id + "' ><i class='fa fa-edit'></i></a>";
+                            //    // html += "<a class='btn btn-danger edt-dlt mr-1' href='javascript:void(0);' data-uri='/IBLimit/DeleteCountryWiseDocument?Id=" + row.id + "' ><i class='fa fa-trash'></i></a>";
+
+                            //    htmlData += `<button title="Edit" class="btn btn-sm btn-success mr-1" onclick="GetBy_Id($(this));"><i class="fa fa-edit"></i></button>`;
+                            //    htmlData += `<button title="Delete IBLimit" class="btn btn-sm btn-danger mr-1" onclick="Delete($(this));"><i class="fa fa-trash"></i></button>`;
+                            //    return htmlData;
+
+                            }
+                            , "orderable": false, "width": "3%"
+                        },
+                    ],
+                    scrollX:true,
+                    // setup responsive extension: http://datatables.net/extensions/responsive/
+                   // responsive: true,
+
+                    "lengthMenu": [
+                        [5, 10, 15, 20, 1000],
+                        [5, 10, 15, 20, 1000] // change per page values here
+                    ],
+                    // set the initial value
+
+                    //"dom": "<'row' <'col-md-12'B>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'f>r><'table-scrollable't><'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>", // horizobtal scrollable datatable
+
+                    // Uncomment below line("dom" parameter) to fix the dropdown overflow issue in the datatable cells. The default datatable layout
+                    // setup uses scrollable div(table-scrollable) with overflow:auto to enable vertical scroll(see: assets/global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js).
+                    // So when dropdowns used the scrollable div should be removed.
+                    //"dom": "<'row' <'col-md-12'T>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'f>r>t<'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>",
+                });
+            }
+
+            return {
+                init: function () {
+                    if ($.fn.DataTable.isDataTable("#iblimitList")) {
+                        $('#iblimitList').dataTable().fnDestroy();
+                        //$('#divUserTable').html('<table class="table table-striped" width="100%" id="UserTable"></table>');
+                    }
+                    initTable1();
+                }
+            };
+        }();
+
+
+
+        //function edit(obj) {
+        //     debugger
+        //     var uri = $(obj).attr('data-uri');
+        //     var header = $(obj).closest('table').attr('edit-header');
+        //     $.get(uri, { async: false }, function (data) {
+        //         $("#frmModel .modal-body").html(data);
+        //         $("#frmModel .modal-title").html(header);
+
+        //         $("#frmModel").modal('show');
+
+
+        //       }).fail(function () {
+        //         //NotifyMsg("getting errors", "warning");
+
+        //     });
+        // }
+
+
+        //function AddEditMappingModal(obj) {
+        //    debugger;
+        //    $('#ddlmargintype').val($(obj).closest('tr').find('input[name="marginTypeId"]').val());
+        //    $('#ddlmargintype').change();
+        //    $('.marginmodal').modal('show');
+
+        //    $('#masteritem').val($(obj).closest('tr').find('td:eq(0)').text());
+        //    $('#marginid').val($(obj).closest('tr').find('input[type="hidden"]').val());
+
+        //    setTimeout(function () {
+
+        //        if ($('#ddlmargintype').val() == 2) {
+        //            $('#ddlmargintypeval').val($(obj).closest('tr').find('input[name="masterInstrumentId"]').val());
+        //        }
+        //        else if ($('#ddlmargintype').val() == 3) {
+        //            $('#ddlmargintypeval').val($(obj).closest('tr').find('input[name="symbolGroupId"]').val());
+        //        }
+        //        else {
+        //            $('#txtinstrumentend').val($(obj).closest('tr').find('input[name="instrumentEnd"]').val());
+        //        }
+        //    }, 2500);
+
+
+
+        //    debugger;
+        //    $("#tblInstrument").empty();
+        //    if ($('#marginid').val() != '') {
+
+        //        GetMarginDetailsByMarginId($('#marginid').val());
+        //    }
+        //    else {
+        //        AddConversion();
+        //    }
+
+        //    //debugger;
+        //    //$('#InstrumentConversiontoUSD').val($(obj).closest('tr').find('input[name="InstrumentConversiontoUSD"]').val());
+        //    //$('#InstrumentConversiontoEUR').val($(obj).closest('tr').find('input[name="InstrumentConversiontoEUR"]').val());
+        //    //$('#InstrumentConversiontoINR').val($(obj).closest('tr').find('input[name="InstrumentConversiontoINR"]').val());
+        //    //$('#ManualInstrumentConversiontoUSD').val($(obj).closest('tr').find('input[name="ManualInstrumentConversiontoUSD"]').val());
+        //    //$('#ManualInstrumentConversiontoEUR').val($(obj).closest('tr').find('input[name="ManualInstrumentConversiontoEUR"]').val());
+        //    //$('#ManualInstrumentConversiontoINR').val($(obj).closest('tr').find('input[name="ManualInstrumentConversiontoINR"]').val());
+        //}
+        function DeleteConversion(counter) {
+            $("#trId_" + counter).remove();
+        }
+        function SaveConversionDataDtl() {
+            var conversionDtl = [];
+            for (var i = 0; i <= conversionCnt; i++) {
+                if (($("#instrumentid_" + i).val() != "") && ($("#instrumentid_" + i).val() != null)) {
+                    var obj = {
+                        Id: $("#MarginDtlId_" + i).val() == "" ? 0 : $("#MarginDtlId_" + i).val(),
+                        MarginId: $("#marginid").val() == "" ? 0 : $("#marginid" + i).val(),
+                        InstrumentId: $("#instrumentid_" + i).val(),
+                        ManualConversion: $("#manualConversion_" + i).val(),
+                        InstrumentToConvertId: $("#currency_" + i).val(),
+                    }
+                    conversionDtl.push(obj);
+                }
+            }
+            $("#conversionData").val(JSON.stringify(conversionDtl));
+        }
+        //function GetBy_Id(MarkUpPer1000) {
+        //    $.ajax({
+        //        async: true,
+        //        type: "GET",
+        //        url: 'Get_All',
+        //        dataType: 'json',
+        //        data: { Id: Id },
+        //        success: function (response) {
+        //            $("#tblInstrument").empty();
+        //            conversionCnt = 0;
+        //            for (var i = 0; i < response.length; i++) {
+        //                ////design
+        //                AddConversion(response[i]);
+        //            }
+        //        },
+        //        error: function (errorTemp) {
+        //            console.log('error', errorTemp);
+        //        }
+        //    })
+        //}
+
+        //function GetBy_Id(obj) {
+
+        //    $('.mappingmodal').modal('show');
+
+        //    var ID = $(obj).closest('tr').find('input[type="hidden"]')
+        //    $.ajax({
+        //        type: "POST",
+        //        url: '/IBLimit/Edit',
+        //        data: ID,
+        //        success: function (data) {
+        //            debugger;
+        //            $('#hdnId').val(data.id);
+        //            $('#MasterInstrumentalId').val(data.masterInstrumentId);
+        //            $('#MarkUpPer1000').val(data.MarkUpPer1000);
+        //            $('#SymbolGroupId').val(data.SymbolGroupId);
+        //            $('#MarkUpPer').val(data.MarkUpPer);
+        //            $('#BuySwapPer1000').val(data.BuySwapPer1000);
+        //            $('#BuySwapPer').val(data.BuySwapPer);
+        //            $('#SellSwapPer1000').val(data.SellSwapPer1000);
+
+
+
+
+        //        }
+        //    });
+        //}
+
+        function updateProgress(count) {
+            $('.bar').css('width', count + '%');
+            $('.percent').text(count + '%');
+        }
+
+        function GetSymbolGroupId(MasterInstrumentId) {
+            $.ajax({
+                async: true,
+                url: '/IBLimit/GetSymbolGroupId',
+                type: "post",
+                data: { Id: MasterInstrumentId },
+                success: function (SymbolGroupId) {
+                    $("#SymbolGroupId").select2("val", `${SymbolGroupId}`)
+
+                }
+            })
+        }
+
+        function ExportIBLimit_Data() {
+            debugger 
+               var table1 = $('#iblimitList').dataTable();
+
+            $("#ProcessModal").modal({ backdrop: 'static', keyboard: false });
+            $("#ProcessModal").focus();
+            $("#ProcessModal").modal('show');
+
+            var totalCnt = table1.fnSettings().fnRecordsTotal()
+            var Interval = totalCnt / 100;
+            Interval = Interval * 10;
+            var counter = totalCnt / 100;
+            counter = Math.round(10);
+            var intervalId = window.setInterval(function () {
+                if (counter < 90) {
+                    updateProgress(counter);
+                    counter = counter + 7;
+                }
+            }, Interval);
+
+            $.ajax({
+                type: "POST",
+                url: 'ExportIBLimit_Data',
+                //contentType: false,
+                dataType: "binary",
+                processData: false,
+                xhrFields: {
+                    'responseType': 'blob'
+                },
+                success: function (res) {
+                    debugger
+                    const date = new Date();
+                    let day = date.getDate();
+                    let month = date.getMonth() + 1;
+                    let year = date.getFullYear();
+                    $("#ProcessModal").modal("hide");
+                    clearInterval(intervalId);
+                    completeHandler();
+                    let currentDate = `${day}_${month}_${year}`;
+                    updateProgress(0);
+                    NotifyMsg('success', 'The file is exported');
+                    var link = document.createElement('a'),
+                        filename = "IBLimit_" + currentDate + ".xlsx";
+                    link.href = URL.createObjectURL(res);
+                    link.download = filename;
+                    link.click();
+                },
+                error: function (errorTemp) {
+                    NotifyMsg('error', errorTemp);
+                    console.log('error', errorTemp);
+                }
+            })
+        }
+
+        $('#FileUpload').on('change', function (e) {
+            //get the file name
+            var fileName = e.target.files[0].name;
+            $(this).next('.custom-file-label').html(fileName);
+        })
+        $(document).on("submit", "#frmExcelForm", function (e) {
+            e.preventDefault();
+            var form = $(this);
+            form.ajaxSubmit({
+                beforeSubmit: function () {
+                    if (!form.valid()) {
+                        return false;
+                    }
+                    else {
+                        return true;
+                    }
+                },
+                success: function (res) {
+                    if (res.statusCode == 200) {
+                        $('#FileUpload').val('');
+                        $('#lblRule').html('Choose File')
+                        NotifyMsg('success', res.message);
+                        $('#MasterInstrumentId').val(res.response.masterinstrumentid);
+                        $('#divUploadFile').hide();
+                        window.location.href = "/IBLimit/index";
+                    } else {
+                        NotifyMsg('error', res.message);
+                    }
+                },
+                Errors: function () {
+                    console.log('error', res.message);
+                    NotifyMsg('error', res.message);
+                }
+            });
+            return false;
+        });
+
+        function completeHandler() {
+            $('.bar').width("100%");
+            $('.percent').html("100%");
+            $("#ProcessModal").modal('hide');
+        }
+    </script>
+}
+
+
+
+
+
+
+
+
+

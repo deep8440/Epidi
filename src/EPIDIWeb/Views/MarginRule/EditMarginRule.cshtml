@@ -1,0 +1,380 @@
+﻿@model Epidi.Models.ViewModel.MarginRuleViewModel.MarginRuleViewModel
+@{
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+    ViewBag.PageTitle = "Edit Margin Rule";
+    ViewBag.Method = "Edit Margin Rule";
+
+    ViewBag.DetailName = " Margin Rule";
+    ViewBag.DetailURL = "/MarginRule/Index";
+
+
+
+}
+<style>
+    .select2-container {
+        display: block;
+    }
+
+    h3 {
+        color: #dc3545 !important;
+        font-weight: bold;
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th, td {
+        text-align: left;
+        padding: 8px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+</style>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-12">
+                        <h3>Margin Rule</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-6">
+                        <div class="form-group">
+                            <input type="hidden" id="rulesDetailsData" />
+                            <input type="hidden" id="rulesCondtionData" />
+                            @Html.HiddenFor(model => model.MarginRuleId,"MarginRuleId")
+                            @Html.LabelFor(model => model.RuleName, "Rule Name")
+                            @Html.TextBoxFor(p => p.RuleName, new { @class = "form-control", @placeholder = "Rule Name" ,@name="RuleName"})
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Priority, "Priority")
+                            @Html.TextBoxFor(p => p.Priority, new { @class = "form-control", @placeholder = "Priority" ,@name="Priority", type="number"})
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.StopOutPercent, "StopOut %")
+                            @Html.TextBoxFor(p => p.StopOutPercent, new { @class = "form-control", @placeholder = "StopOut %" ,@name="StopOutPercent"})
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.MarginCallPercent, "MarginCall %")
+                            @Html.TextBoxFor(p => p.MarginCallPercent, new { @class = "form-control", @placeholder = "MarginCall %" ,@name="MarginCallPercent"})
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.LeveltotheStopOut, "Level to the StopOut")
+                            @Html.TextBoxFor(p => p.LeveltotheStopOut, new { @class = "form-control", @placeholder = "Level to the StopOut" ,@name="LeveltotheStopOut"})
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        @*<div class="form-group">
+                            @Html.LabelFor(model => model.IsPartialCloseoutonStopOut, "Is Partial Closeout on StopOut")
+                            <div  class ="col-3">
+                                <input type="checkbox" id="IsPartial" name="IsPartial" class="form-check-input" style="margin-left: 10px;" />
+                            </div>
+                        </div>*@
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.IsPartialCloseoutonStopOut, "Is Partial Closeout on StopOut")
+                            <div class="col-3">
+                                <input type="checkbox" id="IsPartial" name="IsPartial" onchange="CheckEvent()" class="form-check-input" style="margin-left: 10px;" />
+                                <input type="hidden" id="IsPartialCloseoutonStopOut" name="IsPartialCloseoutonStopOut" />
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+                <div id="accordion">
+                    <div class="card card-info">
+                        <div class="card-header">
+                            <h4 class="card-title w-100">
+                                <a class="d-block w-100" data-toggle="collapse" href="#collapseThree">
+                                    Rule Condition
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="collapseThree" class="collapse" data-parent="#accordion">
+                            <div class="card-body">
+                                <div class="col-12">
+                                    <div class="row" id="divRuleDetails">
+                                        <input id="objRuleConditions_Dtl_Id_0" type="hidden" class="form-control">
+                                        <input id="objRuleConditions_Id_0" type="hidden" class="form-control">
+                                        <div class="col-4">
+                                            <div class="form-group">
+                                                <label>Fields Name</label>
+                                                @if (Model.objRuleConditionViewModel != null && Model.objRuleConditionViewModel.conditionRulesDtlObj != "")
+                                                {
+                                                    <input type="hidden" id="ruleconditionjson" value="@Model.objRuleConditionViewModel.conditionRulesDtlObj" />
+                                                }
+                                                <select id="FieldName_0" name="FieldName_0" class="form-control" onchange="FieldsNameOnChange(0);">
+                                                    @* @foreach (var filed in ViewBag.UserFieldsList)
+                                                    {
+                                                    <option value="@filed.Value">@filed.Text</option>
+                                                    }*@
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="form-group">
+                                                <label>Operation</label>
+                                                <select id="Opration_0" name="Opration" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                        <div class="col-4" id="ddlOprationValue_0">
+                                            <div class="form-group">
+                                                <label>Operation Value</label>
+                                                <input type="text" id="OprationValue_0" name="OprationValue_0" class="form-control" placeholder="Operation Value" />
+                                                @*@Html.TextBoxFor(p => p.OprationValue, new { @class = "form-control", @placeholder = "Opration Value"
+                                                ,@name="OprationValue",Id = "OprationValue_0"})*@
+                                            </div>
+                                        </div>
+                                        <div class="col-4" id="ddlOprationValueTemp_0" style="display:none;">
+                                            <div class="form-group">
+                                                <label>Operation Value</label>
+                                                <select id="OprationIdTemp_0" name="OprationIdTemp" onchange="ddlOprationValueTempOnChange(0)" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row col-12 mt-1">
+                                        @*style="float: right;"*@
+                                        <div class="form-group">
+                                            <button type="button" onclick="AddNewRuleDtl();" id="addnewCondition" class="btn btn-primary">Add Condition</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <h3></h3>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-6">
+                        <h3></h3>
+                    </div>
+                </div>
+
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-6">
+                            <h3></h3>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button onclick="SaveMarginRule();" class="btn btn-primary">Save</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="~/js/jquery-validation/jquery.validate.min.js"></script>
+    <script src="~/js/jquery-validation/additional-methods.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+    <script src="~/js/rule_lp_priority.js"></script>
+
+    <script>
+        //$(function() {
+        //    $('#dropDown').select2();
+        //});
+
+        $(document).ready(() => {
+            var mainId = $('#Id').val();
+
+            if (mainId == "0") {
+                $('#objRuleLpPriorityViewModel_Priority').val(1000);
+            }
+            $('#StartTime').val($('#starttime').val());
+            $('#EndTime').val($('#endtime').val());
+            //GetRuleInstrumentByRuleId(mainId);
+            //GetLpRuleByRuleId(mainId);
+            BindFiledNameDynamic(0);
+            if ($('#ruleconditionjson').val() != undefined) {
+
+                var rulescondition = JSON.parse($('#ruleconditionjson').val());
+                console.log("rulescondition -" + rulescondition);
+                for (var i = 0; i < rulescondition.length; i++) {
+                    if (i > 0) {
+                        AddNewRuleDtl();
+                        var fieldName = rulescondition[i].FieldName;
+
+                        $("#FieldName_" + i).val(rulescondition[i].FieldName);
+                        $("#Opration" + i).val(rulescondition[i].OprationValue);
+                        $("#OprationValue_" + i).val(rulescondition[i].OprationValue);
+
+                        $("#objRuleConditions_Dtl_Id_" + i).val(rulescondition[i].Id);
+                        $("#objRuleConditions_Id_" + i).val(rulescondition[i].RuleConditionsId);
+
+                        var opration = rulescondition[i].Opration;
+                        var oprationValue = rulescondition[i].OprationValue;
+                        BindFiledNameDynamic(i, fieldName, opration, oprationValue);
+                    }
+                    if (i == 0) {
+                        BindFiledNameDynamic(i, rulescondition[i].FieldName, rulescondition[i].Opration, rulescondition[i].OprationValue);
+                        $("#FieldName_" + i).val(rulescondition[i].FieldName);
+                        FieldsNameOnChange(i, rulescondition[i].Opration);
+                        $("#OprationValue_" + i).val(rulescondition[i].OprationValue);
+                        //$("#OprationIdTemp_" + i).val(response.rulesDtlViewModel[i].oprationValue);
+                        $("#objRuleConditions_Dtl_Id_" + i).val(rulescondition[i].Id);
+                        $("#objRuleConditions_Id_" + i).val(rulescondition[i].RuleConditionsId);
+                    }
+                    $("#OprationValue_" + i).val(rulescondition[i].OprationValue);
+                }
+            }
+        });
+
+        function CheckEvent() {
+            var isChecked = $("#IsPartial").prop("checked");
+            $("#IsPartialCloseoutonStopOut").val(isChecked ? "true" : "false");
+        }
+
+        function BindFiledNameDynamic(count, defaultVal = "", defaultOp = "", defaultOpValue = "") {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetUserFieldsForDynamic","LeverageRules")",
+                dataType: 'json',
+                data: { tblName: 'Users' },
+                async: false,
+                success: function (response) {
+                    $("#FieldName_" + count).append(`<option value="">--Select--</option>`)
+                    for (var i = 0; i < response.length; i++) {
+                        $("#FieldName_" + count).append(`<option value="${response[i].value}">${response[i].text}</option>`)
+                    }
+                    if (defaultVal != "") {
+                        $("#FieldName_" + count).val(defaultVal);
+                        FieldsNameOnChange(count, defaultOp, defaultOpValue);
+                    }
+                },
+                error: function (errorTemp) {
+                    console.log('error', errorTemp);
+                }
+            })
+        }
+        function FieldsNameOnChange(count, defaultValue = "", defaultOpValue = "") {
+
+            $("#Opration_" + count).html("");
+            var selectedVal = $("#FieldName_" + count).val();
+            if (selectedVal != undefined) {
+                const myArray = selectedVal.split("|");
+                var FieldName = myArray[0];
+                var DataType = myArray[1];
+                var FkKey = myArray[2];
+
+                $.ajax({
+                    async: true,
+                    type: "POST",
+                    url: "@Url.Action("GetOprationDropDown","LeverageRules")",
+                    data: { FieldsName: FieldName, DataType: DataType, FkKey: FkKey },
+                    dataType: 'json',
+                    success: function (response) {
+                        $("#Opration_" + count).append(`<option value="">--Select--</option>`)
+                        for (var i = 0; i < response.length; i++) {
+                            $("#Opration_" + count).append(`<option value="${response[i].value}">${response[i].text}</option>`)
+                        }
+
+                        if (defaultValue != "") {
+                            $("#Opration_" + count).val(defaultValue);
+                        }
+
+                        $("#ddlOprationValue_" + count).show();
+                        $("#ddlOprationValueTemp_" + count).hide();
+                        if (FkKey == "1") {
+                            $("#ddlOprationValue_" + count).hide();
+                            $("#ddlOprationValueTemp_" + count).show();
+                            //}
+                            $("#OprationIdTemp_" + count).html("");
+                            $.ajax({
+                                async: true,
+                                type: "POST",
+                                url: "@Url.Action("GetTempOprationDropDown","LeverageRules")",
+                                data: { FieldsName: FieldName, DataType: DataType, FkKey: FkKey },
+                                dataType: 'json',
+                                success: function (responseTemp) {
+                                    $("#OprationIdTemp_" + count).append(`<option value="">--Select--</option>`)
+                                    for (var i = 0; i < responseTemp.length; i++) {
+                                        $("#OprationIdTemp_" + count).append(`<option value="${responseTemp[i].value}">${responseTemp[i].text}</option>`)
+                                    }
+                                    if (defaultOpValue != "") {
+                                        $("#OprationIdTemp_" + count).val(defaultOpValue);
+                                    }
+                                },
+                                error: function (errorTemp) {
+                                    console.log('error', errorTemp);
+                                }
+                            })
+                        }
+                    },
+                    error: function (error) {
+                        console.log('error', error);
+
+                    }
+                })
+            }
+        }
+        ///Add New rule Dtl
+        var countDetails = 0;
+        function AddNewRuleDtl() {
+            countDetails = countDetails + 1;
+            $("#divRuleDetails").append(`
+                                                    <input id="objRuleConditions_Dtl_Id_${countDetails}" type="hidden">
+                                                    <input id="objRuleConditions_Id_${countDetails}" type="hidden">
+                                                    <div class="col-4" id="divField_${countDetails}">
+                                                        <div class="form-group">
+                                                        <label>Fields Name</label>
+                                                        <select id="FieldName_${countDetails}" class="form-control" onchange="FieldsNameOnChange(${countDetails});">
+                                                        </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-4" id="divOpration_${countDetails}">
+                                                        <div class="form-group">
+                                                        <label>Operation</label>
+                                                        <select id="Opration_${countDetails}" class="form-control">
+                                                        </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-4" id="ddlOprationValue_${countDetails}">
+                                                        <div class="form-group">
+                                                        <label>Operation Value</label>
+                                                        <input class="form-control" id="OprationValue_${countDetails}" placeholder="Operation Value" type="text" value="" style="width: 85%;display: inline;">
+                                                        <a href="javascript:void(0)" value="Delete" onclick="DeleteMarginRule(${countDetails})"><i class="fa fa-trash" style="font-size: large;margin-top: 8px;" aria-hidden="true"></i></a>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-4" id="ddlOprationValueTemp_${countDetails}" style="display:none;">
+                                                        <div class="form-group">
+                                                            <label>Operation Value</label>
+                                                            <select id="OprationIdTemp_${countDetails}" name="OprationIdTemp" class="form-control" onchange="ddlOprationValueTempOnChange(${countDetails})" style="width: 85%;display: inline;"></select>
+                                                            <a href="javascript:void(0)" value="Delete" onclick="DeleteMarginRule(${countDetails})"><i class="fa fa-trash" style="font-size: large;margin-top: 8px;" aria-hidden="true"></i></a>
+                                                        </div>
+                                                    </div>
+                                                        `);
+            BindFiledNameDynamic(countDetails)
+        };
+
+        function ddlOprationValueTempOnChange(cnt) {
+            //OprationValue
+            var selectOprationIdTemp = $("#OprationIdTemp_" + cnt).val();
+            $("#OprationValue_" + cnt).val(selectOprationIdTemp);
+        }
+    </script>
+}

@@ -1,0 +1,379 @@
+﻿@{
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+    ViewBag.PageTitle = "SwapRule";
+    ViewBag.Method = "SwapRule";
+}
+<style>
+    .progress {
+        display: block;
+        position: relative;
+        margin: 20px;
+        width: 425px;
+        background-color: #ddd;
+        border: 1px solid blue;
+        padding: 1px;
+        left: 40px;
+        border-radius: 3px;
+    }
+
+
+
+    .percent {
+        position: absolute;
+        display: inline-block;
+        color: #fff;
+        font-weight: bold;
+        top: 100%;
+        left: 50%;
+        margin-top: -9px;
+        margin-left: -20px;
+        -webkit-border-radius: 4px;
+    }
+
+
+
+    .bar {
+        background-color: #007bff;
+        width: 0%;
+        height: 30px;
+        border-radius: 4px;
+        -webkit-border-radius: 4px;
+        -moz-border-radius: 4px;
+    }
+
+
+
+    #status {
+        margin: 20px;
+        color: #008000;
+        font-size: 16px;
+    }
+</style>
+
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-12">
+                        <button id="btnAddSwapRule" type="button" class="btn btn-outline-primary btn-uppercase float-right">
+                            <i class="ti-plus mr-2"></i> Add SwapRule
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+                <table id="swapRule" class="table table-bordered table-striped">
+                </table>
+            </div>
+            <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+    </div>
+</div>
+
+<div class="modal fade" id="ProcessModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <h1>Processing...</h1>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="col-6">
+                    <div class="progress">
+                        <div class="bar"></div>
+                        <div class="percent">0%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+    <script src="~/js/jquery-validation/jquery.validate.min.js"></script>
+    <script src="~/js/jquery-validation/additional-methods.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+    <script>
+        $(document).ready(() => {
+
+            $("body").on("click", "#btnAddSwapRule", function () {
+                window.location.href = "/SwapRule/AddSwapRule";
+            });
+
+            SwapRuleDataTable.init();
+
+            //$('#FileUpload').on('change', function (e) {
+            //    //get the file name
+            //    var fileName = e.target.files[0].name;
+            //    $(this).next('.custom-file-label').html(fileName);
+
+            //})
+        });
+
+        function ImportSwap(id) {
+            debugger;
+            $("#Loader").show();
+
+            var files = $('#FileUpload'+id).prop("files");
+            var fileName = files[0].name;
+            $('#lblRule').html(fileName)
+            formData = new FormData();
+            formData.append("FileUpload", files[0]);
+            formData.append("Id", id);
+
+
+            $.ajax({
+                async: true,
+                contentType: false,
+                processData: false,
+                type: "POST",
+                url: 'SaveSwapRule',
+                dataType: 'json',
+                data: formData,
+                success: function (res) {
+                    if (res.statusCode == 200) {
+                        //$('#FileUpload'+id).val('');
+                        //$('#lblRule').html('Choose File')
+                        $("#Loader").hide();
+                        NotifyMsg('success', res.message);
+                        window.location.href = "/SwapRule/Edit?Id=" + res.data;
+                    } else {
+                        $("#Loader").hide();
+                        NotifyMsg('error', res.message);
+                    }
+                },
+                error: function (errorTemp) {
+                    $("#Loader").hide();
+                    NotifyMsg('error', errorTemp);
+                    console.log('error', errorTemp);
+                }
+            })
+        }
+
+        var SwapRuleDataTable = function () {
+            let initTable1 = function () {
+                let table = $('#swapRule');
+
+                let oTable = table.dataTable({
+                    "order": [[1, 'asc']],
+                    "stateSave": true,
+                    "autoWidth": false,
+                    "paging": true,
+                    // Internationalisation. For more info refer to http://datatables.net/manual/i18n
+                    "language": {
+                        "aria": {
+                            "sortAscending": ": activate to sort column ascending",
+                            "sortDescending": ": activate to sort column descending"
+                        },
+                        "emptyTable": "No data available in table",
+                        "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+                        "infoEmpty": "No entries found",
+                        "infoFiltered": "(filtered1 from MAX total entries)",
+                        //"lengthMenu": "MENU entries",
+                        "search": "Search:",
+                        "zeroRecords": "No matching records found"
+                    },
+                    "pageLength": 10,
+                    "start": 0,
+                    "processing": true,
+                    "serverSide": true,
+                    "ajax": {
+                        async: true,
+                        url: '/SwapRule/Get_All',
+                        type: "post",
+                    },
+                    "columns": [
+
+                        {
+                            "title": "Id", "data": "id", "width": "3%", "name": "id"
+                        },
+                        {
+                            "title": "RuleName", "data": "ruleName", "width": "3%", "name": "RuleName"
+                        },
+                        {
+                            "title": "Comment", "data": "comment", "width": "3%", "name": "Comment"
+                        },
+                        {
+                            "title": "Priority", "data": "priority", "width": "1%"
+                        },
+                        {
+                            "title": "TimeToApply", "data": "timeToApply", "width": "1%"
+                        },
+                        {
+                            "title": "Instrument Import", "data": "id",
+                            "render": function (data, type, row) {
+                                let htmlData = "";
+                                //htmlData += "<a class='btn btn-success mr-1' href='javascript:void(0);'  data-uri='/Step/Edit?StepId=" + row.id + "' >Import</a>";
+                                //return htmlData;
+                                htmlData += "<div class='col-6' id = 'divUploadFile'>"
+                                htmlData += "<div class='custom-file form-group float-sm-left mr-3' style='width: 180px' >"
+                                htmlData += "<input type='file' id ='FileUpload"+row.id+"' name ='FileUpload"+row.id+"' class='custom-file-input' onchange='ImportSwap(" + row.id + ")'>"
+                                htmlData += "<label id='lblRule' class='custom-file-label' style = 'text-align:left' for= 'file'>Choose File</label>"
+                                htmlData += "</div></div>"
+                                return htmlData;
+                            }
+                            , "orderable": false, "width": "1%"
+                        },
+                        {
+                            "title": "Instrument Export", "data": "id",
+                            "render": function (data, type, row) {
+                                let htmlData = "";
+                                htmlData += "<a class='btn btn-success mr-1' href='/SwapRule/ExportSwapInstrument?Id=" + row.id + "'  data-uri='/Swap/ExportSwapInstrument?Id=" + row.id + "' >Export</a>";
+                                return htmlData;
+                            }
+                            , "orderable": false, "width": "3%"
+                        },
+
+                        {
+                            "title": "Action", "data": "id",
+                            "render": function (data, type, row) {
+                                var html = "<div class='' style='width:200px;'>";
+                                //btn-group dropleft
+                                html += "<a class='btn btn-success mr-1' href='/SwapRule/Edit?Id=" + row.id + "' data-uri='/SwapRule/Edit?Id=" + row.id + "' ><i class='fa fa-edit'></i></a>";
+                                html += "<a class='btn btn-danger edt-dlt mr-1' href='javascript:void(0);' data-uri='/SwapRule/DeleteSwapRule?Id=" + row.id + "' ><i class='fa fa-trash'></i></a>";
+                                html += "<a class='btn btn-success mr-1' href='javascript:void(0);' onclick='CopySwapRule("+row.id+")'; ><i class='fa fa-copy'></i></a>";
+                                //html += "<button title='Effected users' class='btn btn-success mr-1' onclick='OpenUserPopup(" + row.id + ");'><i class='fa fa-user'></i></button>";
+                                html += "</div>";
+                                return html;
+                            }
+                            , "orderable": false, "width": "3%"
+                        },
+                    ],
+                    scrollX: true,
+                    // setup responsive extension: http://datatables.net/extensions/responsive/
+                    //responsive: true,
+
+                    "lengthMenu": [
+                        [5, 10, 15, 20, 500],
+                        [5, 10, 15, 20, 500] // change per page values here
+                    ],
+                    // set the initial value
+
+                    //"dom": "<'row' <'col-md-12'B>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'f>r><'table-scrollable't><'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>", // horizobtal scrollable datatable
+
+                    // Uncomment below line("dom" parameter) to fix the dropdown overflow issue in the datatable cells. The default datatable layout
+                    // setup uses scrollable div(table-scrollable) with overflow:auto to enable vertical scroll(see: assets/global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js).
+                    // So when dropdowns used the scrollable div should be removed.
+                    //"dom": "<'row' <'col-md-12'T>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'f>r>t<'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>",
+                });
+            }
+
+            return {
+                init: function () {
+                    if ($.fn.DataTable.isDataTable("#swapRule")) {
+                        $('#swapRule').dataTable().fnDestroy();
+                        //$('#divUserTable').html('<table class="table table-striped" width="100%" id="UserTable"></table>');
+                    }
+                    initTable1();
+                }
+            };
+        }();
+        function CopySwapRule(Id) {
+            Swal.fire({
+                title: "Are you sure ?",
+                text: "you want to copy this record!",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+                showCancelButton: false,
+                showCloseButton: true,
+                focusConfirm: false,
+                showDenyButton: true,
+                focusCancelButton: true,
+                confirmButtonText: 'Yes',
+                denyButtonText: 'No',
+            })
+            .then((willdelete) => {
+            if (willdelete.value == true) {
+                $.ajax({
+                    async: true,
+                    type: "POST",
+                    url: '/SwapRule/CopyRule',
+                    dataType: 'json',
+                     data: { Id: Id },
+                    success: function (res) {
+                        NotifyMsg('success', 'Copy Succeed');
+                         SwapRuleDataTable.init();
+                    },
+                    error: function (errorTemp) {
+                        NotifyMsg('error', errorTemp);
+                        console.log('error', errorTemp);
+                    }
+                })
+            }
+        });
+        }
+
+
+
+        function ExportSwapInstrument(Id) {
+            debugger;
+            updateProgress(0);
+            var table1 = $('#swapRule tr').length;
+
+            $("#ProcessModal").modal({ backdrop: 'static', keyboard: false });
+            $("#ProcessModal").focus();
+            $("#ProcessModal").modal('show');
+
+            var totalCnt = table1;//.fnSettings().fnRecordsTotal()
+            var counter = totalCnt / 100;
+            counter = Math.round(counter);
+            var intervalId = window.setInterval(function () {
+                if (counter < 90) {
+                    updateProgress(counter);
+                    counter = counter + 7;
+                }
+            }, 50);
+
+            $.ajax({
+                type: "POST",
+                url: '/SwapRule/ExportSwapInstrument?Id=' + Id,
+                //contentType: false,
+                dataType: "binary",
+                processData: false,
+                xhrFields: {
+                    'responseType': 'blob'
+                },
+                success: function (res) {
+                    debugger
+                    const date = new Date();
+                    let day = date.getDate();
+                    let month = date.getMonth() + 1;
+                    let year = date.getFullYear();
+                    let currentDate = `${day}_${month}_${year}`;
+                    $("#ProcessModal").modal("hide");
+                    clearInterval(intervalId);
+                  
+                    NotifyMsg('success', 'The file is exported');
+                    var link = document.createElement('a'),
+                        filename = "SwapInstrument_" + currentDate + ".xlsx";
+                    link.href = URL.createObjectURL(res);
+                    link.download = filename;
+                    link.click();
+                    completeHandler();
+                },
+                error: function (errorTemp) {
+                    NotifyMsg('error', errorTemp);
+                    console.log('error', errorTemp);
+                }
+            })
+        }
+        function updateProgress(count) {
+            $('.bar').css('width', count + '%');
+            $('.percent').text(count + '%');
+        }
+        function completeHandler() {
+            $('.bar').width("100%");
+            $('.percent').html("100%");
+            $("#ProcessModal").modal('hide');
+        }
+
+
+    </script>
+}

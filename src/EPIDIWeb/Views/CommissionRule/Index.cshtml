@@ -1,0 +1,216 @@
+﻿@{
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+    ViewBag.PageTitle = "CommissionRule";
+    ViewBag.Method = "CommissionRule";
+}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-12">
+                        <button id="btnAddCommissionRule" type="button" class="btn btn-outline-primary btn-uppercase float-right">
+                            <i class="ti-plus mr-2"></i> Add Commission Rule
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+                <table id="commissionRule" class="table table-bordered table-striped">
+                </table>
+            </div>
+            <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+    </div>
+</div>
+@section Scripts{
+    <script src="~/js/jquery-validation/jquery.validate.min.js"></script>
+    <script src="~/js/jquery-validation/additional-methods.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+    <script>
+        $(document).ready(() => {
+
+            $("body").on("click", "#btnAddCommissionRule", function () {
+                window.location.href = "/CommissionRule/AddCommissionRule";
+            });
+
+            CommissionRuleDataTable.init();
+        });
+
+        function ImportCommission(id) {
+            debugger;
+            $("#Loader").show();
+
+            var files = $('#FileUpload' + id).prop("files");
+            var fileName = files[0].name;
+            $('#lblRule').html(fileName)
+            formData = new FormData();
+            formData.append("FileUpload", files[0]);
+            formData.append("Id", id);
+
+
+            $.ajax({
+                async: true,
+                contentType: false,
+                processData: false,
+                type: "POST",
+                url: 'SaveCommissionRule',
+                dataType: 'json',
+                data: formData,
+                success: function (res) {
+                    if (res.statusCode == 200) {
+                        //$('#FileUpload'+id).val('');
+                        //$('#lblRule').html('Choose File')
+                        $("#Loader").hide();
+                        NotifyMsg('success', res.message);
+                      
+                    } else {
+                        $("#Loader").hide();
+                        NotifyMsg('error', res.message);
+                    }
+                },
+                error: function (errorTemp) {
+                    $("#Loader").hide();
+                    NotifyMsg('error', errorTemp);
+                    console.log('error', errorTemp);
+                }
+            })
+        }
+
+        var CommissionRuleDataTable = function () {
+            let initTable1 = function () {
+                let table = $('#commissionRule');
+
+                let oTable = table.dataTable({
+                    "order": [[1, 'asc']],
+                    "stateSave": true,
+                    "autoWidth": false,
+                    "paging": true,
+                    // Internationalisation. For more info refer to http://datatables.net/manual/i18n
+                    "language": {
+                        "aria": {
+                            "sortAscending": ": activate to sort column ascending",
+                            "sortDescending": ": activate to sort column descending"
+                        },
+                        "emptyTable": "No data available in table",
+                        "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+                        "infoEmpty": "No entries found",
+                        "infoFiltered": "(filtered1 from MAX total entries)",
+                        //"lengthMenu": "MENU entries",
+                        "search": "Search:",
+                        "zeroRecords": "No matching records found"
+                    },
+                    "pageLength": 10,
+                    "start": 0,
+                    "processing": true,
+                    "serverSide": true,
+                    "ajax": {
+                        async: true,
+                        url: '/CommissionRule/Get_All',
+                        type: "post",
+                    },
+                    "columns": [
+
+                        {
+                            "title": "Id", "data": "id", "width": "3%", "name": "id"
+                        },
+                        {
+                            "title": "Comment", "data": "comment", "width": "3%", "name": "Comment"
+                        },
+                        {
+                            "title": "Priority", "data": "priority", "width": "1%", "name": "priority"
+                        },
+                        {
+                            "title": "TimeTo Apply", "data": "timeToApply", "width": "1%", "name": "timeToApply"
+                        },
+                        {
+                            "title": "WhenTo ApplyCombo", "data": "whenToApplyCombo", "width": "1%", "name": "whenToApplyCombo"
+                        },
+                        {
+                            "title": "Order Comment", "data": "orderComment", "width": "1%", "name": "orderComment"
+                        },
+                        {
+                            "title": "Leverage", "data": "leverage", "width": "1%", "name": "leverage"
+                        },
+                        {
+                            "title": "Chargeble Units", "data": "unitsType", "width": "1%", "name": "unitsType"
+                        },
+                        {
+                            "title": "WhereTo ApplyId", "data": "whereToApplyId", "width": "1%", "name": "whereToApplyId"
+                        },
+                        {
+                            "title": "Percentage Value", "data": "percentageValue", "width": "1%", "name": "percentageValue"
+                        },
+                        {
+                            "title": "Instrument Import", "data": "id",
+                            "render": function (data, type, row) {
+                                let htmlData = "";
+                                //htmlData += "<a class='btn btn-success mr-1' href='javascript:void(0);'  data-uri='/Step/Edit?StepId=" + row.id + "' >Import</a>";
+                                //return htmlData;
+                                htmlData += "<div class='col-6' id = 'divUploadFile'>"
+                                htmlData += "<div class='custom-file form-group float-sm-left mr-3' style='width: 170px' >"
+                                htmlData += "<input type='file' id ='FileUpload" + row.id + "' name ='FileUpload" + row.id + "' class='custom-file-input' onchange='ImportCommission(" + row.id + ")'>"
+                                htmlData += "<label id='lblRule' class='custom-file-label' style = 'text-align:left' for= 'file'>Choose File</label>"
+                                htmlData += "</div></div>"
+                                return htmlData;
+                            }
+                            , "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Instrument Export", "data": "id",
+                            "render": function (data, type, row) {
+                                let htmlData = "";
+                                htmlData += "<a class='btn btn-success mr-1' href='/CommissionRule/ExportCommissionRuleInstrument?Id=" + row.id + "'  data-uri='/CommissionRule/ExportCommissionRuleInstrument?Id=" + row.id + "' >Export</a>";
+                                return htmlData;
+                            }
+                            , "orderable": false, "width": "3%"
+                        },
+
+                        {
+                            "title": "Action", "data": "id",
+                            "render": function (data, type, row) {
+                                var html = "<div class='' style='width:92px;'>";
+                                //btn-group dropleft
+                                html += "<a class='btn btn-success  mr-1' href='/CommissionRule/Edit?Id=" + row.id + "' data-uri='/CommissionRule/Edit?Id=" + row.id + "' ><i class='fa fa-edit'></i></a>";
+                                html += "<a class='btn btn-danger edt-dlt mr-1' href='javascript:void(0);' data-uri='/CommissionRule/DeleteCommissionRule?Id=" + row.id + "' ><i class='fa fa-trash'></i></a>";
+                                //html += "<a class='btn btn-success edt-rcd mr-1' href='javascript:void(0);' data-uri='/LeverageRules/ShowUser?Id=" + row.id + "' ><i class='fa fa-user'></i></a>";
+                                //html += "<button title='Effected users' class='btn btn-success mr-1' onclick='OpenUserPopup(" + row.id + ");'><i class='fa fa-user'></i></button>";
+                                html += "</div>";
+                                return html;
+                            }
+                            , "orderable": false, "width": "3%"
+                        },
+                    ],
+                    scrollX: true,
+                    // setup responsive extension: http://datatables.net/extensions/responsive/
+                    //responsive: true,
+
+                    "lengthMenu": [
+                        [5, 10, 15, 20, 500],
+                        [5, 10, 15, 20, 500] // change per page values here
+                    ],
+                    // set the initial value
+
+                    //"dom": "<'row' <'col-md-12'B>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'f>r><'table-scrollable't><'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>", // horizobtal scrollable datatable
+
+                    // Uncomment below line("dom" parameter) to fix the dropdown overflow issue in the datatable cells. The default datatable layout
+                    // setup uses scrollable div(table-scrollable) with overflow:auto to enable vertical scroll(see: assets/global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js).
+                    // So when dropdowns used the scrollable div should be removed.
+                    //"dom": "<'row' <'col-md-12'T>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'f>r>t<'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>",
+                });
+            }
+
+            return {
+                init: function () {
+                    if ($.fn.DataTable.isDataTable("#commissionRule")) {
+                        $('#commissionRule').dataTable().fnDestroy();
+                        //$('#divUserTable').html('<table class="table table-striped" width="100%" id="UserTable"></table>');
+                    }
+                    initTable1();
+                }
+            };
+        }();
+    </script>
+}

@@ -1,0 +1,380 @@
+﻿@{
+    ViewBag.PageTitle = "Instrument Specification";
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+    ViewBag.Method = "Instrument Specification";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                @*<div class="row">
+                    <div class="col-6">
+                        @using (Html.BeginForm("UploadMasterInstrumentsExcel", "ImportInstruments", FormMethod.Post, new { enctype = "multipart/form-data", id = "frmMasterInstrumentExcelForm" }))//onsubmit = "return myFunction()"
+                        {
+                            <div class="custom-file form-group float-sm-left mr-3" style="width:230px">
+                                <input type="file" id="MasterInstrimentUpload" name="MasterInstrimentUpload" class="custom-file-input">
+                                <label id="MasterlblName" class="custom-file-label" style="text-align:left" for="file">Choose Master Instrumnet</label>
+                            </div>
+                            <button type="submit" class="btn btn-info form-group float-sm-left mr-3 ">Import MasterInstruments</button>
+                        }
+                    </div>
+                    <div class="col-6">
+                        <a href="/ImportInstruments/ExportInstrumentExcel" class="btn btn-info form-group float-sm-left mr-3">Export MasterInstruments</a>
+                    </div>
+                </div>*@
+                <div class="row">
+                    <div class="col-12">
+                        <button id="btnAddInstrumentSpecification" type="button" class="btn btn-outline-primary btn-uppercase float-right">
+                            <i class="ti-plus mr-2"></i> Add Instrument Specification
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <table id="SpecificationRule" class="table table-bordered table-striped">
+                </table>
+            </div>
+        </div>
+        <!-- /.card -->
+    </div>
+    <!-- /.col -->
+</div>
+
+<div class="modal editspecificationmodal" tabindex="-1" role="dialog" id="btnMapModal">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ModelTitleLable">Specifications</h5>
+            </div>
+
+            <div class="modal-body editspecificationsmodalbody">
+            </div>
+            <div class="modal-footer">
+                <input id="btnSave" type="button" onclick="Updatespecification();" class="btn btn-primary saveBtn" value="Save" />
+                <button class="btn btn-primary loading" type="button" disabled style="display:none;float:right;">
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    Saving...
+                </button>
+                <button type="button" onclick="ResetValues()" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+
+@section Scripts
+    {
+    <script src="~/js/jquery-validation/jquery.validate.min.js"></script>
+    <script src="~/js/jquery-validation/additional-methods.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+    <script>
+        var ioInstrument = JSON.parse(JSON.stringify(@Json.Serialize(ViewBag.IoInstrument)));
+        var lmaxInstrument = JSON.parse(JSON.stringify(@Json.Serialize(ViewBag.LMaxInstrument)));
+    </script>
+    <script src="~/js/customscript/instrumentmapping/custominstrumentmapping.js"></script>
+
+    <script>
+        $(document).ready(() => {
+
+            $("body").on("click", "#btnAddInstrumentSpecification", function() {
+                window.location.href = "/ImportInstruments/ImportSpecificationRule";
+                //AddModal("/TradeRule/AddTradeRule", "Add New TradeRule")
+            });
+
+            SpecificationRuleDataTable.init();
+
+            $('#MasterInstrimentUpload').on('change', function (e) {
+                //get the file name
+                debugger
+                var fileName = e.target.files[0].name;
+                $(this).next('.custom-file-label').html(fileName);
+            })
+
+
+
+            $(document).on("submit", "#frmMasterInstrumentExcelForm", function (e) {
+                $('#Loader').show();
+                e.preventDefault();
+                $('#Loader').show();
+                debugger
+                var form = $(this);
+                form.ajaxSubmit({ 
+                    beforeSubmit: function () {
+                        if (!form.valid()) {
+                            $('#Loader').show();
+                            return false;
+                        }
+                        else {
+                            $('#Loader').show();
+                            return true;
+                        }
+                    },
+                    success: function (res) {
+                        debugger
+                        if (res.statusCode == 200) {
+                            $('#MasterInstrimentUpload').val('');
+                            $('#MasterlblName').html('Choose Master Instruments')
+                            NotifyMsg('success', res.message);
+                            window.location.href = "/ImportInstruments/Index";
+                            $('#Loader').hide();
+
+                        } else {
+                            NotifyMsg('error', res.message);
+                            $('#Loader').hide();
+                        }
+                    },
+                    Errors: function () {
+
+                        NotifyMsg('error', res.message);
+                        $('#Loader').hide();
+                    }
+                });
+                return false;
+            });
+
+        });
+        function GetTradeTimingById(obj) {
+            debugger;
+            var id = $(obj).closest('tr').find('input[name="MasterInstrumentId"]').val();
+            var tradeId = $(obj).closest('tr').find('input[name="TradeId"]').val()
+            $.ajax({
+                type: "POST",
+                async: false,
+                url: '/ImportInstruments/Edit',
+                data: { id, tradeId},
+                success: function (data) {
+                    $('.editspecificationmodal').modal('show');
+                    $('.editspecificationsmodalbody').html(data);
+                }
+            });
+
+        }
+
+        function Updatespecification() {
+            var model = {};
+            model.Id = $('#MasterInstrumentId').val();
+            model.InstrumentName = $('#ddlinstrumentmaster option:selected').text();
+            model.SymbolGroup = $('#ddlsymbolgroup option:selected').text();
+            model.tradeTimings = [];
+            var count = $('.tradetimingcontrols').length;
+            for (var i = 0; i < count; i++) {
+                var trades = {};
+                trades.QTFrom = $('#txtQTFrom' + i).val();
+                trades.QTTo = $('#txtQTTo' + i).val();
+                trades.Day = $('#txtdays' + i).val();
+                trades.TTFrom = $('#txtTTFrom' + i).val();
+                trades.TTTo = $('#txtTTTo'+i).val();
+                model.tradeTimings.push(trades);
+            }
+            model.SymbolDenomination = $('#txtsymboldenom').val();
+            model.TradeStatus = $('#ddltradestatus option:selected').text();
+            model.AverageSpread = $('#txtaveragespeed').val();
+            model.Decimals = $('#txtdecimals').val();
+            model.TradeId = $('#TradeId').val();
+            $.ajax({
+                type: "POST",
+                async: false,
+                url: '/ImportInstruments/UpdateSpecifications',
+                data: { model },
+                success: function (data) {
+                    $('.editspecificationmodal').modal('hide');
+                    $('.editspecificationsmodalbody').html('');
+                    alert('Record updated');
+                    window.location.href = "/ImportInstruments/Index"
+                }
+            });
+        }
+        var SpecificationRuleDataTable = function () {
+            let initTable1 = function () {
+                let table = $('#SpecificationRule');
+
+                let oTable = table.dataTable({
+                    "stateSave": true,
+                    "autoWidth": false,
+                    "paging": true,
+                    // Internationalisation. For more info refer to http://datatables.net/manual/i18n
+                    "language": {
+                        "aria": {
+                            "sortAscending": ": activate to sort column ascending",
+                            "sortDescending": ": activate to sort column descending"
+                        },
+                        "emptyTable": "No data available in table",
+                        "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+                        "infoEmpty": "No entries found",
+                        "infoFiltered": "(filtered1 from MAX total entries)",
+                        //"lengthMenu": "MENU entries",
+                        "search": "Search:",
+                        "zeroRecords": "No matching records found"
+                    },
+                    "pageLength": 10,
+                    "processing": true,
+                    "serverSide": true,
+                    "ajax": {
+                        async: false,
+                        url: '/ImportInstruments/All_SpecificationRule',
+                        type: "post",
+                    },
+                    "columns": [
+
+                        {
+                            "title": "Comment", "data": "comment", "name": "Comment", "orderable": true, "width": "2%"
+                        },
+                        {
+                            "title": "Priority", "data": "priority", "name": "Priority", "orderable": true, "width": "1%"
+                        },
+                        {
+                            "title": "Action  ", "data": "id",
+                            "render": function (data, type, row) {
+                                let htmlData = "";
+                                
+                                htmlData += '<input type="hidden" name="MasterInstrumentId" value=' + row['id'] + ' />'
+                                htmlData += '<a class="btn btn-success  mr-1" href="/ImportInstruments/EditSpecificationRule?Id=' + row.id + '"><i class="fa fa-edit"></i></a>';
+                                htmlData += "<a class='btn btn-danger edt-dlt mr-1' href='javascript:void(0);' data-uri='/ImportInstruments/DeleteSpecificationRule?Id=" + row.id + "' ><i class='fa fa-trash'></i></a>";
+                                return htmlData;
+                            }
+                            , "orderable": false, "width": "1%"
+                        },
+                    ],
+                   //"scrollX": true,
+                    // setup responsive extension: http://datatables.net/extensions/responsive/
+                    responsive: true,
+
+                    "lengthMenu": [
+                        [5, 10, 15, 20, 1000],
+                        [5, 10, 15, 20, 1000] // change per page values here
+                    ],
+                    // set the initial value
+
+                    //"dom": "<'row' <'col-md-12'B>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'f>r><'table-scrollable't><'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>", // horizobtal scrollable datatable
+
+                    // Uncomment below line("dom" parameter) to fix the dropdown overflow issue in the datatable cells. The default datatable layout
+                    // setup uses scrollable div(table-scrollable) with overflow:auto to enable vertical scroll(see: assets/global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js).
+                    // So when dropdowns used the scrollable div should be removed.
+                    //"dom": "<'row' <'col-md-12'T>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'f>r>t<'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>",
+                });
+            }
+
+            return {
+                init: function () {
+                    if ($.fn.DataTable.isDataTable("#instrumentMasterMapping")) {
+                        $('#instrumentMasterMapping').dataTable().fnDestroy();
+                        //$('#divUserTable').html('<table class="table table-striped" width="100%" id="UserTable"></table>');
+                    }
+                    initTable1();
+                }
+            };
+        }();
+
+        var MasterInstrumentDataTable = function () {
+            let initTable1 = function () {
+                let table = $('#instrumentMasterMapping');
+
+                let oTable = table.dataTable({
+                    "stateSave": true,
+                    "autoWidth": false,
+                    "paging": true,
+                    // Internationalisation. For more info refer to http://datatables.net/manual/i18n
+                    "language": {
+                        "aria": {
+                            "sortAscending": ": activate to sort column ascending",
+                            "sortDescending": ": activate to sort column descending"
+                        },
+                        "emptyTable": "No data available in table",
+                        "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+                        "infoEmpty": "No entries found",
+                        "infoFiltered": "(filtered1 from MAX total entries)",
+                        //"lengthMenu": "MENU entries",
+                        "search": "Search:",
+                        "zeroRecords": "No matching records found"
+                    },
+                    "pageLength": 10,
+                    "processing": true,
+                    "serverSide": true,
+                    "ajax": {
+                        async: false,
+                        url: '/ImportInstruments/All_Import_MasterInstrument',
+                        type: "post",
+                    },
+                    "columns": [
+
+                        {
+                            "title": "InstrumentName", "data": "instrumentName", "name": "InstrumentName", "orderable": true, "width": "2%"
+                        },
+                        {
+                            "title": "SymbolGroup", "data": "symbolGroup", "name": "SymbolGroup", "orderable": true, "width": "1%"
+                        },
+                        {
+                            "title": "TTFrom", "data": "ttFrom", "name": "TTFrom", "orderable": false, "width": "1%"
+                        },
+                        {
+                            "title": "TTTo", "data": "ttTo", "name": "TTTo", "orderable": false, "width": "1%"
+                        },
+                        {
+                            "title": "QTFrom", "data": "qtFrom", "name": "QTFrom", "orderable": false, "width": "1%"
+                        },
+                        {
+                            "title": "QTTo", "data": "qtTo", "name": "QTTo", "orderable": false, "width": "1%"
+                        },
+                        {
+                            "title": "TradeStatus", "data": "tradeStatus", "name": "TradeStatus", "orderable": true, "width": "1%"
+                        },
+                        {
+                            "title": "AverageSpread", "data": "averageSpread","name":"AverageSpread" ,"orderable": true, "width": "1%"
+                        },
+                        {
+                            "title": "Decimals", "data": "decimals", "name":"Decimals","orderable": true, "width": "1%"
+                        },
+                        {
+                            "title": "SymbolDenomination", "data": "symbolDenomination","name":"SymbolDenomination" ,"orderable": true, "width": "1%"
+                        },
+                        {
+                            "title": "Unit Description", "data": "unitDescription","name":"UnitDescription" ,"orderable": true, "width": "1%"
+                        },
+                        {
+                            "title": "Action  ", "data": "id",
+                            "render": function (data, type, row) {
+                                let htmlData = "";
+
+                                htmlData += '<input type="hidden" name="TradeId" value=' + row['tradeId'] + ' />';
+                                htmlData += '<input type="hidden" name="MasterInstrumentId" value=' + row['id'] + ' />'
+                                htmlData += `<button title="Edit TradeTiming" class="btn btn-sm btn-success mr-1" onclick="GetTradeTimingById($(this));"><i class="fa fa-edit"></i></button>`;
+                                htmlData += `<button title="Delete TradeTiming" class="btn btn-sm btn-danger mr-1" onclick="DeleteTradeTiming($(this));"><i class="fa fa-trash"></i></button>`;
+                                return htmlData;
+                            }
+                            , "orderable": false, "width": "1%"
+                        },
+                    ],
+                   "scrollX": true,
+                    // setup responsive extension: http://datatables.net/extensions/responsive/
+                    //responsive: true,
+
+                    "lengthMenu": [
+                        [5, 10, 15, 20, 1000],
+                        [5, 10, 15, 20, 1000] // change per page values here
+                    ],
+                    // set the initial value
+
+                    //"dom": "<'row' <'col-md-12'B>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'f>r><'table-scrollable't><'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>", // horizobtal scrollable datatable
+
+                    // Uncomment below line("dom" parameter) to fix the dropdown overflow issue in the datatable cells. The default datatable layout
+                    // setup uses scrollable div(table-scrollable) with overflow:auto to enable vertical scroll(see: assets/global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js).
+                    // So when dropdowns used the scrollable div should be removed.
+                    //"dom": "<'row' <'col-md-12'T>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'f>r>t<'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>",
+                });
+            }
+
+            return {
+                init: function () {
+                    if ($.fn.DataTable.isDataTable("#instrumentMasterMapping")) {
+                        $('#instrumentMasterMapping').dataTable().fnDestroy();
+                        //$('#divUserTable').html('<table class="table table-striped" width="100%" id="UserTable"></table>');
+                    }
+                    initTable1();
+                }
+            };
+        }();
+
+    </script>
+}

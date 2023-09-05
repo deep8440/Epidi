@@ -1,0 +1,347 @@
+﻿@{
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+    ViewBag.PageTitle = "User Transactions";
+    ViewBag.Method = "User Transactions";
+}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-1">
+                        <label>User List</label>
+                    </div>
+                    <div class="col-3">
+                        <div class="form-group">
+                            @Html.DropDownList("Id", new SelectList(ViewBag.TransactionUsersList, "Value", "Text", "Id"), "-- Select User --", new { @class = "form-control" ,@id="UserId" })
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <label>Transaction Type</label>
+                    </div>
+                    <div class="col-3">
+                        <div class="form-group">
+
+                            @Html.DropDownList("Id", new SelectList(ViewBag.transactionType, "Value", "Text", "Id"), "-- Select Type --", new { @class = "form-control" ,@id="TransactionType" })
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <button id="btnAddQue" type="button" class="btn btn-outline-secondary btn-uppercase float-right" onclick="AddFilter();">
+                            <i class="ti-plus mr-2"></i> Search
+                        </button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-1">
+
+                        <div class="form-group" style="width:78px;">
+                            <label>From Date:</label>
+                        </div>
+
+                    </div>
+                    <div class="col-3">
+
+                        <div class="form-group">
+                            <div class="input-group date" id="fromdate" data-target-input="nearest">
+                                <input type="text" class="form-control datetimepicker-input" id="fdate" data-target="#fromdate">
+                                <div class="input-group-append" data-target="#fromdate" data-toggle="datetimepicker">
+                                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-1">
+
+                        <div class="form-group">
+                            <label>To Date:</label>
+                        </div>
+
+                    </div>
+                    <div class="col-3">
+
+                        <div class="form-group">
+                            <div class="input-group date" id="todate" data-target-input="nearest">
+                                <input type="text" class="form-control datetimepicker-input" id="tdate" data-target="#todate">
+                                <div class="input-group-append" data-target="#todate" data-toggle="datetimepicker">
+                                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-4">
+                        <button id="btnAddTransaction" type="button" class="btn btn-outline-primary btn-uppercase float-right">
+                            <i class="ti-plus mr-2"></i> Add Transaction
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+                <table id="userTransactionsList" class="table table-bordered table-striped">
+                </table>
+            </div>
+            <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+    </div>
+</div>
+@section Scripts{
+    <script src="~/js/jquery-validation/jquery.validate.min.js"></script>
+    <script src="~/js/jquery-validation/additional-methods.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+    <script>
+
+
+        $(document).ready(() => {
+
+            $('#userTransactionsList').on('draw.dt', function () {
+                $('[data-toggle="tooltip"]').tooltip();
+            });
+
+            $('#fromdate').datetimepicker({
+                format: 'DD-MM-YYYY'
+            });
+
+            $('#todate').datetimepicker({
+                format: 'DD-MM-YYYY'
+            });
+
+            $("body").on("click", "#btnAddTransaction", function () {
+            
+                AddModal("/UserTransactions/AddUserTransaction", "Add New Transaction")
+            });
+
+            UserTransactionsDataTable.init('', '', '', '');
+
+
+            $(document).on("submit", "#transactionForm", function (e) {
+
+                debugger;
+                e.preventDefault();
+                TransactionValidation();
+                var form = $(this);
+                form.ajaxSubmit({
+                    beforeSubmit: function () {
+                        if (!form.valid()) {
+
+                            return false;
+                        }
+                        else {
+
+                            return true;
+                        }
+                    },
+                    success: function (res) {
+                        debugger;
+                        if (res.code == 200) {
+                            $("#frmModel").modal('hide');
+                            $("#transactionForm").resetForm();
+
+                            UserTransactionsDataTable.init('', '', '', '');
+
+                             NotifyMsg('success', res.message);
+
+                        } else {
+
+                            NotifyMsg('error', res.message);
+                        }
+                    },
+                    Errors: function () {
+
+                      NotifyMsg('error', res.message);
+                    }
+                });
+                return false;
+            });
+        });
+
+        function TransactionValidation() {
+            $('#transactionForm').validate({
+                rules: {
+                    UserId: {
+                        required: true
+                    },
+                    Type: {
+                        required: true
+                    },
+                    Amount: {
+                        required: true
+                    },
+                    Comment: {
+                        required: true
+                    }
+                },
+                messages: {
+                    UserId: {
+                        required: "Please select UserName"
+                    },
+                    Type: {
+                        required: "Please enter Transaction Type"
+                    },
+                    Amount: "Please enter amount",
+                    Comment: "Please enter comment",
+
+                },
+                errorElement: 'span',
+                errorPlacement: function (error, element) {
+                    error.addClass('invalid-feedback');
+                    element.closest('.form-group').append(error);
+                },
+                highlight: function (element, errorClass, validClass) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function (element, errorClass, validClass) {
+                    $(element).removeClass('is-invalid');
+                }
+            });
+        }
+        var UserTransactionsDataTable = function (userId, fromDate, toDate, type) {
+            let initTable1 = function () {
+                let table = $('#userTransactionsList');
+
+                let oTable = table.dataTable({
+                    "stateSave": true,
+                    "autoWidth": false,
+                    "paging": true,
+                    // Internationalisation. For more info refer to http://datatables.net/manual/i18n
+                    "language": {
+                        "aria": {
+                            "sortAscending": ": activate to sort column ascending",
+                            "sortDescending": ": activate to sort column descending"
+                        },
+                        "emptyTable": "No data available in table",
+                        "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+                        "infoEmpty": "No entries found",
+                        "infoFiltered": "(filtered1 from MAX total entries)",
+                        //"lengthMenu": "MENU entries",
+                        "search": "Search:",
+                        "zeroRecords": "No matching records found"
+                    },
+                    "pageLength": 10,
+                    "processing": true,
+                    "serverSide": true,
+                    "ajax": {
+                        async: true,
+                        url: '/UserTransactions/User_Transactions_All',
+                        type: "post",
+                        data: { UserId: userId, FromDate: fromDate, ToDate: toDate, Type: type }
+                    },
+                    "columns": [
+
+                        {
+                            "title": "UserName", "data": "userName", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Type", "data": "type", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Amount", "data": "amount", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Current Balance", "data": "currentBalance", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Comment", "data": "comment",
+                            "render": function (data, type, row) {
+                                debugger;
+                                let htmlData = "";
+                                return row.comment.length > 25 ? '<span data-toggle="tooltip" title= \"' + row.comment + '\">' + row.comment.substr(0, 25) + '...</span>' : row.comment;
+                            }
+                            , "orderable": false, "width": "3%"
+                        },
+                        //{
+                        //    "title": "Action", "data": "id",
+                        //    "render": function (data, type, row) {
+
+                        //        let htmlData = "";
+                        //        if (row.requestType == 'OUT') {
+                        //            if (row.currentBalance >= row.amount) {
+                        //                htmlData += `<button title="Approve" class="btn btn-sm btn-success mr-1" onclick="AddNote('${(row["id"])}','${(row["userId"])}','${(row["requestType"])}','${(row["amount"])}','Approved','${(row["currentBalance"])}');" > <i class="fa fa-check" > </i></button > `;
+                        //            }
+                        //        }
+                        //        else {
+                        //            htmlData += `<button title="Approve" class="btn btn-sm btn-success mr-1" onclick="AddNote('${(row["id"])}','${(row["userId"])}','${(row["requestType"])}','${(row["amount"])}','Approved','${(row["currentBalance"])}');" > <i class="fa fa-check" > </i></button > `;
+                        //        }
+                        //        htmlData += `<button title="Reject" class="btn btn-sm btn-danger mr-1" onclick="AddNote('${(row["id"])}','${(row["userId"])}','${(row["requestType"])}','${(row["amount"])}','Rejected','${(row["currentBalance"])}');"><i class="fa fa-times"></i></button>`;
+                        //        return htmlData;
+                        //    }
+                        //    , "orderable": false, "width": "3%"
+                        //},
+                    ],
+
+                    // setup responsive extension: http://datatables.net/extensions/responsive/
+                    responsive: true,
+
+                    "lengthMenu": [
+                        [5, 10, 15, 20, 1000],
+                        [5, 10, 15, 20, 1000] // change per page values here
+                    ],
+                    // set the initial value
+
+                    //"dom": "<'row' <'col-md-12'B>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'f>r><'table-scrollable't><'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>", // horizobtal scrollable datatable
+
+                    // Uncomment below line("dom" parameter) to fix the dropdown overflow issue in the datatable cells. The default datatable layout
+                    // setup uses scrollable div(table-scrollable) with overflow:auto to enable vertical scroll(see: assets/global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js).
+                    // So when dropdowns used the scrollable div should be removed.
+                    //"dom": "<'row' <'col-md-12'T>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'f>r>t<'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>",
+                });
+            }
+
+            return {
+                init: function (UserId, FromDate, ToDate, Type) {
+                    debugger;
+                    if ($.fn.DataTable.isDataTable("#userTransactionsList")) {
+                        $('#userTransactionsList').dataTable().fnDestroy();
+                        userId = UserId;
+                        fromDate = FromDate;
+                        toDate = ToDate;
+                        type = Type;
+                        //$('#divUserTable').html('<table class="table table-striped" width="100%" id="UserTable"></table>');
+                    }
+                    initTable1();
+                }
+            };
+        }();
+
+        function AddFilter() {
+            debugger;
+
+            var fromdate = $('#fdate').val();
+            var todate = $('#tdate').val();
+            var UserId = $('#UserId').val();
+            var type = $('#TransactionType').val();
+
+            if (fromdate != '' && todate != '') {
+                var fdateAr = fromdate.split('-');
+                var tdateAr = todate.split('-');
+                var newFromDate = fdateAr[2] + '-' + fdateAr[1] + '-' + fdateAr[0].slice(-2);
+                var newToDate = tdateAr[2] + '-' + tdateAr[1] + '-' + tdateAr[0].slice(-2);
+                fromdate = newFromDate;
+                todate = newToDate;
+                newFromDate = new Date(newFromDate);
+                newToDate = new Date(newToDate);
+                if (newFromDate > newToDate) {
+
+                    NotifyMsg('error', 'Please select greter than To Date');
+                    return false;
+                }
+            }
+            if (fromdate != "" && todate == "") {
+
+                NotifyMsg('error', 'Please select to date');
+
+                return false;
+            }
+            if (todate != "" && fromdate == "") {
+                NotifyMsg('error', 'Please select from date');
+                return false;
+            }
+
+
+            UserTransactionsDataTable.init(UserId, fromdate, todate, type);
+
+        }
+    </script>
+}

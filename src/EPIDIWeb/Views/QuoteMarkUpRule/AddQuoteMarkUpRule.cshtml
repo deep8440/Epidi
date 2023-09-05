@@ -1,0 +1,814 @@
+﻿@model QuoteMarkUpRuleViewModel
+@{
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+    ViewBag.PageTitle = "Add Quote Mark Rule";
+    ViewBag.Method = " Edit QuoteMarkUpRule";
+
+    ViewBag.DetailName = "QuoteMarkUpRule";
+    ViewBag.DetailURL = "/QuoteMarkUpRule/Index";
+
+}
+<style>
+    /* Chrome, Safari, Edge, Opera */
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    /* Firefox */
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+
+    .select2-container {
+        display: block;
+    }
+
+    h3 {
+        color: #dc3545 !important;
+        font-weight: bold;
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th, td {
+        text-align: left;
+        padding: 8px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
+    .progress {
+        display: block;
+        position: relative;
+        margin: 20px;
+        width: 425px;
+        background-color: #ddd;
+        border: 1px solid blue;
+        padding: 1px;
+        left: 40px;
+        border-radius: 3px;
+    }
+
+    .percent {
+        position: absolute;
+        display: inline-block;
+        color: #fff;
+        font-weight: bold;
+        top: 100%;
+        left: 50%;
+        margin-top: -9px;
+        margin-left: -20px;
+        -webkit-border-radius: 4px;
+    }
+
+    .bar {
+        background-color: #007bff;
+        width: 0%;
+        height: 30px;
+        border-radius: 4px;
+        -webkit-border-radius: 4px;
+        -moz-border-radius: 4px;
+    }
+</style>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-12">
+                        <h3>Quote MarkUp Rule</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                @using (Html.BeginForm("UploadQuoteMarkupRule", "QuoteMarkUpRule", FormMethod.Post, new { enctype = "multipart/form-data", id = "frmQuoteMarkUpExcelForm", style = "padding: 8px;" }))//onsubmit = "return myFunction()"
+                {
+                    <div class="row">
+                        <div class="col-3">
+                            <div class="form-group">
+                                @*<input type="hidden" id="lpRulesPriorityData" />*@
+                                <input type="hidden" id="rulesCondtionData" />
+                                <input type="hidden" id="instrumentData" />
+                                @Html.HiddenFor(model => model.Id,"Id")
+                                @Html.LabelFor(model => model.Name, "Name")
+                                @Html.TextBoxFor(p => p.Name, new { @class = "form-control", @placeholder = "Name" ,@name="Name"})
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.AutoupdateLPPriorityUp, "Auto Update LP Priority Up")
+                                <div class="col-3">
+                                    <input type="checkbox" id="AutoUpdate" name="AutoUpdate" onchange="CheckEvent()" class="form-check-input" style="margin-left: 12px;" />
+                                    <input type="hidden" id="AutoupdateLPPriorityUp" name="AutoupdateLPPriorityUp" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.Priority, "Priority")
+                                @Html.TextBoxFor(p => p.Priority, new { @class = "form-control", @placeholder = "Priority" ,@name="Priority"})
+                            </div>
+                        </div>
+                        @*<div class="col-3" style="margin-top:32px;">
+                    <div class="form-group">
+                    <button type="button" onclick="ExportQuoteMarkUpRule();" id="exportToExcel" class="btn btn-info">Export QuoteMarkUpRule</button>
+                    </div>
+                    </div>*@
+                    </div>
+                    <div class="row">
+                        @if (Model.objRuleConditionViewModel != null && Model.objRuleConditionViewModel.conditionRulesDtlObj != "")
+                        {
+                            <input type="hidden" id="ruleconditionjson" value="@Model.objRuleConditionViewModel.conditionRulesDtlObj" />
+                        }
+                        <div class="col-3 text-left" id="divUploadFile">
+                            <div class="custom-file form-group mt-3" style="width:240px">
+                                <input type="file" id="FileUpload" name="FileUpload" class="custom-file-input ">
+                                <label id="lblRule" class="custom-file-label" style="text-align:left" for="file">Choose QuoteMarkUp</label>
+                            </div>
+                            @*<button type="submit" class="btn btn-info form-group float-sm-left mr-3 ">Import Trade Rule</button>*@
+
+                        </div>
+                        <div class="col-6 text-left">
+                            <button type="submit" id="importToExcel" class="btn btn-info mt-3 ml-3">Import QuoteMarkUpRule</button>
+                        </div>
+
+                    </div>
+
+                    <div class="mt-3 text-left">
+                        <button type="button" onclick="ExportQuoteMarkUpRule();" id="exportToExcel" class="btn btn-info">Export QuoteMarkUpRule</button>
+                    </div>
+                }
+
+
+                <div id="accordion">
+                    <div class="card card-info">
+                        <div class="card-header">
+                            <h3 class="card-title w-100">
+                                <a class="d-block w-100 collapsed" data-toggle="collapse" href="#collapseOne" aria-expanded="false">
+                                    Instrument Rules
+                                </a>
+                            </h3>
+                        </div>
+                        <div id="collapseOne" class="collapse show" data-parent="#accordion" style="">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-3">
+                                        @* <input class="form-control" id="StartTime_110" type="time" step="1" min="00:00" max="23:59">*@
+                                        <label>Instruments</label>
+
+
+                                        <select class="form-control  js-select2 disabled" id="instrumentid_filter" style="border:1px solid;">
+                                            @foreach (var item in (SelectList)ViewBag.InstrumentList)
+                                            {
+                                                <option value="@item.Value">@item.Text</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="col-3">
+                                        <label>LP</label>
+                                        <select class="form-control js-select2 disabled" id="objRuleLpPriorityViewModel_LPId_filter" style="border:1px solid;">
+                                        </select>
+                                    </div>
+                                    @*<div class="col-3">
+                                    <label>Day</label>
+                                    <select class="form-control" id="day_filter" style="border:1px solid;">
+                                    <option value="0">--Select--</option>
+                                    <option value="1">Sunday</option>
+                                    <option value="2">Monday</option>
+                                    <option value="3">Tuesday</option>
+                                    <option value="4">Wednesday</option>
+                                    <option value="5">Thursday</option>
+                                    <option value="6">Friday</option>
+                                    <option value="7">Saturday</option>
+                                    </select>
+                                    </div>*@
+                                    <div class="col-3">
+                                        <div class="form-group mt-3">
+                                            <button type="button" onclick="btnSearchClick();" id="Search" class="btn btn-info mt-3">Search</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="DivInstrument" style="width: 100%;overflow-x: auto;">
+                                    <table id="tblInstrument">
+                                        @*<tr>
+                                            <th>#</th>
+                                            <th>Instruments</th>
+                                            <th>Day</th>
+                                            <th>Start Time</th>
+                                            <th>End Time</th>
+                                            <th>Max Spread</th>
+                                            <th>LP</th>
+                                            <th>Priority</th>
+                                            <th>MBId</th>
+                                            <th>Mask</th>
+                                            <th>Timeout</th>
+                                            <th>Action</th>
+                                        </tr>*@
+                                        @*<tr>
+                                        <td>
+                                        <div class="form-group">
+                                        <input id="objRuleInstrument_Id_0" type="hidden" value="1">
+                                        <input id="objRuleInstrumen_RuleId_0" type="hidden" value="1">
+                                        <select class="form-control" id="instrumentid_0" style="border:1px solid;">
+                                        <option value=""> --Select--</option>
+                                        <option value="7"> Apple</option>
+                                        <option value="8"> JBL</option>
+                                        <option value="11"> EURUSD</option>
+                                        <option value="12"> JBL123</option>
+                                        </select>
+                                        </div>
+                                        </td>
+                                        <td style="width:130px;">
+                                        <div class="form-group">
+                                        <select class="form-control" id="Day_0" name="Day">
+                                        <option value="1">Sunday</option>
+                                        <option value="2">Monday</option>
+                                        <option value="3">Tuesday</option>
+                                        <option value="4">Wednesday</option>
+                                        <option value="5">Thursday</option>
+                                        <option value="6">Friday</option>
+                                        <option value="7">Saturday</option>
+                                        </select>
+                                        </div>
+                                        </td>
+                                        <td>
+                                        <div class="form-group">
+                                        <input class="form-control" id="StartTime_0" type="time">
+                                        </div>
+                                        </td>
+                                        <td>
+                                        <div class="form-group">
+                                        <input class="form-control" id="EndTime_0" type="time">
+                                        </div>
+                                        </td>
+                                        <td>
+                                        <div class="form-group">
+                                        <input class="form-control valid" id="MaxSpread_0" placeholder="Max Spread" type="number">
+                                        </div>
+                                        </td>
+                                        <td style="width:100px;">
+                                        <input id="objRuleLpPriorityViewModel_Id_0_0" type="hidden" value="1">
+                                        <input id="objRuleLpPriorityViewModel_RuleId_0_0" type="hidden" value="1">
+                                        <input id="objRuleLpPriorityViewModel_RuleInstrumentId_0_0" type="hidden" value="1">
+                                        <div class="form-group">
+                                        <select id="objRuleLpPriorityViewModel_LPId_0_0" class="form-control">
+                                        <option value="">--Select--</option>
+                                        <option value="1">GATEIO</option>
+                                        <option value="2">LMAX</option>
+                                        <option value="3">Saxo</option>
+                                        </select>
+                                        </div>
+                                        </td>
+                                        <td>
+                                        <div class="form-group">
+                                        <input class="form-control" id="objRuleLpPriorityViewModel_Priority_0_0" placeholder="Priority" type="number" value="1">
+                                        </div>
+                                        </td>
+                                        <td>
+                                        <div class="form-group">
+                                        <input class="form-control" id="objRuleLpPriorityViewModel_MarkUpValue_0_0" placeholder="MarkUpValue" type="number" value="0">
+                                        </div>
+                                        </td>
+                                        <td>
+                                        <div class="form-group">
+                                        <input class="form-control" id="objRuleLpPriorityViewModel_MbId_0_0" placeholder="MBId" type="number" value="12">
+                                        </div>
+                                        </td>
+                                        <td>
+                                        <div class="form-group">
+                                        <input class="form-control" id="objRuleLpPriorityViewModel_Mask_0_0" placeholder="Mask" type="number" value="-5">
+                                        </div>
+                                        </td>
+                                        <td>
+                                        <div class="form-group">
+                                        <input class="form-control" id="objRuleLpPriorityViewModel_Timeout_0_0" placeholder="Timeout" type="number" value="15000">
+                                        </div>
+                                        </td>
+                                        <td>
+                                        <div class="form-group">
+                                        <a href="javascript:void(0)" value="Delete" onclick="DeleteLpRule(1,1)" style=" display: block; width: 100%; height: calc(2.25rem + 2px); padding: 0.375rem 0.75rem;">
+                                        <i class="fa fa-trash" style="font-size: large;margin-top: 8px;" aria-hidden="true"></i>
+                                        </a>
+                                        </div>
+                                        </td>
+                                        </tr>*@
+                                    </table>
+                                </div>
+
+                                <div class="row col-12 mt-1">
+                                    @*style="float: right;"*@
+                                    <div class="form-group">
+                                        <button type="button" onclick="AddInstrumentRule();" id="addnewInstrumentRule" class="btn btn-primary">Add Instrument Rule</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card card-info">
+                        <div class="card-header">
+                            <h4 class="card-title w-100">
+                                <a class="d-block w-100" data-toggle="collapse" href="#collapseThree">
+                                    Rule Condition
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="collapseThree" class="collapse" data-parent="#accordion">
+                            <div class="card-body">
+                                <div class="col-12">
+                                    <div class="row" id="divRuleDetails">
+                                        <input id="objRuleConditions_Dtl_Id_0" type="hidden" class="form-control">
+                                        <input id="objRuleConditions_Id_0" type="hidden" class="form-control">
+                                        <div class="col-4">
+                                            <div class="form-group">
+                                                <label>Fields Name</label>
+                                                @if (Model.objRuleConditionViewModel != null && Model.objRuleConditionViewModel.conditionRulesDtlObj != "")
+                                                {
+                                                    <input type="hidden" id="ruleconditionjson" value="@Model.objRuleConditionViewModel.conditionRulesDtlObj" />
+                                                }
+                                                <select id="FieldName_0" name="FieldName_0" class="form-control" onchange="FieldsNameOnChange(0);">
+                                                    @* @foreach (var filed in ViewBag.UserFieldsList)
+                                                    {
+                                                    <option value="@filed.Value">@filed.Text</option>
+                                                    }*@
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="form-group">
+                                                <label>Operation</label>
+                                                <select id="Opration_0" name="Opration" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                        <div class="col-4" id="ddlOprationValue_0">
+                                            <div class="form-group">
+                                                <label>Operation Value</label>
+                                                <input type="text" id="OprationValue_0" name="OprationValue_0" class="form-control" placeholder="Operation Value" />
+                                                @*@Html.TextBoxFor(p => p.OprationValue, new { @class = "form-control", @placeholder = "Opration Value"
+                                                ,@name="OprationValue",Id = "OprationValue_0"})*@
+                                            </div>
+                                        </div>
+                                        <div class="col-4" id="ddlOprationValueTemp_0" style="display:none;">
+                                            <div class="form-group">
+                                                <label>Operation Value</label>
+                                                <select id="OprationIdTemp_0" name="OprationIdTemp" onchange="ddlOprationValueTempOnChange(0)" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row col-12 mt-1">
+                                        @*style="float: right;"*@
+                                        <div class="form-group">
+                                            <button type="button" onclick="AddNewRuleDtl();" id="addnewCondition" class="btn btn-primary">Add Condition</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6">
+                        <h3></h3>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-6">
+                        <h3></h3>
+                    </div>
+                </div>
+
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-6">
+                            <h3></h3>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button onclick="SaveQuoteMarkUpRule();" class="btn btn-primary">Save</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ProcessModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <h1>Processing...</h1>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="col-6">
+                    <div class="progress">
+                        <div class="bar"></div>
+                        <div class="percent">0%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="~/js/jquery-validation/jquery.validate.min.js"></script>
+    <script src="~/js/jquery-validation/additional-methods.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+    <script src="~/js/rule_lp_priority.js"></script>
+
+    @*<script src="https://code.jquery.com/jquery-3.1.0.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>*@
+    <script>
+        //$(function() {
+        //    $('#dropDown').select2();
+        //});
+
+        $(document).ready(() => {
+            var mainId = $('#Id').val();
+            $("#instrumentid_filter").select2();
+            $("#objRuleLpPriorityViewModel_LPId_filter").select2();
+            BindLpRule("0");
+            if (mainId == "0") {
+                $('#objRuleLpPriorityViewModel_Priority').val(1000);
+            }
+            $('#StartTime').val($('#starttime').val());
+            $('#EndTime').val($('#endtime').val());
+            GetRuleInstrumentByRuleId(mainId);
+            GetLpRuleByRuleId(mainId);
+            BindFiledNameDynamic(0);
+            BindLpRule("filter");
+            //BindIntruments("filter");
+            GetIntrumentFilterDropdownByRuleId(mainId);
+            if ($('#ruleconditionjson').val() != undefined) {
+                var rulescondition = JSON.parse($('#ruleconditionjson').val());
+                console.log("rulescondition -" + rulescondition);
+                for (var i = 0; i < rulescondition.length; i++) {
+                    if (i > 0) {
+                        AddNewRuleDtl();
+                        var fieldName = rulescondition[i].FieldName;
+
+                        $("#FieldName_" + i).val(rulescondition[i].FieldName);
+                        $("#Opration" + i).val(rulescondition[i].OprationValue);
+                        $("#OprationValue_" + i).val(rulescondition[i].OprationValue);
+
+                        $("#objRuleConditions_Dtl_Id_" + i).val(rulescondition[i].Id);
+                        $("#objRuleConditions_Id_" + i).val(rulescondition[i].RuleConditionsId);
+
+                        var opration = rulescondition[i].Opration;
+                        var oprationValue = rulescondition[i].OprationValue;
+                        BindFiledNameDynamic(i, fieldName, opration, oprationValue);
+                    }
+                    if (i == 0) {
+                        BindFiledNameDynamic(i, rulescondition[i].FieldName, rulescondition[i].Opration, rulescondition[i].OprationValue);
+                        $("#FieldName_" + i).val(rulescondition[i].FieldName);
+                        FieldsNameOnChange(i, rulescondition[i].Opration);
+                        $("#OprationValue_" + i).val(rulescondition[i].OprationValue);
+                        //$("#OprationIdTemp_" + i).val(response.rulesDtlViewModel[i].oprationValue);
+                        $("#objRuleConditions_Dtl_Id_" + i).val(rulescondition[i].Id);
+                        $("#objRuleConditions_Id_" + i).val(rulescondition[i].RuleConditionsId);
+                    }
+                    $("#OprationValue_" + i).val(rulescondition[i].OprationValue);
+                }
+                //$(document).on("submit", "#quoteMarkUpRuleForm", function(e) {
+                //    e.preventDefault();
+                //    frmValidation();
+                //    //var model={};
+                //    //model.Name = $('#Name').val();
+                //    //model.StartTime = $('#StartTime').val();
+                //    //model.EndTime = $('#EndTime').val();
+                //    //model.Day=$('#Day').val();
+                //    //model.MaxSpread = $('#MaxSpread').val();
+                //    //model.AutoupdateLPPriorityUp=$('#AutoupdateLPPriorityUp').is(':checked');
+                //    //model.AutoupdateLPPriorityDown = $('#AutoupdateLPPriorityDown').is(':checked');
+                //    //model.objRuleInstrumentViewModel={};
+                //    //model.objRuleLpPriorityViewModel = {};
+                //    //model.objRuleConditionViewModel={};
+                //    //model.objRuleConditionViewModel.rulesDtlViewModel=[];
+                //    var form = $(this);
+                //    form.ajaxSubmit({
+                //        beforeSubmit: function() {
+                //            if (!form.valid()) {
+
+                //                return false;
+                //            }
+                //            else {
+
+                //                return true;
+                //            }
+                //        },
+                //        success: function(res) {
+                //            if (res.code == 200) {
+                //                AddRuleCondition(res.id);
+                //                //$("#frmModel").modal('hide');
+                //                //$("#ruleConditionForm").resetForm();
+
+                //                //RuleConditionDataTable.init('', '', '', '');
+
+                //                //NotifyMsg('success', res.message);
+
+                //            } else {
+
+                //                NotifyMsg('error', res.message);
+                //            }
+                //        },
+                //        Errors: function() {
+
+                //            NotifyMsg('error', res.message);
+                //        }
+                //    });
+                //    return false;
+                //});
+            }
+
+            function btnSearchClick () {
+                debugger;
+                $("#Loader").show();
+                var Name = $("#instrumentid_filter").val();
+                if (Name == "" ) {
+
+                    NotifyMsg('error', 'Please select to Name');
+
+                    return false;
+                }
+
+                GetLeverageRuleInstrumentByRuleId($("#LeverageRuleID").val(), Name);
+                $("#Loader").hide();
+            }
+
+
+            $('#FileUpload').on('change', function (e) {
+                //get the file name
+                var fileName = e.target.files[0].name;
+                $(this).next('.custom-file-label').html(fileName);
+            })
+            $(document).on("submit", "#frmQuoteMarkUpExcelForm", function (e) {
+                debugger 
+               
+                e.preventDefault();
+                updateProgress(0);
+                var table1 = $('#frmQuoteMarkUpExcelForm tr').length;
+
+                //BDMValidation();
+                var form = $(this);
+                $("#ProcessModal").modal('show');
+                var totalCnt = table1;//.fnSettings().fnRecordsTotal()
+                var counter = totalCnt / 100;
+                counter = Math.round(counter);
+                var intervalId = window.setInterval(function () {
+                    if (counter < 90) {
+                        updateProgress(counter);
+                        counter = counter + 7;
+                    }
+                }, 1000);
+               // $("#Loader").show();
+                form.ajaxSubmit({
+                    beforeSubmit: function () {
+                        if (!form.valid()) {
+                            //$("#Loader").hide();
+                            return false;
+                        }
+                        else {
+
+                            return true;
+                        }
+                    },
+                    success: function (res) {
+                        debugger
+                        if (res.code == 200) {
+                            //$("#frmModel").modal('hide');
+                            //$("#quoteMarkUpRuleForm").resetForm();
+                            //QuoteMarkUpRuleDataTable.init('', '', '', '');
+                            $("#ProcessModal").modal("hide");
+                            updateProgress(0);
+                            clearInterval(intervalId);
+                            //$("#Loader").hide();
+                            NotifyMsg('success', res.message);
+                            completeHandler();
+                            location.reload();
+
+                        } else {
+                            NotifyMsg('success', res.message);
+                            //$("#Loader").hide();
+                            location.reload();
+                        }
+                    },
+                    Errors: function () {
+                      //  $("#ProcessModal").modal("hide");
+                       // $("#Loader").hide();
+                        NotifyMsg('error', res.message);
+                    }
+                });
+                return false;
+            });
+        });
+        //function SaveQuoteRule() {
+        //   frmValidation();
+        //}
+        function CheckEvent() {
+            debugger;
+            var isChecked = $("#AutoUpdate").prop("checked");
+            $("#AutoupdateLPPriorityUp").val(isChecked ? "true" : "false");
+        }
+        function AddRuleCondition(id) {
+            var rulesCount = $('#divRuleDetails').children().length;
+            rulesCount = rulesCount / 4;
+            var rules = [];
+            for (var i = 0; i < rulesCount; i++) {
+                rules.push({ 'FieldName': $('#FieldName_' + i).val(), 'Opration': $('#Opration_' + i).val(), 'OprationValue': $('#OprationValue_' + i).val() });
+            }
+            var model = {};
+            model.RuleId = id;
+            model.conditionRulesDtlObj = JSON.stringify(rules);
+            $.ajax({
+                type: "POST",
+                url: '/RuleCondition/SaveRuleCondition',
+                data: { 'model': model },
+                success: function (data) {
+                    $('.mappingmodal').modal('hide');
+                    alert('Data Saved !!');
+                    window.location.href = '/QuoteMarkUpRule/Index';
+                }
+            });
+        }
+        function frmValidation() {
+
+            $('#quoteMarkUpRuleForm').validate({
+                rules: {
+                    Name: {
+                        required: true
+                    }
+                },
+                messages: {
+                    Name: "Please enter name"
+                },
+                errorElement: 'span',
+                errorPlacement: function (error, element) {
+                    error.addClass('invalid-feedback');
+                    element.closest('.form-group').append(error);
+                },
+                highlight: function (element, errorClass, validClass) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function (element, errorClass, validClass) {
+                    $(element).removeClass('is-invalid');
+                }
+            });
+        }
+        function BindFiledNameDynamic(count, defaultVal = "", defaultOp = "", defaultOpValue = "") {
+            $.ajax({
+                async: true,
+                type: "POST",
+                url: "@Url.Action("GetUserFieldsForDynamic","LeverageRules")",
+                dataType: 'json',
+                data: { tblName: 'Users' },
+                success: function (response) {
+                    $("#FieldName_" + count).append(`<option value="">--Select--</option>`)
+                    for (var i = 0; i < response.length; i++) {
+                        $("#FieldName_" + count).append(`<option value="${response[i].value}">${response[i].text}</option>`)
+                    }
+                    if (defaultVal != "") {
+                        $("#FieldName_" + count).val(defaultVal);
+                        FieldsNameOnChange(count, defaultOp, defaultOpValue);
+                    }
+                },
+                error: function (errorTemp) {
+                    console.log('error', errorTemp);
+                }
+            })
+        }
+        function FieldsNameOnChange(count, defaultValue = "", defaultOpValue = "") {
+
+            $("#Opration_" + count).html("");
+            var selectedVal = $("#FieldName_" + count).val();
+            if (selectedVal != undefined) {
+                const myArray = selectedVal.split("|");
+                var FieldName = myArray[0];
+                var DataType = myArray[1];
+                var FkKey = myArray[2];
+
+                $.ajax({
+                    async: true,
+                    type: "POST",
+                    url: "@Url.Action("GetOprationDropDown","LeverageRules")",
+                    data: { FieldsName: FieldName, DataType: DataType, FkKey: FkKey },
+                    dataType: 'json',
+                    success: function (response) {
+                        $("#Opration_" + count).append(`<option value="">--Select--</option>`)
+                        for (var i = 0; i < response.length; i++) {
+                            $("#Opration_" + count).append(`<option value="${response[i].value}">${response[i].text}</option>`)
+                        }
+
+                        if (defaultValue != "") {
+                            $("#Opration_" + count).val(defaultValue);
+                        }
+
+                        $("#ddlOprationValue_" + count).show();
+                        $("#ddlOprationValueTemp_" + count).hide();
+                        if (FkKey == "1") {
+                            $("#ddlOprationValue_" + count).hide();
+                            $("#ddlOprationValueTemp_" + count).show();
+                            //}
+                            $("#OprationIdTemp_" + count).html("");
+                            $.ajax({
+                                async: true,
+                                type: "POST",
+                                url: "@Url.Action("GetTempOprationDropDown","LeverageRules")",
+                                data: { FieldsName: FieldName, DataType: DataType, FkKey: FkKey },
+                                dataType: 'json',
+                                success: function (responseTemp) {
+                                    $("#OprationIdTemp_" + count).append(`<option value="">--Select--</option>`)
+                                    for (var i = 0; i < responseTemp.length; i++) {
+                                        $("#OprationIdTemp_" + count).append(`<option value="${responseTemp[i].value}">${responseTemp[i].text}</option>`)
+                                    }
+                                    if (defaultOpValue != "") {
+                                        $("#OprationIdTemp_" + count).val(defaultOpValue);
+                                    }
+                                },
+                                error: function (errorTemp) {
+                                    console.log('error', errorTemp);
+                                }
+                            })
+                        }
+                    },
+                    error: function (error) {
+                        console.log('error', error);
+
+                    }
+                })
+            }
+        }
+        ///Add New rule Dtl
+        var countDetails = 0;
+        function AddNewRuleDtl() {
+            countDetails = countDetails + 1;
+            $("#divRuleDetails").append(`
+                                                                                <input id="objRuleConditions_Dtl_Id_${countDetails}" type="hidden">
+                                                                                <input id="objRuleConditions_Id_${countDetails}" type="hidden">
+                                                                            <div class="col-4" id="divField_${countDetails}">
+                                                                                <div class="form-group">
+                                                                                <label>Fields Name</label>
+                                                                                <select id="FieldName_${countDetails}" class="form-control" onchange="FieldsNameOnChange(${countDetails});">
+                                                                                </select>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-4" id="divOpration_${countDetails}">
+                                                                                <div class="form-group">
+                                                                                <label>Operation</label>
+                                                                                <select id="Opration_${countDetails}" class="form-control">
+                                                                                </select>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-4" id="ddlOprationValue_${countDetails}">
+                                                                                <div class="form-group">
+                                                                                <label>Operation Value</label>
+                                                                                <input class="form-control" id="OprationValue_${countDetails}" placeholder="Operation Value" type="text" value="" style="width: 85%;display: inline;">
+                                                                                <a href="javascript:void(0)" value="Delete" onclick="DeleteRule(${countDetails})"><i class="fa fa-trash" style="font-size: large;margin-top: 8px;" aria-hidden="true"></i></a>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-4" id="ddlOprationValueTemp_${countDetails}" style="display:none;">
+                                                                                <div class="form-group">
+                                                                                    <label>Operation Value</label>
+                                                                                    <select id="OprationIdTemp_${countDetails}" name="OprationIdTemp" class="form-control" onchange="ddlOprationValueTempOnChange(${countDetails})" style="width: 85%;display: inline;"></select>
+                                                                                    <a href="javascript:void(0)" value="Delete" onclick="DeleteRule(${countDetails})"><i class="fa fa-trash" style="font-size: large;margin-top: 8px;" aria-hidden="true"></i></a>
+                                                                                </div>
+                                                                            </div>
+                                                                            `);
+            BindFiledNameDynamic(countDetails)
+        };
+        function AddNewLPPrio(count, RuleInstrumentId) {
+            AddNewLPPrioJs(count, RuleInstrumentId);
+        }
+        function ddlOprationValueTempOnChange(cnt) {
+            //OprationValue
+            var selectOprationIdTemp = $("#OprationIdTemp_" + cnt).val();
+            $("#OprationValue_" + cnt).val(selectOprationIdTemp);
+        }
+        function AddInstrumentRule() {
+            GetInstrumentWithRuleLpInEditTable();
+        }
+
+
+        function updateProgress(count) {
+            $('.bar').css('width', count + '%');
+            $('.percent').text(count + '%');
+        }
+        function completeHandler() {
+            $('.bar').width("100%");
+            $('.percent').html("100%");
+            $("#ProcessModal").modal('hide');
+        }
+    </script>
+ }
+

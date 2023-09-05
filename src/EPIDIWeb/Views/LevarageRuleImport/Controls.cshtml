@@ -1,0 +1,155 @@
+﻿@using Epidi.Models.Model;
+@model List<LeverageRuleImport>
+@{
+    int countRuleInstrument = 1;
+}
+<thead>
+    <tr>
+        <th>#</th>
+        <th>Instruments</th>
+        <th>Symbol Group</th>
+        <th>Day</th>
+        <th style="width:15% !important">Start Time</th>
+        <th style="width:15% !important">End Time</th>
+        <th>Priority</th>
+        <th>Band From</th>
+        <th>Band To</th>
+        <th>Leverage</th>
+        <th>New Position</th>
+        <th>Legal Entity </th>
+        <th>Action</th>
+    </tr>
+</thead>
+<tbody>
+    @foreach (var item in Model)
+    {
+        if (item.MasterInstrumentId > 0)
+        {
+            <tr>
+                <td>@countRuleInstrument</td>
+                <td>
+                    <input type="hidden" id="hdnLeverageId_@countRuleInstrument" name="leverageid" value="@item.LeverageId">
+                    <div class="form-group" style="width:130px;">
+                        @*<input>*@
+                        @*<select class="form-control" id="instrumentid_@countRuleInstrument" style="border:1px solid;">*@
+                        @foreach (var instrument in Model.FirstOrDefault().instrumentMasters)
+                        {
+                            if (item.MasterInstrumentId == instrument.id)
+                            {
+                                <input id="instrumentid_@countRuleInstrument" name="instrumentid" type="hidden" value="@instrument.id">
+                                <input class="form-control" value="@instrument.name" type="text" disabled="disabled" />
+                                @*<option value="@instrument.id" selected="selected">@instrument.name</option>*@
+                            }
+                            @*else
+                            {
+                                <input id="instrumentid_${countRuleInstrument}" type="hidden">
+                                <input class="form-control" value="@instrument.name" type="text" disabled="disabled" />
+                                @*<option value="@instrument.id">@instrument.name</option>
+                            }*@
+                        }
+                        @*</select>*@
+                    </div>
+                </td>
+                <td >
+                    <div class="form-group" style="width:130px;">
+                        @*<select class="form-control" id="symbolgroup_@countRuleInstrument" name="Day">*@
+                        @foreach (var symbols in Model.FirstOrDefault().symbolGroups)
+                        {
+                            if (item.SymbolGroupId == symbols.Id)
+                            {
+                                <input id="symbolgroup_@countRuleInstrument" name="symbolgroup" type="hidden" value="@symbols.Id">
+                                <input class="form-control" value="@symbols.Group" type="text" disabled="disabled" />
+                                @*<option value="@symbols.Id" selected="selected">@symbols.Group</option>*@
+                            }
+                            @*else
+                            {
+                                <option value="@symbols.Id">@symbols.Group</option>
+                            }*@
+
+                        }
+                        @*</select>*@
+
+                    </div>
+                </td>
+                <td>
+                    <div class="form-group" style="width:130px;">
+                        <input type="number" class="form-control" name="day" id="Day_@countRuleInstrument" value="@item.Day" />
+                    </div>
+                </td>
+                <td>
+                    <div class="form-group">
+                        <input class="form-control" id="StartTime_@countRuleInstrument" name="starttime" value="@DateTime.Parse(item.TimeFrom).ToString("HH:mm")" type="time" step="1" min="00:00" max="23:59" style="width:95%">
+                    </div>
+                </td>
+                <td>
+                    <div class="form-group">
+                        <input class="form-control" id="EndTime_@countRuleInstrument" name="endtime" value="@DateTime.Parse(item.TimeTo).ToString("HH:mm")" type="time" step="1" min="00:00" max="23:59" style="width:95%">
+                    </div>
+                </td>
+
+                <td>
+                    <div class="form-group" style="width:130px;">
+                        <input class="form-control valid" id="Priority_@countRuleInstrument" name="priority" value="@item.Priority2" placeholder="Max Spread" type="number">
+                    </div>
+                </td>
+                <td>
+                    <div class="form-group" style="width:100px;">
+                        <input class="form-control valid number-separator" id="Bandfrom_@countRuleInstrument" name="bandfrom" value="@item.BandFrom" placeholder="from" type="text">
+                    </div>
+                </td>
+                <td>
+                    <div class="form-group" style="width:100px;">
+                        <input class="form-control valid number-separator" id="Bandto_@countRuleInstrument" name="bandto" value="@item.BandTo" placeholder="from" type="text">
+                    </div>
+                </td>
+                <td>
+                    <div class="form-group" style="width:100px;">
+                        <input class="form-control" id="leverage_@countRuleInstrument" name="leverage" value="@item.LeverageAmount" placeholder="Leverage" type="number">
+                    </div>
+                </td>
+                <td>
+                    <div class="form-group" style="width:100px;">
+                        <select class="form-control number-separator" id="newposition_@countRuleInstrument" name="newposition" style="border:1px solid;">
+                            @if (item.IsNewPosition == "False")
+                            {
+                                <option>Yes</option>
+                                <option selected="selected">No</option>
+                            }
+                            else
+                            {
+                                <option selected="selected">Yes</option>
+                                <option >No</option>
+                            }
+                        </select>
+                    </div>
+                </td>
+                <td>
+                    <div class="form-group" style="width:300px;">
+                        <select class="form-control" id="legalentity_@countRuleInstrument" name="legalentity">
+                            @foreach (var entity in Model.FirstOrDefault().legalEntities)
+                            {
+                                if (item.LegalEntityId == entity.Id)
+                                {
+                                    <option value="@entity.Id" selected="selected">@entity.Name</option>
+                                }
+                                else
+                                {
+                                    <option value="@entity.Id">@entity.Name</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </td>
+                <td>
+                    <div class="form-group">
+                        <a href="javascript:void(0)" value="Delete" onclick="DeleteLeverageRule($(this))" style=" display: block; width: 100%; height: calc(2.25rem + 2px); padding: 0.375rem 0.75rem;">
+                            <i class="fa fa-trash" style="font-size: large;margin-top: 8px;" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            countRuleInstrument = countRuleInstrument + 1;
+        }
+    }
+    
+</tbody>

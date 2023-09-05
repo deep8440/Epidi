@@ -1,0 +1,371 @@
+﻿@model DividendViewModel
+@{
+    Layout = null;
+}
+<style>
+    /* Chrome, Safari, Edge, Opera */
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    /* Firefox */
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+
+    .select2-container {
+        display: block;
+    }
+
+    h3 {
+        color: #dc3545 !important;
+        font-weight: bold;
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th, td {
+        text-align: left;
+        padding: 8px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
+     select#InstrumentId {
+        color: black !important;
+    }
+
+    .select2-container--default .select2-dropdown .select2-search__field:focus, .select2-container--default .select2-search--inline .select2-search__field:focus {
+        outline: 0;
+        border: none;
+    }
+</style>
+<div class="row">
+    <div class="col-5">
+        <div class="form-group">
+            @Html.LabelFor(model => model.InstrumentId,"Instrument List")
+            @Html.DropDownListFor(model => model.InstrumentId, new SelectList(ViewBag.divedendInstrument, "Value", "Text", Model.InstrumentId),  new { @class = "form-control js-select2" ,@name="InstrumentId" })
+
+            @*<label id="lblEquityToSpinOff" class="error">Please select equity to spin off.</label>*@
+        </div>
+    </div>
+    @*<div class="col-4">
+    <div class="btn btn-uppercase float-left">
+    <div class="form-group">
+    <label>Search Date:</label>
+    </div>
+    </div>
+    </div>*@
+    <div class="col-4">
+        <div class="form-group">
+            <label>Search Date:</label>
+        </div>
+        <div class="btn float-left" style="margin-top: -19px;">
+            <div class="form-group">
+                <div class="input-group date" id="fromdate" data-target-input="nearest">
+                    <input type="text" class="form-control datetimepicker-input" id="fdate" data-target="#fromdate">
+                    <div class="input-group-append" data-target="#fromdate" data-toggle="datetimepicker">
+                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3" style="margin-top: 34px;">
+        <button id="btnSearch" type="button" class="btn btn-primary" onclick="GetDividendDetails()">Search</button>
+    </div>
+</div>
+<div class="row">
+    <div class="col-6">
+        @using (Html.BeginForm("UploadDividendExcel", "CorporateActions", FormMethod.Post, new { enctype = "multipart/form-data", id = "frmExcelForm" }))//onsubmit = "return myFunction()"
+        {
+            <div class="custom-file form-group float-sm-left mr-3 " style="width:230px">
+                <input type="file" id="FileUpload" name="FileUpload" class="custom-file-input">
+                <label id="GatelblName" class="custom-file-label" style="text-align:left" for="file">Choose File</label>
+            </div>
+            <button type="submit" class="btn btn-info form-group float-sm-left mr-3">Import Dividen Details</button>
+        }
+    </div>
+    <div class="col-6">
+        <button onclick="ExportDividendDetails()" class="btn btn-info form-group float-sm-left mr-3">Export Dividen Details</button>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            @using (Html.BeginForm("UpdateDividendDetails", "CorporateActions", FormMethod.Post, new { id = "frmDividend" }))
+            {
+                <div class="card-body">
+                    <div id="accordion">
+                        <div class="card card-info">
+                            <div class="card-header">
+                                <h3 class="card-title w-100">
+                                    <a class="d-block w-100 collapsed" data-toggle="collapse" href="#collapseOne" aria-expanded="false">
+                                        Dividend List
+                                    </a>
+                                </h3>
+                            </div>
+                            <div id="collapseOne" class="collapse show" data-parent="#accordion" style="overflow:auto">
+                                <div class="card-body">
+                                    <div id="Divdividend">
+                                        <table id="tbldividend">
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Instrument</th>
+                                                <th>Symbol</th>
+                                                <th>TimeTo</th>
+                                                <th>Tax Apply Buy(Leverage=1)</th>
+                                                <th>Tax Apply Buy(Leverage>1)</th>
+                                                <th>Tax Apply Sell</th>
+                                                <th>Dividend Per Unit</th>
+                                                <th>Dividend Per Unit Sell</th>
+                                                <th>Dividend Per Unit Buy (Leverage>1)</th>
+                                                <th>Dividend Per Unit Buy (Leverage=1)</th>
+                                                <th>Ex Dividend Date</th>
+                                                <th>Action</th>
+                                            </tr>
+                                            <tbody id="details">
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    debugger
+    $(document).ready(() => {
+
+        $("#InstrumentId").select2();
+        $("#InstrumentId").select2({
+            multiple: true,
+            placeholder: {
+                id: '-1',
+                text: '-- Select Instrument --',
+                allowClear: true
+            }
+        });
+
+        $('#fromdate').datetimepicker({
+            format: 'DD-MM-YYYY'
+        });
+
+        $("#btnSearch").trigger("click");
+
+        $('#FileUpload').on('change', function (e) {
+            //get the file name
+            var fileName = e.target.files[0].name;
+            $(this).next('.custom-file-label').html(fileName);
+        })
+
+        $(document).on("submit", "#frmDividend", function (e) {
+
+            debugger;
+            e.preventDefault();
+            //DividendValidation();
+            var form = $(this);
+            form.ajaxSubmit({
+                beforeSubmit: function () {
+                    //if (!form.valid()) {
+
+                    //    return false;
+                    //}
+                    //else {
+
+                    //    return true;
+                    //}
+                },
+                success: function (res) {
+                    debugger;
+                    if (res.statusCode == 200) {
+
+                        NotifyMsg('success', res.message);
+
+                    } else {
+                        NotifyMsg('error', res.message);
+                    }
+                },
+                Errors: function () {
+                    NotifyMsg('error', res.message);
+                }
+            });
+            return false;
+        });
+
+        $(document).on("submit", "#frmExcelForm", function (e) {
+            $('#Loader').show();
+            debugger;
+            e.preventDefault();
+            $('#Loader').show();
+            var form = $(this);
+            form.ajaxSubmit({
+                beforeSubmit: function () {
+                    if (!form.valid()) {
+                        $('#Loader').hide();
+                        return false;
+                    }
+                    else {
+                        $('#Loader').show();
+                        return true;
+                    }
+                },
+                success: function (res) {
+                    debugger
+                    if (res.statusCode == 200) {
+                        $('#FileUpload').val('');
+                        $('#GatelblName').html('Choose File')
+                        NotifyMsg('success', res.message);
+                        $('#Loader').hide();
+                        $("#custom-tabs-five-normal-tab2").trigger("click");
+                    } else {
+                        NotifyMsg('error', res.message);
+                        $('#Loader').hide();
+                    }
+                },
+                Errors: function () {
+
+                    NotifyMsg('error', res.message);
+                    $('#Loader').hide();
+                }
+            });
+            //$('#Loader').hide();
+            return false;
+        });
+    });
+
+    function DividendValidation() {
+        $('#frmDividend').validate({
+            rules: {
+                TimeTo: { step: false },
+            },
+            messages: {
+
+            },
+            errorElement: 'span',
+            errorPlacement: function (error, element) {
+                error.addClass('invalid-feedback');
+                element.closest('.form-group').append(error);
+            },
+            highlight: function (element, errorClass, validClass) {
+                $(element).addClass('is-invalid');
+            },
+            unhighlight: function (element, errorClass, validClass) {
+                $(element).removeClass('is-invalid');
+            }
+        });
+    }
+
+    function GetDividendDetails() {
+        debugger
+        var instrumentId = $('#InstrumentId').val().toString();
+        var fromdate = $('#fdate').val();
+        if (fromdate != '') {
+            var fdateAr = fromdate.split('-');
+            var newFromDate = fdateAr[2] + '-' + fdateAr[1] + '-' + fdateAr[0].slice(-2);
+            fromdate = new Date(newFromDate);
+        }
+        
+
+        $.ajax({
+            type: "POST",
+            url: '/CorporateActions/GetDivedendDetails',
+            data: { InstrumentId: instrumentId, FromDate: fromdate },
+            dataType: "html",
+            success: function (res) {
+
+                if (res != null) {
+                    $("#details").html(res);
+                } else 
+                {
+                    NotifyMsg('error', res.message);
+                }
+            },
+            error: function (errorTemp) {
+
+                NotifyMsg('error', errorTemp);
+                console.log('error', errorTemp);
+            }
+        })
+
+    }
+
+    function ExportDividendDetails()
+    {
+        debugger;
+        $("#Loader").show();
+
+        $.ajax({
+            type: "POST",
+            url: '/CorporateActions/ExportDividendDetailsExcel',
+            dataType: "binary",
+            processData: false,
+            xhrFields: {
+                'responseType': 'blob'
+            },
+            success: function (res, contextType, fileName) {
+                debugger;
+                const date = new Date();
+                let day = date.getDate();
+                let month = date.getMonth() + 1;
+                let year = date.getFullYear();
+                // This arrangement can be altered based on how we want the date's format to appear.
+                let currentDate = `${day}${month}${year}`;
+
+                var link = document.createElement('a'),
+                    filename = "DividendDetails_" + currentDate + ".xlsx";
+                link.href = URL.createObjectURL(res);
+                link.download = filename;
+                link.click();
+                 $("#Loader").hide();
+            },
+            error: function (errorTemp) {
+                $("#Loader").hide();
+                NotifyMsg('error', errorTemp);
+                console.log('error', errorTemp);
+            }
+        })
+    }
+
+    function OpenOrderDeailsModal(instrumentId) {
+        debugger
+        $.ajax({
+            type: "POST",
+            url: '/CorporateActions/GetDivedendOrderDetails',
+            data: { InstrumentId: instrumentId, FromDate: '',ToDate:'' },
+            dataType: "html",
+            success: function (res) {
+                debugger
+                if (res != null) {
+                    $("#frmModel .modal-body").html(res);
+                    $("#frmModel .modal-title").text('Dividend Order Details');
+                    $("#frmModel").modal({ backdrop: 'static', keyboard: false });
+                    $("#frmModel").focus();
+                    $("#frmModel").show();
+                } else {
+                    NotifyMsg('error', res.message);
+                }
+            },
+            error: function (errorTemp) {
+
+                NotifyMsg('error', errorTemp);
+                console.log('error', errorTemp);
+            }
+        })
+    }
+</script>

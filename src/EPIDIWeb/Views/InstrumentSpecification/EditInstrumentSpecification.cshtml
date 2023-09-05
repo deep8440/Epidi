@@ -1,0 +1,102 @@
+﻿@model InstrumentSpecificationViewModel
+@{
+    Layout = null;
+}
+@using (Html.BeginForm("UpdateInstrumentSpecification", "InstrumentSpecification", FormMethod.Post, new { id = "instrumentForm" }))
+{
+    <div class="row">
+        <div class="col-12">
+            <div class="form-group">
+                @Html.HiddenFor(p => p.Id)
+                @Html.HiddenFor(p => p.LPId)
+                @Html.HiddenFor(p => p.LPInstrumentId)
+                @Html.HiddenFor(p => p.MasterInstrumentId)
+                @Html.HiddenFor(p => p.TradeId)
+                @Html.LabelFor(model => model.MasterInstrumentName,"MasterInstrumentName")
+                @Html.TextBoxFor(p => p.MasterInstrumentName, new { @class = "form-control", @placeholder = "MasterInstrumentName" ,@name="MasterInstrumentName" ,@disabled="disabled"})
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.LPName,"LPName")
+                @Html.TextBoxFor(p => p.LPName, new { @class = "form-control", @placeholder = "LPName" ,@name="LPName",@disabled="disabled"})
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.LPInstrumentName, "LPInstrumentName")
+                @Html.TextBoxFor(p => p.LPInstrumentName, new { @class = "form-control", @placeholder = "LPInstrumentName" ,@name="LPInstrumentName",@disabled="disabled"})
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.TTFrom, "TTFrom")
+                @Html.TextBoxFor(p => p.TTFrom, new {@type="time",@step=2 ,@class = "form-control", @placeholder = "TTFrom" ,@name="TTFrom"})
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.TTTo, "TTTo")
+                @Html.TextBoxFor(p => p.TTTo, new {@type="time",@step=2 ,@class = "form-control", @placeholder = "TTTo" ,@name="TTTo"})
+
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.QTFrom,"QTFrom")
+                @Html.TextBoxFor(p => p.QTFrom, new {@type="time",@step=2 ,@class = "form-control", @placeholder = "QTFrom" ,@name="QTFrom"})
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.QTTo,"QTTo")
+                @Html.TextBoxFor(p => p.QTTo, new {@type="time", @step=2 ,@class = "form-control", @placeholder = "QTTo" ,@name="QTFrom"})
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.TradeDays, "Days")
+                @*@Html.DropDownListFor(model => model.TradeDays, new SelectList(ViewBag.DayList, "Value", "Text", Model.TradeDays), "-- Select Day --", new { @class = "form-control js-select2" ,@name="TradeDays" })*@
+                @Html.TextBoxFor(p => p.TradeDays, new { @class = "form-control", @placeholder = "TradeDays" ,@name="TradeDays" })
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.MinValue,"MinValue")
+                @Html.TextBoxFor(p => p.MinValue, new { @class = "form-control", @placeholder = "MinValue" ,@name="MinValue" })
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.Multiplier,"Multiplier")
+                @Html.TextBoxFor(p => p.Multiplier, new { @class = "form-control", @placeholder = "Multiplier" ,@name="Multiplier" })
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.OnOff,"OnOff")
+                @Html.TextBoxFor(p => p.OnOff, new { @class = "form-control", @placeholder = "OnOff" ,@name="OnOff" })
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.ContractSize,"ContractSize")
+                @Html.TextBoxFor(p => p.ContractSize, new { @class = "form-control", @placeholder = "ContractSize" ,@name="ContractSize" })
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.ISIN,"ISIN")
+                @Html.TextBoxFor(p => p.ISIN, new { @class = "form-control", @placeholder = "ISIN" ,@name="ISIN" })
+            </div>
+        </div>
+
+    </div>
+
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+}
+<script type="text/javascript">
+
+</script>

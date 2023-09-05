@@ -1,0 +1,27 @@
+﻿@model PayInoutRequestViewModel
+@{
+    Layout = null;
+}
+
+@using (Html.BeginForm("SavePayInOutRequest", "PayInoutRequest", FormMethod.Post, new { id = "payInOutForm" }))
+{
+    <div class="row">
+        <div class="col-12">
+            <div class="form-group">
+                @Html.HiddenFor(p => p.UserId)
+                @Html.HiddenFor(p => p.RequestType)
+                @Html.HiddenFor(p => p.Amount)
+                @Html.HiddenFor(p => p.Id)
+                @Html.HiddenFor(p => p.CurrentBalance)
+                @Html.HiddenFor(p => p.Status)
+                @Html.LabelFor(model => model.Comment,"Comment")
+                @Html.TextAreaFor(p => p.Comment, new { @class = "form-control", @placeholder = "Note" ,@name="Comment" })
+            </div>
+        </div>
+        
+    </div>
+
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+}

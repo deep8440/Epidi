@@ -1,0 +1,56 @@
+﻿@model BDMViewModel
+@{
+    Layout = null;
+}
+@using (Html.BeginForm("SaveBDM", "BDM", FormMethod.Post, new { id = "bdmForm" }))
+{
+    <div class="row">
+        <div class="col-12">
+            <div class="form-group">
+                @Html.HiddenFor(model => model.Id)
+                @Html.LabelFor(model => model.Name, "Name")
+                @Html.TextBoxFor(p => p.Name, new { @class = "form-control", @placeholder = "Name" ,@name="Name"})
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.BDMCommision.MarkUpPer1000, "MarkUpPer1000")
+                @Html.TextBoxFor(p => p.BDMCommision.MarkUpPer1000, new { @class = "form-control", @placeholder = "MarkUpPer1000" ,@name="MarkUpPer1000",type = "number",step="any"})
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.BDMCommision.MarkUpPer, "Mark Up Per%")
+                @Html.TextBoxFor(p => p.BDMCommision.MarkUpPer, new { @class = "form-control", @placeholder = "MarkUpPer" ,@name="MarkUpPer",type = "number"})
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.BDMCommision.BuySwapPer1000, "BuySwapPer1000")
+                @Html.TextBoxFor(p => p.BDMCommision.BuySwapPer1000, new { @class = "form-control", @placeholder = "BuySwapPer1000" ,@name="BuySwapPer1000",type = "number"})
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.BDMCommision.BuySwapPer, "Buy Swap Per%")
+                @Html.TextBoxFor(p => p.BDMCommision.BuySwapPer, new { @class = "form-control", @placeholder = "Buy Swap Per%" ,@name="BuySwapPer",type = "number"})
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.BDMCommision.SellSwapPer1000, "SellSwapPer1000")
+                @Html.TextBoxFor(p => p.BDMCommision.SellSwapPer1000, new { @class = "form-control", @placeholder = "SellSwapPer1000" ,@name="SellSwapPer1000",type = "number"})
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.BDMCommision.SellSwapPer, "Sell Swap Per%")
+                @Html.TextBoxFor(p => p.BDMCommision.SellSwapPer, new { @class = "form-control", @placeholder = "Sell Swap Per%" ,@name="SellSwapPer",type = "number"})
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+}

@@ -1,0 +1,193 @@
+﻿@model IBLimitViewModel
+@{
+    Layout = null;
+}
+@using (Html.BeginForm("SaveIBLimit", "IBLimit", FormMethod.Post, new { id = "iblimitForm" }))
+{
+    <div class="row">
+        <div class="col-6">
+            <div class="form-group">
+                @Html.HiddenFor(model => model.Id)
+                @Html.LabelFor(model => model.MasterInstrumentName, "Master Instrument")
+                @Html.DropDownListFor(model => model.MasterInstrumentId, new SelectList(ViewBag.InstrumentList, "Value", "Text", Model.MasterInstrumentId), "-- Select GetInstrument --", new { @class = "form-control js-select2" ,@name="MasterInstrumentName",@Onchange = "GetSymbolGroupId($('#MasterInstrumentId').val());"   })
+
+
+            </div>
+        </div>
+
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.SymbolName, "Symbol")
+                @Html.DropDownListFor(model => model.SymbolGroupId, new SelectList(ViewBag.SymbolList, "Value", "Text", Model.SymbolGroupId), "-- Select GetSymbol --", new { @class = "form-control js-select2" ,@name="SymbolName" })
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.MarkUpPer1000,"MarkUpPer1000")
+                @Html.TextBoxFor(p => p.MarkUpPer1000, new { @class = "form-control", @placeholder = "MarkUpPer1000" ,@name="MarkUpPer1000" })
+
+            </div>
+        </div>
+
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.MarkUpPer,"MarkUpPer%")
+                @Html.TextBoxFor(p => p.MarkUpPer, new { @class = "form-control", @placeholder = "MarkUpPer" ,@name="MarkUpPer" })
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.BuySwapPer1000,"BuySwapPer1000")
+                @Html.TextBoxFor(p => p.BuySwapPer1000, new { @class = "form-control", @placeholder = "BuySwapPer1000" ,@name="BuySwapPer1000"})
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.BuySwapPer,"BuySwapPer%")
+                @Html.TextBoxFor(p => p.BuySwapPer, new { @class = "form-control", @placeholder = "BuySwapPer" ,@name="BuySwapPer" })
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.SellSwapPer1000,"SellSwapPer1000")
+                @Html.TextBoxFor(p => p.SellSwapPer1000, new { @class = "form-control", @placeholder = "SellSwapPer1000" ,@name="SellSwapPer1000" })
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.SellSwapPer, "SellSwapPer%")
+                @Html.TextBoxFor(p => p.SellSwapPer, new { @class = "form-control", @placeholder = "SellSwapPer" ,@name="SellSwapPer" })
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+}
+@section Scripts{
+    <script src="~/js/jquery-validation/jquery.validate.min.js"></script>
+    <script src="~/js/jquery-validation/additional-methods.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+    <script src="~/js/rule_lp_priority.js"></script>
+
+    @*<script src="https://code.jquery.com/jquery-3.1.0.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>*@
+    <script>
+
+
+
+        function SaveIBLimit() {
+            var iblimitRule = {};
+            iblimitRule.RuleId = $('#Id').val();
+            iblimitRule.RuleName = $('#MasterInstrumentName').val();
+            iblimitRule.MarkUpPer1000 = $('#MarkUpPer1000').val();
+            iblimitRule.SymbolName = $('#SymbolName').val();
+            iblimitRule.MarkUpPer = $('#MarkUpPer').val();
+            iblimitRule.MarkUpPer1000 = $('#MarkUpPer1000').val();
+            iblimitRule.SymbolName = $('#SymbolName').val();
+
+
+            iblimitRule.objleverageRuleImport = [];
+            var rows = $('#tblInstrument').find('tbody tr');
+            var leverageRules = [];
+            $.each(rows, function (i, j) {
+                var obj = {};
+                obj.MasterInstrumentId = $('#instrumentid_' + (i + 1)).val();
+                obj.LeverageId = $('#hdnLeverageId_' + (i + 1)).val();
+                obj.SymbolGroupId = $('#symbolgroup_' + (i + 1)).val();
+                obj.Day = $('#Day_' + (i + 1)).val();
+                obj.TimeFrom = $('#StartTime_' + (i + 1)).val();
+                obj.TimeTo = $('#EndTime_' + (i + 1)).val();
+                obj.Priority = $('#Priority_' + (i + 1)).val();
+                obj.BandFrom = $('#Bandfrom_' + (i + 1)).val();
+                obj.BandTo = $('#Bandto_' + (i + 1)).val();
+                obj.LeverageAmount = $('#leverage_' + (i + 1)).val();
+                obj.IsNewPosition = $('#newposition_' + (i + 1)).val();
+                obj.LegalEntityId = $('#legalentity_' + (i + 1)).val();
+                leverageRules.push(obj);
+            });
+            leverageRule.objleverageRuleImportstr = JSON.stringify(leverageRules);
+            leverageRule.objRuleconditions = [];
+            var rulesCount = $('#divRuleDetails').children().length;
+            rulesCount = rulesCount / 4;
+            var rules = [];
+            for (var i = 0; i < rulesCount - 1; i++) {
+                if (($("#FieldName_" + i).val() != "") && ($("#FieldName_" + i).val() != null)) {
+                    rules.push({
+                        'Id': $("#objRuleConditions_Dtl_Id_" + i).val() == "" ? 0 : $("#objRuleConditions_Dtl_Id_" + i).val(),
+                        'RuleConditionsId': $("#objRuleConditions_Id_" + i).val() == "" ? 0 : $("#objRuleConditions_Id_" + i).val(),
+                        'FieldName': $('#FieldName_' + i).val(),
+                        'Opration': $('#Opration_' + i).val(),
+                        'OprationValue': $('#OprationValue_' + i).val()
+                    });
+                }
+            }
+            leverageRule.objRuleconditionsstr = JSON.stringify(rules);
+            //$.ajax({
+            //    type: "POST",
+            //    url: '/LevarageRuleImport/SaveLeverageRule',
+            //    data: leverageRule,
+            //    success: function (data) {
+            //        $('.mappingmodal').modal('hide');
+            //        alert('Data Saved !!');
+
+            //    }
+            //});
+
+
+            $.ajax({
+                type: "POST",
+                url: '/LevarageRuleImport/SaveLeverageRule',
+                data: { leverageRule },
+                //contentType: false,
+                //processData: false,
+                success: function (res) {
+                    if (res.statusCode == 200) {
+                        //$("#frmModel").modal('hide');
+                        //$("#rulesDetailsData").resetForm();
+                        NotifyMsg('success', res.message);
+                        window.location.href = "/LevarageRuleImport/index";
+
+                    } else {
+                        NotifyMsg('error', res.message);
+                    }
+                },
+                error: function (errorTemp) {
+                    NotifyMsg('error', errorTemp);
+                    console.log('error', errorTemp);
+                }
+            })
+
+            //NotifyMsg('success', 'Saved Successfully');
+            //window.location.href = '/LevarageRuleImport/Index';
+        }
+        function AddRuleCondition(id) {
+            var rulesCount = $('#divRuleDetails').children().length;
+            rulesCount = rulesCount / 4;
+            var rules = [];
+            for (var i = 0; i < rulesCount; i++) {
+                rules.push({ 'FieldName': $('#FieldName_' + i).val(), 'Opration': $('#Opration_' + i).val(), 'OprationValue': $('#OprationValue_' + i).val() });
+            }
+            var model = {};
+            model.RuleId = id;
+            model.conditionRulesDtlObj = JSON.stringify(rules);
+            $.ajax({
+                type: "POST",
+                url: '/RuleCondition/SaveRuleCondition',
+                data: { 'model': model },
+                success: function (data) {
+                    $('.mappingmodal').modal('hide');
+                    alert('Data Saved !!');
+
+                }
+            });
+        }
+
+    </script>
+}
+
+
+
+
+

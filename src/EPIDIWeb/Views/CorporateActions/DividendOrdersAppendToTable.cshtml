@@ -1,0 +1,8 @@
+﻿@model List<DividendOrdersViewModel>
+@{
+	Layout = null;
+}
+@foreach (var item in Model)
+{
+	@Html.Partial("DividendOrderTable", item)
+}

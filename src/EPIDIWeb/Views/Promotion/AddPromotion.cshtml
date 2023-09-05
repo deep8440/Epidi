@@ -1,0 +1,2089 @@
+﻿@model Epidi.Models.Model.Promotion
+@{
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+
+     ViewBag.Method = "Add Promotion";
+
+    ViewBag.DetailName = "Add Promotion"; 
+    ViewBag.DetailURL = "/Promotion/Index";
+	
+}
+<style>
+    /*.form-check-inline {
+                        margin-left:-1rem;
+                    }*/
+</style>
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-12">
+                        <h3>Promotion Rule</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-3 form-group">
+                        <label>Rule Name</label>
+                        <input type="text" required class="form-control" id="txtRuleName" value="@Model.Name" />
+                        <input type="hidden" id="hdnPromoRuleId" value="@ViewBag.Id" />
+                        <input type="hidden" id="RuleConditionStr" value="@Convert.ToString(Model.ObjRuleConditions)" />
+                        <input type="hidden" id="FieldsStr" value="@Convert.ToString(ViewBag.JsonFields)" />
+                    </div>
+                    <div class="col-3 form-group">
+                        <label>Priority</label>
+                        <input type="text" required class="form-control" id="txtRulePriority" value="@Model.Priority" />
+                    </div>
+                </div>
+
+
+
+                <div id="accordion">
+                    <div class="card card-info">
+                        <div class="card-header">
+                            <h3 class="card-title w-100">
+                                <a class="d-block w-100 collapsed" data-toggle="collapse" href="#collapseOne" aria-expanded="false">
+                                    Promotion Rules
+                                </a>
+                            </h3>
+                        </div>
+                        <div id="collapseOne" class="collapse show" data-parent="#accordion" style="">
+                            <div class="card-body">
+
+                                <div id="DivInstrument">
+                                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home"
+                                                    type="button" role="tab" aria-controls="home" aria-selected="true">
+                                                Credit Promotion
+                                            </button>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile"
+                                                    type="button" role="tab" aria-controls="profile" aria-selected="false">
+                                                Refer a friend
+                                            </button>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact"
+                                                    type="button" role="tab" aria-controls="contact" aria-selected="false">
+                                                Free Assets Upto
+                                            </button>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link" id="upto-tab" data-bs-toggle="tab" data-bs-target="#uptoxx"
+                                                    type="button" role="tab" aria-controls="contact" aria-selected="false">
+                                                Voucher Upto XX
+                                            </button>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link" id="rebate-tab" data-bs-toggle="tab" data-bs-target="#rebate"
+                                                    type="button" role="tab" aria-controls="contact" aria-selected="false">
+                                                Rebate
+                                            </button>
+                                        </li>
+                                    </ul>
+                                    <div class="tab-content" id="myTabContent">
+                                        <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                                            <br />
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <div class="card">
+                                                        <div class="card-header">
+                                                            <h3 class="card-title">Credit promotion</h3>
+                                                        </div>
+                                                        <div class="card-body">
+                                                            <button class="btn btn-outline-primary text-right" style="float:right;" onclick="showAddEdit();">Add Credit Promotion</button><br /><br />
+                                                            <table id="creditpromoList" class="table table-bordered table-striped">
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                                            <br />
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <div class="card">
+                                                        <div class="card-header">
+                                                            <h3 class="card-title">Refer a friend promotion</h3>
+                                                        </div>
+                                                        <div class="card-body">
+                                                            <button class="btn btn-outline-primary text-right" style="float:right;" onclick="showreferfriendAddEdit();">Add Ref Promotion</button><br /><br />
+                                                            <table id="referfriendpromoList" class="table table-bordered table-striped">
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+                                            <br />
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <div class="card">
+                                                        <div class="card-header">
+                                                            <h3 class="card-title">Free Asset promotion</h3>
+                                                        </div>
+                                                        <div class="card-body">
+                                                            <button class="btn btn-outline-primary text-right" style="float:right;" onclick="showfreeassetAddEdit();">Add Free Asset Promotion</button><br /><br />
+                                                            <table id="freeassetpromoList" class="table table-bordered table-striped" style="width:200px;">
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane fade" id="uptoxx" role="tabpanel" aria-labelledby="contact-tab">
+                                            <br />
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <div class="card">
+                                                        <div class="card-header">
+                                                            <h3 class="card-title">Voucher promotion</h3>
+                                                        </div>
+                                                        <div class="card-body">
+                                                            <button class="btn btn-outline-primary text-right" style="float:right;" onclick="showvoucherAddEdit();">Add Voucher Promotion</button><br /><br />
+                                                            <table id="voucherpromoList" class="table table-bordered table-striped">
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane fade" id="rebate" role="tabpanel" aria-labelledby="contact-tab">
+                                            <br />
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <div class="card">
+                                                        <div class="card-header">
+                                                            <h3 class="card-title">Rebate promotion</h3>
+                                                        </div>
+                                                        <div class="card-body">
+                                                            <button class="btn btn-outline-primary text-right" style="float:right;" onclick="showrebateAddEdit();">Add Rebate Promotion</button><br /><br />
+                                                            <table id="rebatepromoList" class="table table-bordered table-striped">
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal" tabindex="-1" role="dialog" id="creditpromomodal">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Manage Credit Promotion</h5>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <label>CP Ref Code</label>
+                                                            <input type="hidden" id="CreditPromoId" value="0" />
+                                                            <input type="text" class="form-control" id="promoname" />
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label>Start Date</label>
+                                                            <input type="date" class="form-control" id="starttime" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <label>End Date</label>
+                                                            <input type="date" class="form-control" id="endtime" />
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label>Maximum Credit</label>
+                                                            <input type="text" class="form-control" id="maxamt" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <label>Posted DateTime</label>
+                                                            <input type="date" class="form-control" id="posteddate" />
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label>Promo Expiry Date</label>
+                                                            <input type="date" class="form-control" id="expdate" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <label>Enable Trigger</label>
+                                                            <select class="form-control" id="cpddlRegistration">
+                                                                @if (Model.creditPromotion != null && Model.creditPromotion.EnableTrigger == "Deposit")
+                                                                {
+                                                                    <option value="Deposit" selected="selected">Deposit</option>
+                                                                    <option value="Full Registration">Full Registration</option>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <option value="Deposit">Deposit</option>
+                                                                    <option value="Full Registration" selected="selected">Full Registration</option>
+                                                                }
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label>Countries</label>
+                                                            <select class="form-control" id="cpddlCountries">
+                                                                @foreach (var item in (List<CountryViewModel>)ViewBag.Countries)
+                                                                {
+                                                                    if (Model.creditPromotion != null && item.CountryName == Model.creditPromotion.Countries)
+                                                                    {
+                                                                        <option value="@item.CountryName" selected="selected">@item.CountryName</option>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <option value="@item.CountryName">@item.CountryName</option>
+                                                                    }
+                                                                }
+                                                            </select>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <label>Active</label>
+                                                            <div>
+                                                                <div class="form-check form-check-inline">
+                                                                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="cpyes" value="option1" />
+                                                                    <label class="form-check-label" for="inlineRadio1">Yes</label>
+                                                                </div>
+
+                                                                <div class="form-check form-check-inline">
+                                                                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="cpno" value="option2" />
+                                                                    <label class="form-check-label" for="inlineRadio2">No</label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+
+                                                            <label>% Of Deposit</label>
+                                                            <input type="text" class="form-control" id="PERofdeposit" />
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-primary" onclick="SaveOrUpdate();">Save changes</button>
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="closepopup();">Close</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="modal" tabindex="-1" role="dialog" id="referfriendpromomodal">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Manage Refer friend Promotion</h5>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <label>Raf Ref Code</label>
+                                                            <input type="hidden" id="ReferFriendPromoId" value="0" />
+                                                            <input type="text" class="form-control" id="rafrefcode" />
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label>Start Time</label>
+                                                            <input type="date" class="form-control" id="refstarttime" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <label>End Time</label>
+                                                            <input type="date" class="form-control" id="refendtime" />
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label>Sender Ref Amount</label>
+                                                            <input type="text" class="form-control" id="refsenderamt" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <label>Enable Trigger</label>
+                                                            <select class="form-control" id="refddlRegistration">
+                                                                <option>Deposit</option>
+                                                                <option>Full Registration</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label>Countries</label>
+                                                            <select class="form-control" id="refddlCountries">
+                                                                @foreach (var item in (List<CountryViewModel>)ViewBag.Countries)
+                                                                {
+                                                                    <option value="@item.CountryName">@item.CountryName</option>
+                                                                }
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <label>Receipt Ref Amount</label>
+                                                            <input type="text" class="form-control" id="refreceiptamt" />
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label>Active</label>
+                                                            <div>
+                                                                <div class="form-check form-check-inline">
+                                                                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="refyes" value="option1" />
+                                                                    <label class="form-check-label" for="inlineRadio1">Yes</label>
+                                                                </div>
+
+                                                                <div class="form-check form-check-inline">
+                                                                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="refno" value="option2" />
+                                                                    <label class="form-check-label" for="inlineRadio2">No</label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-primary" onclick="SaveOrUpdateReferFriend();">Save changes</button>
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="closepopup();">Close</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="modal" tabindex="-1" role="dialog" id="rebatepromomodal">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Manage Rebate Promotion</h5>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <label>Reb Ref Code</label>
+                                                            <input type="hidden" id="RebatePromoId" value="0" />
+                                                            <input type="text" class="form-control" id="rebrefcode" />
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label>Start Date</label>
+                                                            <input type="date" class="form-control" id="rebstarttime" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <label>End Date</label>
+                                                            <input type="date" class="form-control" id="rebendtime" />
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label>Rebate Amount</label>
+                                                            <input type="text" class="form-control" id="rebamt" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <label>Rebate Volume</label>
+                                                            <input type="text" class="form-control" id="rebvolamt" />
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label>Countries</label>
+                                                            <select class="form-control" id="rebcountries">
+                                                                @foreach (var item in (List<CountryViewModel>)ViewBag.Countries)
+                                                                {
+                                                                    <option value="@item.CountryName">@item.CountryName</option>
+                                                                }
+                                                            </select>
+                                                            @*<input type="text" class="form-control" id="rebcountries" />*@
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <label>Enable Trigger</label>
+                                                            <select class="form-control" id="rebddlRegistration">
+                                                                <option value="Deposit">Deposit</option>
+                                                                <option value="Full Registration">Full Registration</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-6">
+
+                                                            <label>Active</label>
+                                                            <div>
+                                                                <div class="form-check form-check-inline">
+                                                                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="rbyes" value="option1" />
+                                                                    <label class="form-check-label" for="inlineRadio1">Yes</label>
+                                                                </div>
+
+                                                                <div class="form-check form-check-inline">
+                                                                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="rbno" value="option2" />
+                                                                    <label class="form-check-label" for="inlineRadio2">No</label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-primary" onclick="SaveOrUpdateRebate();">Save changes</button>
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="closepopup();">Close</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="modal" tabindex="-1" role="dialog" id="freeAssetpromomodal">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Manage Free Asset Promotion</h5>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <label>FAP Ref Code</label>
+                                                            <input type="hidden" id="FAPPromoId" value="0" />
+                                                            <input type="text" class="form-control" id="FAPrefcode" />
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label>Start Date</label>
+                                                            <input type="date" class="form-control" id="FAPstarttime" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <label>End Date</label>
+                                                            <input type="date" class="form-control" id="FAPendtime" />
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label>Max Amount</label>
+                                                            <input type="text" class="form-control" id="FAPmaxamt" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <label>Max num of Instruments</label>
+                                                            <input type="text" class="form-control" id="FAPMaxInst" />
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label>Min Deposit</label>
+                                                            <input type="text" class="form-control" id="FAPmindeposit" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <label>Enable Trigger</label>
+                                                            <select class="form-control" id="FAPddlRegistration">
+                                                                <option value="Deposit">Deposit</option>
+                                                                <option value="Full Registration">Full Registration</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label>Countries</label>
+                                                            <select class="form-control" id="FAPddlCountries">
+                                                                @foreach (var item in (List<CountryViewModel>)ViewBag.Countries)
+                                                                {
+                                                                    <option value="@item.CountryName">@item.CountryName</option>
+                                                                }
+                                                            </select>
+                                                        </div>
+
+
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <label>Active</label>
+                                                            <div>
+                                                                <div class="form-check form-check-inline">
+                                                                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="FAPyes" value="option1" />
+                                                                    <label class="form-check-label" for="inlineRadio1">Yes</label>
+                                                                </div>
+
+                                                                <div class="form-check form-check-inline">
+                                                                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="FAPno" value="option2" />
+                                                                    <label class="form-check-label" for="inlineRadio2">No</label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-primary" onclick="SaveOrUpdateFreeAsset();">Save changes</button>
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="closepopup();">Close</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="modal" tabindex="-1" role="dialog" id="voucherpromomodal">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Manage Voucher Promotion</h5>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <label>Vou Ref Code</label>
+                                                            <input type="hidden" id="VouPromoId" value="0" />
+                                                            <input type="text" class="form-control" id="Vourefcode" />
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label>Name</label>
+                                                            <input type="text" class="form-control" id="VouName" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <label>Start Date</label>
+                                                            <input type="date" class="form-control" id="Voustartdate" />
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label>End Date</label>
+                                                            <input type="date" class="form-control" id="Vouenddate" />
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <label>Voucher Amount</label>
+                                                            <input type="text" class="form-control" id="VouAmount" />
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label>Allowed Shares</label>
+                                                            <input type="text" class="form-control" id="Voumaxallowedshare" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <label>Min Deposit</label>
+                                                            <input type="text" class="form-control" id="VouMinDeposit" />
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label>Countries</label>
+                                                            <select class="form-control" id="voucountries">
+                                                                @foreach (var item in (List<CountryViewModel>)ViewBag.Countries)
+                                                                {
+                                                                    <option value="@item.CountryName">@item.CountryName</option>
+                                                                }
+                                                            </select>
+                                                            @*<input type="text" class="form-control" id="rebcountries" />*@
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <label>Enable Trigger</label>
+                                                            <select class="form-control" id="vouddlRegistration">
+                                                                <option value="Deposit">Deposit</option>
+                                                                <option value="Full Registration">Full Registration</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label>Active</label>
+                                                            <div>
+                                                                <div class="form-check form-check-inline">
+                                                                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="Vouyes" value="option1" />
+                                                                    <label class="form-check-label" for="inlineRadio1">Yes</label>
+                                                                </div>
+
+                                                                <div class="form-check form-check-inline">
+                                                                    <input class="form-check-input" type="radio" name="inlineRadioOptions" id="Vouno" value="option2" />
+                                                                    <label class="form-check-label" for="inlineRadio2">No</label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-primary" onclick="SaveOrUpdateVoucher();">Save changes</button>
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="closepopup();">Close</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal" role="dialog" id="QRCodeModal">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">QR Code</h5>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div id="qrcode" style="text-align:center;"></div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <a href="" class="btn btn-secondary" id="downloadqrcode" download="image.png">Download</a>
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="closepopup();">Close</button>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card card-info">
+                        <div class="card-header">
+                            <h4 class="card-title w-100">
+                                <a class="d-block w-100" data-toggle="collapse" href="#collapseThree">
+                                    Rule Condition
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="collapseThree" class="collapse" data-parent="#accordion">
+                            <div class="card-body">
+                                <div class="col-12">
+                                    <div class="row" id="divRuleDetails">
+                                        <input id="objRuleConditions_Dtl_Id_0" type="hidden" class="form-control">
+                                        <input id="objRuleConditions_Id_0" type="hidden" class="form-control">
+                                        <div class="col-4">
+                                            <div class="form-group">
+                                                <label>Fields Name</label>
+                                                <select id="FieldName_0" name="FieldName_0" class="form-control" onchange="FieldsNameOnChange(0);">
+                                                    @foreach (var item in (List<SelectListItem>)ViewBag.Fields)
+                                                    {
+                                                        <option value="@item.Value">@item.Text</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="form-group">
+                                                <label>Operation</label>
+                                                <select id="Opration_0" name="Opration" class="form-control"></select>
+                                            </div>
+                                        </div>
+                                        <div class="col-4" id="ddlOprationValue_0">
+                                            <div class="form-group">
+                                                <label>Operation Value</label>
+                                                <input type="text" id="OprationValue_0" name="OprationValue_0" class="form-control" placeholder="Operation Value" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row col-12 mt-1">
+                                        @*style="float: right;"*@
+                                        <div class="form-group">
+                                            <button type="button" onclick="AddNewRuleDtl();" id="addnewCondition" class="btn btn-outline-primary">Add Condition</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button onclick="SaveRuleConditions()" class="btn btn-primary">Save</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="~/js/barcode/jquery.qrcode.min.js"></script>
+    <script src="~/js/jquery/filesaver.js"></script>
+    <script>
+        $(document).ready(() => {
+            //$('#cpddlCountries').selectpicker();
+            //$('#refddlCountries').selectpicker();
+            //$('#rebcountries').selectpicker();
+            //$('#voucountries').selectpicker();
+
+            //$('#cpddlRegistration').selectpicker();
+            //$('#refddlRegistration').selectpicker();
+            //$('#rebddlRegistration').selectpicker();
+            //$('#FAPddlRegistration').selectpicker();
+            //$('#vouddlRegistration').selectpicker();
+
+            //$('#referfriendpromoList').DataTable({scrollX: true,});
+
+            CreditDataTable.init();
+            ReferFriendDataTable.init();
+            RebateDataTable.init();
+            FreeAssetDataTable.init();
+            VoucherDataTable.init();
+            $('#maxamt').keypress(function (e) {
+                var charCode = (e.which) ? e.which : event.keyCode
+
+                if (String.fromCharCode(charCode).match(/[^0-9]/g))
+
+                    return false;
+            })
+            $('#home-tab').click(function () {
+                $('#home-tab').addClass('active');
+                $('#home').addClass('show');
+                $('#home').addClass('active');
+                $('#profile-tab').removeClass('active');
+                $('#profile').removeClass('show');
+                $('#profile').removeClass('active');
+                $('#contact-tab').removeClass('active');
+                $('#contact').removeClass('show');
+                $('#contact').removeClass('active');
+                $('#upto-tab').removeClass('active');
+                $('#uptoxx').removeClass('show');
+                $('#uptoxx').removeClass('active');
+                $('#rebate-tab').removeClass('active');
+                $('#rebate').removeClass('active');
+                $('#rebate').removeClass('show');
+
+            });
+
+
+            $('#profile-tab').click(function () {
+                $('#profile-tab').addClass('active');
+                $('#profile').addClass('show');
+                $('#profile').addClass('active');
+                $('#home-tab').removeClass('active');
+                $('#home').removeClass('show');
+                $('#home').removeClass('active');
+                $('#contact-tab').removeClass('active');
+                $('#contact').removeClass('show');
+                $('#contact').removeClass('active');
+                $('#upto-tab').removeClass('active');
+                $('#uptoxx').removeClass('show');
+                $('#uptoxx').removeClass('active');
+                $('#rebate-tab').removeClass('active');
+                $('#rebate').removeClass('active');
+                $('#rebate').removeClass('show');
+
+
+            });
+
+
+            $('#contact-tab').click(function () {
+                $('#profile-tab').removeClass('active');
+                $('#profile').removeClass('show');
+                $('#profile').removeClass('active');
+                $('#home-tab').removeClass('active');
+                $('#home').removeClass('show');
+                $('#home').removeClass('active');
+                $('#contact-tab').addClass('active');
+                $('#contact').addClass('show');
+                $('#contact').addClass('active');
+                $('#upto-tab').removeClass('active');
+                $('#uptoxx').removeClass('show');
+                $('#uptoxx').removeClass('active');
+                $('#rebate-tab').removeClass('active');
+                $('#rebate').removeClass('active');
+                $('#rebate').removeClass('show');
+            });
+
+            $('#upto-tab').click(function () {
+                $('#profile-tab').removeClass('active');
+                $('#profile').removeClass('show');
+                $('#profile').removeClass('active');
+                $('#home-tab').removeClass('active');
+                $('#home').removeClass('show');
+                $('#home').removeClass('active');
+                $('#contact-tab').removeClass('active');
+                $('#contact').removeClass('show');
+                $('#contact').removeClass('active');
+                $('#upto-tab').addClass('active');
+                $('#uptoxx').addClass('show');
+                $('#uptoxx').addClass('active');
+                $('#rebate-tab').removeClass('active');
+                $('#rebate').removeClass('active');
+                $('#rebate').removeClass('show');
+            });
+
+
+            $('#rebate-tab').click(function () {
+                $('#profile-tab').removeClass('active');
+                $('#profile').removeClass('show');
+                $('#profile').removeClass('active');
+                $('#home-tab').removeClass('active');
+                $('#home').removeClass('show');
+                $('#home').removeClass('active');
+                $('#contact-tab').removeClass('active');
+                $('#contact').removeClass('show');
+                $('#contact').removeClass('active');
+                $('#upto-tab').removeClass('active');
+                $('#uptoxx').removeClass('show');
+                $('#uptoxx').removeClass('active');
+                $('#rebate-tab').addClass('active');
+                $('#rebate').addClass('active');
+                $('#rebate').addClass('show');
+            });
+
+            if ($('#RuleConditionStr').val() != undefined && $('#RuleConditionStr').val() != null && $('#RuleConditionStr').val() != '') {
+                var rulescondition = JSON.parse($('#RuleConditionStr').val());
+                console.log("rulescondition -" + rulescondition);
+                for (var i = 0; i < rulescondition.length; i++) {
+                    if (i > 0) {
+                        AddNewRuleDtl();
+                        var fieldName = rulescondition[i].FieldName;
+
+                        $("#FieldName_" + i).val(rulescondition[i].Value);
+                        FieldsNameOnChange(i, rulescondition[i].Opration);
+                        $("#Opration" + i).val(rulescondition[i].Opration);
+                        $("#OprationValue_" + i).val(rulescondition[i].OprationValue);
+
+                        $("#objRuleConditions_Dtl_Id_" + i).val(rulescondition[i].Id);
+                        $("#objRuleConditions_Id_" + i).val(rulescondition[i].RuleConditionsId);
+
+                        var opration = rulescondition[i].Opration;
+                        var oprationValue = rulescondition[i].OprationValue;
+                        //BindFiledNameDynamic(i, fieldName, opration, oprationValue);
+                    }
+                    if (i == 0) {
+                        BindFiledNameDynamic(i, rulescondition[i].FieldName, rulescondition[i].Opration, rulescondition[i].OprationValue);
+                        $("#FieldName_" + i).val(rulescondition[i].Value);
+                        FieldsNameOnChange(i, rulescondition[i].Opration);
+                        $("#OprationValue_" + i).val(rulescondition[i].OprationValue);
+                        //$("#OprationIdTemp_" + i).val(response.rulesDtlViewModel[i].oprationValue);
+                        $("#objRuleConditions_Dtl_Id_" + i).val(rulescondition[i].Id);
+                        $("#objRuleConditions_Id_" + i).val(rulescondition[i].RuleConditionsId);
+                    }
+                    $("#OprationValue_" + i).val(rulescondition[i].OprationValue);
+                }
+
+            }
+        });
+        function Delete(obj) {
+            debugger;
+            if (confirm('Are you sure want to delete this record ?')) {
+                var id = $($(obj).siblings()[1]).val();
+                $.ajax({
+                    url: '/Promotion/DeletePromo',
+                    type: "POST",
+                    data: { 'Id': id },
+                    dataType: "application/json",
+                    //contentType: "application/json; charset=utf-8",
+                    success: function (data) {
+                        debugger;
+                        alert('Record deleted success');
+                        $('#creditpromomodal').modal('hide');
+                        CreditDataTable.init();
+                        $('#CreditPromoId').val('0');
+                    },
+                    error: function (data) {
+                        alert('Record deleted success');
+                        $('#creditpromomodal').modal('hide');
+                        CreditDataTable.init();
+                        $('#CreditPromoId').val('0');
+                    }
+                });
+            }
+        }
+        function Deletereferfriend(obj) {
+            debugger;
+            if (confirm('Are you sure want to delete this record ?')) {
+                var id = $($(obj).siblings()[1]).val();
+                $.ajax({
+                    url: '/Promotion/DeleteReferFriendPromo',
+                    type: "POST",
+                    data: { 'Id': id },
+                    dataType: "application/json",
+                    //contentType: "application/json; charset=utf-8",
+                    success: function (data) {
+                        debugger;
+                        alert('Record deleted success');
+                        $('#creditpromomodal').modal('hide');
+                        ReferFriendDataTable.init();
+                        $('#ReferFriendPromoId').val('0');
+                    },
+                    error: function (data) {
+                        alert('Record deleted success');
+                        $('#creditpromomodal').modal('hide');
+                        ReferFriendDataTable.init();
+                        $('#ReferFriendPromoId').val('0');
+                    }
+                });
+            }
+        }
+        function Deleterebate(obj) {
+            debugger;
+            if (confirm('Are you sure want to delete this record ?')) {
+                var id = $($(obj).siblings()[1]).val();
+                $.ajax({
+                    url: '/Promotion/DeleteRebatePromo',
+                    type: "POST",
+                    data: { 'Id': id },
+                    dataType: "application/json",
+                    //contentType: "application/json; charset=utf-8",
+                    success: function (data) {
+                        debugger;
+                        alert('Record deleted success');
+                        $('#creditpromomodal').modal('hide');
+                        RebateDataTable.init();
+                        $('#ReferFriendPromoId').val('0');
+                    },
+                    error: function (data) {
+                        alert('Record deleted success');
+                        $('#creditpromomodal').modal('hide');
+                        RebateDataTable.init();
+                        $('#ReferFriendPromoId').val('0');
+                    }
+                });
+            }
+        }
+
+        function Deletefreeasset(obj) {
+            debugger;
+            if (confirm('Are you sure want to delete this record ?')) {
+                var id = $($(obj).siblings()[1]).val();
+                $.ajax({
+                    url: '/Promotion/DeleteFreeAssetPromo',
+                    type: "POST",
+                    data: { 'Id': id },
+                    dataType: "application/json",
+                    //contentType: "application/json; charset=utf-8",
+                    success: function (data) {
+                        debugger;
+                        alert('Record deleted success');
+                        $('#freeAssetpromomodal').modal('hide');
+                        FreeAssetDataTable.init();
+                        $('#FAPPromoId').val('0');
+                    },
+                    error: function (data) {
+                        alert('Record deleted success');
+                        $('#freeAssetpromomodal').modal('hide');
+                        FreeAssetDataTable.init();
+                        $('#FAPPromoId').val('0');
+                    }
+                });
+            }
+        }
+
+        function Deletevoucher(obj) {
+            debugger;
+            if (confirm('Are you sure want to delete this record ?')) {
+                var id = $($(obj).siblings()[1]).val();
+                $.ajax({
+                    url: '/Promotion/DeleteVoucherPromo',
+                    type: "POST",
+                    data: { 'Id': id },
+                    dataType: "application/json",
+                    //contentType: "application/json; charset=utf-8",
+                    success: function (data) {
+                        debugger;
+                        alert('Record deleted success');
+                        $('#freeAssetpromomodal').modal('hide');
+                        VoucherDataTable.init();
+                        $('#VouPromoId').val('0');
+                    },
+                    error: function (data) {
+                        alert('Record deleted success');
+                        $('#freeAssetpromomodal').modal('hide');
+                        VoucherDataTable.init();
+                        $('#VouPromoId').val('0');
+                    }
+                });
+            }
+        }
+
+        function closepopup() {
+            $('#creditpromomodal').modal('hide');
+            $('.modal').modal('hide');
+        }
+        function showAddEdit(obj) {
+            debugger;
+            if (obj == undefined || obj == null) {
+                $('#CreditPromoId').val('0');
+                $('#creditpromomodal').find('input').val('');
+            }
+            else {
+                $('#CreditPromoId').val($($(obj).siblings()[0]).val());
+                $('#promoname').val($(obj).closest('tr').find('td:eq(0)').text());
+                $('#starttime').val($(obj).closest('tr').find('td:eq(1)').text().substring(0, 10));
+                $('#endtime').val($(obj).closest('tr').find('td:eq(2)').text().substring(0, 10));
+                $('#maxamt').val($(obj).closest('tr').find('td:eq(3)').text());
+                $('#expdate').val($(obj).closest('tr').find('td:eq(2)').text().substring(0, 10));
+                $('#posteddate').val($(obj).closest('tr').find('td:eq(2)').text().substring(0, 10));
+                $('#PERofdeposit').val($(obj).closest('tr').find('td:eq(4)').text().substring(0, 10));
+                $('#cpddlCountries').val($(obj).closest('tr').find('td:eq(5)').text().substring(0, 10));
+                $('#cpddlRegistration').val($(obj).closest('tr').find('td:eq(6)').text().substring(0, 10));
+            }
+            $('#creditpromomodal').modal('show');
+        }
+        function showreferfriendAddEdit(obj) {
+            if (obj == undefined || obj == null) {
+                $('#ReferFriendPromoId').val('0');
+                $('#referfriendpromomodal').find('input').val('');
+            }
+            else {
+                $('#ReferFriendPromoId').val($($(obj).siblings()[0]).val());
+                $('#rafrefcode').val($(obj).closest('tr').find('td:eq(0)').text());
+                $('#refstarttime').val($(obj).closest('tr').find('td:eq(1)').text().substring(0, 10));
+                $('#refendtime').val($(obj).closest('tr').find('td:eq(2)').text().substring(0, 10));
+                $('#refsenderamt').val($(obj).closest('tr').find('td:eq(3)').text());
+                $('#refreceiptamt').val($(obj).closest('tr').find('td:eq(4)').text());
+                $('#refcountries').val($(obj).closest('tr').find('td:eq(5)').text());
+                //$('#posteddate').val($(obj).closest('tr').find('td:eq(2)').text().substring(0, 10));
+            }
+            $('#referfriendpromomodal').modal('show');
+        }
+        function showrebateAddEdit(obj) {
+            if (obj == undefined || obj == null) {
+                $('#RebatePromoId').val('0');
+            }
+            else {
+                $('#RebatePromoId').val($($(obj).siblings()[0]).val());
+                $('#rebrefcode').val($(obj).closest('tr').find('td:eq(0)').text());
+                $('#rebstarttime').val($(obj).closest('tr').find('td:eq(1)').text().substring(0, 10));
+                $('#rebendtime').val($(obj).closest('tr').find('td:eq(2)').text().substring(0, 10));
+                $('#rebamt').val($(obj).closest('tr').find('td:eq(3)').text());
+                $('#rebvolamt').val($(obj).closest('tr').find('td:eq(5)').text());
+                $('#rebcountries').val($(obj).closest('tr').find('td:eq(6)').text());
+                debugger;
+                if ($(obj).closest('tr').find('td:eq(7)').text() == 'Enable') {
+                    $('#rbyes').attr('checked', true);
+                    $('#rbyes').attr('checked', 'checked');
+                }
+                else {
+                    $('#rbno').attr('checked', true);
+                    $('#rbno').attr('checked', 'checked');
+                }
+                //$('#posteddate').val($(obj).closest('tr').find('td:eq(2)').text().substring(0, 10));
+            }
+            $('#rebatepromomodal').modal('show');
+        }
+
+        function showfreeassetAddEdit(obj) {
+            if (obj == undefined || obj == null) {
+                $('#FAPPromoId').val('0');
+            }
+            else {
+                $('#FAPPromoId').val($($(obj).siblings()[0]).val());
+                $('#FAPrefcode').val($(obj).closest('tr').find('td:eq(0)').text());
+                $('#FAPstarttime').val($(obj).closest('tr').find('td:eq(1)').text().substring(0, 10));
+                $('#FAPendtime').val($(obj).closest('tr').find('td:eq(2)').text().substring(0, 10));
+                $('#FAPmaxamt').val($(obj).closest('tr').find('td:eq(3)').text());
+                $('#FAPmindeposit').val($(obj).closest('tr').find('td:eq(5)').text());
+                $('#FAPMaxInst').val($(obj).closest('tr').find('td:eq(4)').text());
+
+                $('#FAPcountries').val($(obj).closest('tr').find('td:eq(7)').text());
+                debugger;
+                if ($(obj).closest('tr').find('td:eq(8)').text() == 'Enable') {
+                    $('#FAPyes').attr('checked', true);
+                    $('#FAPyes').attr('checked', 'checked');
+                }
+                else {
+                    $('#FAPno').attr('checked', true);
+                    $('#FAPno').attr('checked', 'checked');
+                }
+            }
+            $('#freeAssetpromomodal').modal('show');
+        }
+
+        function showvoucherAddEdit(obj) {
+            if (obj == undefined || obj == null) {
+                $('#VouPromoId').val('0');
+            }
+            else {
+                $('#VouPromoId').val($($(obj).siblings()[0]).val());
+                $('#VouName').val($(obj).closest('tr').find('td:eq(1)').text());
+                $('#Vourefcode').val($(obj).closest('tr').find('td:eq(0)').text());
+                $('#Voustartdate').val($(obj).closest('tr').find('td:eq(2)').text().substring(0, 10));
+                $('#Vouenddate').val($(obj).closest('tr').find('td:eq(3)').text().substring(0, 10));
+                $('#VouAmount').val($(obj).closest('tr').find('td:eq(4)').text());
+                $('#VouMinDeposit').val($(obj).closest('tr').find('td:eq(6)').text());
+                $('#Voumaxallowedshare').val($(obj).closest('tr').find('td:eq(5)').text());
+
+                $('#Voucountries').val($(obj).closest('tr').find('td:eq(8)').text());
+                debugger;
+                if ($(obj).closest('tr').find('td:eq(9)').text() == 'Enable') {
+                    $('#Vouyes').attr('checked', true);
+                    $('#Vouyes').attr('checked', 'checked');
+                }
+                else {
+                    $('#Vouno').attr('checked', true);
+                    $('#Vouno').attr('checked', 'checked');
+                }
+            }
+            $('#voucherpromomodal').modal('show');
+        }
+
+        function SaveOrUpdate() {
+            if ($('#txtRuleName').val() == '' || $('#txtRuleName').val() == null || $('#txtRuleName').val() == undefined) {
+                NotifyMsg('error', 'Please add a Rule Name');
+                return;
+            }
+            if ($('#txtRulePriority').val() == '' || $('#txtRulePriority').val() == null || $('#txtRulePriority').val() == undefined) {
+                NotifyMsg('error', 'Please add a Rule Priority');
+                return;
+            }
+            var promotion = {
+                Name: $('#txtRuleName').val(),
+                Priority: $('#txtRulePriority').val(),
+                Id: $('#hdnPromoRuleId').val()
+            };
+            promotion.creditPromotion = {};
+
+            promotion.creditPromotion.CreditPromoId = $('#CreditPromoId').val();
+            promotion.creditPromotion.Id = $('#hdnPromoRuleId').val();
+            promotion.creditPromotion.AcceptedDateTime = $('#endtime').val();
+            promotion.creditPromotion.PostedDateTime = $('#starttime').val();
+            promotion.creditPromotion.PromoExpDate = $('#expdate').val();
+            promotion.creditPromotion.PromoName = $('#promoname').val();
+            promotion.creditPromotion.PromoAmount = $('#maxamt').val();
+            promotion.creditPromotion.PerOfDeposit = $('#PERofdeposit').val();
+            promotion.creditPromotion.Countries = $('#cpddlCountries').val();
+            promotion.creditPromotion.EnableTrigger = $('#cpddlRegistration').val();
+            $.ajax({
+                url: '/Promotion/PromotionAddUpdate',
+                type: "POST",
+                data: { 'promotion': promotion },
+                dataType: "application/json",
+                //contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    debugger;
+                    alert('Record updated success');
+                    $('#creditpromomodal').modal('hide');
+                    location.reload();
+                },
+                error: function (data) {
+                    alert('Record updated success');
+                    $('#creditpromomodal').modal('hide');
+                    location.reload();
+                }
+            });
+        }
+
+        function SaveOrUpdateReferFriend() {
+            var obj = {
+                ReferFriendPromoId: $('#ReferFriendPromoId').val(),
+                Id: $('#hdnPromoRuleId').val(),
+                PromoRefCode: $('#rafrefcode').val(),
+                StartDate: $('#refstarttime').val(),
+                EndDate: $('#refendtime').val(),
+                SenderRefFee: $('#refsenderamt').val(),
+                RecipientFee: $('#refreceiptamt').val(),
+                Countries: $('#refddlCountries').val(),
+                EnableTrigger: $('#refddlRegistration').val()
+            };
+            $.ajax({
+                url: '/Promotion/ReferFriendPromoAddUpdate',
+                type: "POST",
+                data: { 'referFriendPromotion': obj },
+                dataType: "application/json",
+                //contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    debugger;
+                    alert('Record updated success');
+                    $('#referfriendpromomodal').modal('hide');
+                    ReferFriendDataTable.init();
+                    $('#ReferFriendPromoId').val('0');
+                },
+                error: function (data) {
+                    alert('Record updated success');
+                    $('#referfriendpromomodal').modal('hide');
+                    ReferFriendDataTable.init();
+                    $('#ReferFriendPromoId').val('0');
+                }
+            });
+        }
+
+        function SaveOrUpdateRebate() {
+            var obj = {
+                RebatePromoId: $('#RebatePromoId').val(),
+                Id: $('#hdnPromoRuleId').val(),
+                PromoRefCode: $('#rebrefcode').val(),
+                StartDate: $('#rebstarttime').val(),
+                EndDate: $('#rebendtime').val(),
+                RebateAmt: $('#rebamt').val(),
+                RebateVol: $('#rebvolamt').val(),
+                Countries: $('#rebcountries').val(),
+                EnableTrigger: $('#rebddlRegistration').val(),
+                Active: $('#rbyes').is(':checked') ? true : false
+            };
+            $.ajax({
+                url: '/Promotion/RebatePromoAddUpdate',
+                type: "POST",
+                data: { 'rebatePromotion': obj },
+                dataType: "application/json",
+                success: function (data) {
+                    debugger;
+                    alert('Record updated success');
+                    $('#rebatepromomodal').modal('hide');
+                    RebateDataTable.init();
+                    $('#RebatePromoId').val('0');
+                },
+                error: function (data) {
+                    alert('Record updated success');
+                    $('#rebatepromomodal').modal('hide');
+                    RebateDataTable.init();
+                    $('#RebatePromoId').val('0');
+                }
+            });
+        }
+
+        function SaveOrUpdateFreeAsset() {
+            var obj = {
+                FreeAssetsPromoId: $('#FAPPromoId').val(),
+                Id: $('#hdnPromoRuleId').val(),
+                PromoRefCode: $('#FAPrefcode').val(),
+                StartDate: $('#FAPstarttime').val(),
+                EndDate: $('#FAPendtime').val(),
+                MaxAmount: $('#FAPmaxamt').val(),
+                Allowedshare: $('#FAPMaxInst').val(),
+                MinDeposit: $('#FAPmindeposit').val(),
+                EnableTrigger: $('#FAPddlRegistration').val(),
+                Countries: $('#FAPddlCountries').val(),
+                Active: $('#FAPyes').is(':checked') ? true : false
+            };
+            $.ajax({
+                url: '/Promotion/FreeAssetPromoAddUpdate',
+                type: "POST",
+                data: { 'freeAssetPromotion': obj },
+                dataType: "application/json",
+                success: function (data) {
+                    debugger;
+                    alert('Record updated success');
+                    $('#freeAssetpromomodal').modal('hide');
+                    FreeAssetDataTable.init();
+                    $('#FAPPromoId').val('0');
+                },
+                error: function (data) {
+                    alert('Record updated success');
+                    $('#freeAssetpromomodal').modal('hide');
+                    FreeAssetDataTable.init();
+                    $('#FAPPromoId').val('0');
+                }
+            });
+        }
+
+        function SaveOrUpdateVoucher() {
+            var obj = {
+                VoucherPromoId: $('#VouPromoId').val(),
+                Id: $('#hdnPromoRuleId').val(),
+                Name: $('#VouName').val(),
+                PromoRefCode: $('#Vourefcode').val(),
+                StartTime: $('#Voustartdate').val(),
+                EndTime: $('#Vouenddate').val(),
+                VoucherAmt: $('#VouAmount').val(),
+                MaxAllowedShare: $('#Voumaxallowedshare').val(),
+                MinDeposit: $('#VouMinDeposit').val(),
+                Countries: $('#voucountries').val(),
+                EnableTrigger: $('#vouddlRegistration').val(),
+                Active: $('#Vouyes').is(':checked') ? true : false
+            };
+            $.ajax({
+                url: '/Promotion/VoucherAddUpdate',
+                type: "POST",
+                data: { 'promotion': obj },
+                dataType: "application/json",
+                success: function (data) {
+                    debugger;
+                    alert('Record updated success');
+                    $('#voucherpromomodal').modal('hide');
+                    VoucherDataTable.init();
+                    $('#VouPromoId').val('0');
+                },
+                error: function (data) {
+                    alert('Record updated success');
+                    $('#voucherpromomodal').modal('hide');
+                    VoucherDataTable.init();
+                    $('#VouPromoId').val('0');
+                }
+            });
+        }
+       
+        function SaveRuleConditions() {
+            debugger;
+            $(this).attr('disabled', true);
+            var obj = {};
+            obj.Id = $('#hdnPromoRuleId').val();
+            obj.Name = $('#txtRuleName').val();
+            obj.Priority = $('#txtRulePriority').val();
+            obj.ObjRuleConditions = '';
+            var rulesCount = $('#divRuleDetails').children().length;
+            rulesCount = rulesCount / 4;
+            rulesCount = parseInt(rulesCount);
+            var rules = [];
+            if ($('#RuleConditionStr').val() != '[]' &&$('#RuleConditionStr').val() != '' && $('#RuleConditionStr').val() != null && $('#RuleConditionStr').val() != undefined) {
+                var ruleconditionJSON = JSON.parse($('#RuleConditionStr').val());
+                if (ruleconditionJSON.length > 0) {
+                    
+                    for (var i = 0; i <= rulesCount; i++) {
+                        if ($('#FieldName_' + i).val() != null && $('#FieldName_' + i).val() != "" && $('#FieldName_' + i).val() != undefined) {
+                            rules.push(
+                            {
+                                    'Id': ruleconditionJSON[0].RuleId,
+                                    'FieldName': $('#FieldName_' + i).val(), 
+                                   'Opration': $('#Opration_' + i).val(), 
+                                   'OprationValue': $('#OprationValue_' + i).val() ,
+                                    'RuleId': $("#objRuleConditions_Dtl_Id_" + i).val() == "" ? 0 : $("#objRuleConditions_Dtl_Id_" + i).val(),
+                                    'RuleConditionsId': $("#objRuleConditions_Id_" + i).val() == "" ? 0 : $("#objRuleConditions_Id_" + i).val(),
+                            });
+                        }
+                    }
+                }
+            }
+            else {
+                for (var i = 0; i < rulesCount; i++) {
+                    rules.push({'FieldName': $('#FieldName_' + i).val(), 'Opration': $('#Opration_' + i).val(), 'OprationValue': $('#OprationValue_' + i).val() });
+                }
+            }
+            obj.ObjRuleConditions = JSON.stringify(rules);
+
+            $.ajax({
+                url: '/Promotion/AddRuleConditions',
+                type: "POST",
+                data: { 'promotion': obj },
+                dataType: "application/json",
+                success: function (data) {
+                    debugger;
+                    alert('Record updated success');
+                    $('#rebatepromomodal').modal('hide');
+                    RebateDataTable.init();
+                    $('#RebatePromoId').val('0');
+                },
+                error: function (data) {
+                    alert('Record updated success');
+                    $('#rebatepromomodal').modal('hide');
+                    RebateDataTable.init();
+                    $('#RebatePromoId').val('0');
+                }
+            });
+            $(this).attr('disabled', false);
+        }
+        var countDetails = 0;
+        function AddNewRuleDtl() {
+            countDetails = countDetails + 1;
+            $("#divRuleDetails").append(`
+                                                                        <input id="objRuleConditions_Dtl_Id_${countDetails}" type="hidden">
+                                                                        <input id="objRuleConditions_Id_${countDetails}" type="hidden">
+                                                                    <div class="col-4" id="divField_${countDetails}">
+                                                                        <div class="form-group">
+                                                                        <label>Fields Name</label>
+                                                                        <select id="FieldName_${countDetails}" class="form-control" onchange="FieldsNameOnChange(${countDetails});">
+                                                                        </select>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-4" id="divOpration_${countDetails}">
+                                                                        <div class="form-group">
+                                                                        <label>Operation</label>
+                                                                        <select id="Opration_${countDetails}" class="form-control">
+                                                                        </select>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-4" id="ddlOprationValue_${countDetails}">
+                                                                        <div class="form-group">
+                                                                        <label>Operation Value</label>
+                                                                        <input class="form-control" id="OprationValue_${countDetails}" placeholder="Operation Value" type="text" value="" style="width: 85%;display: inline;">
+                                                                        <a href="javascript:void(0)" value="Delete" onclick="DeleteRule(${countDetails})"><i class="fa fa-trash" style="font-size: large;margin-top: 8px;" aria-hidden="true"></i></a>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-4" id="ddlOprationValueTemp_${countDetails}" style="display:none;">
+                                                                        <div class="form-group">
+                                                                            <label>Operation Value</label>
+                                                                            <select id="OprationIdTemp_${countDetails}" name="OprationIdTemp" class="form-control" onchange="ddlOprationValueTempOnChange(${countDetails})" style="width: 85%;display: inline;"></select>
+                                                                            <a href="javascript:void(0)" value="Delete" onclick="DeleteRule(${countDetails})"><i class="fa fa-trash" style="font-size: large;margin-top: 8px;" aria-hidden="true"></i></a>
+                                                                        </div>
+                                                                    </div>
+                                                                    `);
+            BindFiledNameDynamic(countDetails)
+        };
+        function BindFiledNameDynamic(count, defaultVal = "", defaultOp = "", defaultOpValue = "") {
+            var response = JSON.parse($('#FieldsStr').val());
+            $("#FieldName_" + count).append(`<option value="">--Select--</option>`)
+            for (var i = 0; i < response.length; i++) {
+                $("#FieldName_" + count).append(`<option value="${response[i].Value}">${response[i].Text}</option>`)
+            }
+            if (defaultVal != "") {
+                $("#FieldName_" + count).val(defaultVal);
+                FieldsNameOnChange(count, defaultOp, defaultOpValue);
+            }
+
+        }
+
+        function FieldsNameOnChange(count, defaultValue = "", defaultOpValue = "") {
+
+            $("#Opration_" + count).html("");
+            var selectedVal = $("#FieldName_" + count).val();
+            if (selectedVal != undefined) {
+                const myArray = selectedVal.split("|");
+                var FieldName = myArray[0];
+                var DataType = myArray[1];
+                var FkKey = myArray[2];
+
+                if (DataType == 'STRING') {
+                    $("#Opration_" + count).append("<option value='Contain'>Contain</option>");
+                    $("#Opration_" + count).append("<option value='NotContain'>Not Contain</option>");
+                    $("#Opration_" + count).append("<option value='Equal'>Equal</option>");
+                }
+                else if (DataType == 'NUMEBR' && FkKey == '0') {
+                    $("#Opration_" + count).append("<option value='Equal'>Equal</option>");
+                    $("#Opration_" + count).append("<option value='LessThan'>Less Than (<)</option>");
+                    $("#Opration_" + count).append("<option value='GreaterThan'>Greater Than (>)</option>");
+                }
+                else if (DataType == 'NUMBER' && FkKey == '1') {
+                    $("#Opration_" + count).append("<option value='Equal'>Equal</option>");
+                    $("#Opration_" + count).append("<option value='Not Equal'>Not Equal</option>");
+                }
+
+            }
+        }
+        function ViewQRCode(obj) {
+            debugger;
+            var jsondata = '';
+            jsondata += 'RefCode : ' + $(obj).closest('tr').find('td:eq(0)').html() + '</br>';
+            jsondata += 'StartTime : ' + $(obj).closest('tr').find('td:eq(1)').html() + '</br>';
+            jsondata += 'EndTime : ' + $(obj).closest('tr').find('td:eq(2)').html() + '</br>';
+            jsondata += 'MaxAmount : ' + $(obj).closest('tr').find('td:eq(3)').html() + '</br>';
+            jsondata += 'Deposit : ' + $(obj).closest('tr').find('td:eq(4)').html() + '</br>';
+            jsondata += 'Countries : ' + $(obj).closest('tr').find('td:eq(5)').html() + '</br>';
+            jsondata += 'Trigger : ' + $(obj).closest('tr').find('td:eq(6)').html() + '</br>';
+            jsondata += 'Status : ' + $(obj).closest('tr').find('td:eq(7)').html() + '</br>';
+            console.log(jsondata);
+            $('#QRCodeModal').modal('show');
+            $('#qrcode').html('');
+            $('#qrcode').qrcode({ width: 300, height: 300, text: jsondata });
+            var down = $('#downloadqrcode');
+            var can = $('canvas');
+            var image = can[0].toDataURL('image/png').replace("image/png", "image/octet-stream");
+            down.attr('href', image);
+        }
+        function ViewRebateQRCode(obj) {
+            debugger;
+            var jsondata = '';
+            jsondata += 'RefCode : ' + $(obj).closest('tr').find('td:eq(0)').html() + '</br>';
+            jsondata += 'StartTime : ' + $(obj).closest('tr').find('td:eq(1)').html() + '</br>';
+            jsondata += 'EndTime : ' + $(obj).closest('tr').find('td:eq(2)').html() + '</br>';
+            jsondata += 'Rebate : ' + $(obj).closest('tr').find('td:eq(3)').html() + '</br>';
+            jsondata += 'Trigger : ' + $(obj).closest('tr').find('td:eq(4)').html() + '</br>';
+            jsondata += 'Rebate Volume : ' + $(obj).closest('tr').find('td:eq(5)').html() + '</br>';
+            jsondata += 'Countries : ' + $(obj).closest('tr').find('td:eq(6)').html() + '</br>';
+
+            jsondata += 'Status : ' + $(obj).closest('tr').find('td:eq(7)').html() + '</br>';
+            console.log(jsondata);
+            $('#QRCodeModal').modal('show');
+            $('#qrcode').html('');
+            $('#qrcode').qrcode({ width: 300, height: 300, text: jsondata });
+            var down = $('#downloadqrcode');
+            var can = $('canvas');
+            var image = can[0].toDataURL('image/png').replace("image/png", "image/octet-stream");
+            down.attr('href', image);
+        }
+        function ViewVoucherQRCode(obj) {
+            debugger;
+            var jsondata = '';
+            jsondata += 'RefCode : ' + $(obj).closest('tr').find('td:eq(0)').html() + '</br>';
+            jsondata += 'Name : ' + $(obj).closest('tr').find('td:eq(0)').html() + '</br>';
+            jsondata += 'StartTime : ' + $(obj).closest('tr').find('td:eq(1)').html() + '</br>';
+            jsondata += 'EndTime : ' + $(obj).closest('tr').find('td:eq(2)').html() + '</br>';
+            jsondata += 'MaxAmount : ' + $(obj).closest('tr').find('td:eq(3)').html() + '</br>';
+            jsondata += 'Max number of Instrument : ' + $(obj).closest('tr').find('td:eq(4)').html() + '</br>';
+            jsondata += 'Min Deposit : ' + $(obj).closest('tr').find('td:eq(5)').html() + '</br>';
+            jsondata += 'Trigger : ' + $(obj).closest('tr').find('td:eq(6)').html() + '</br>';
+            jsondata += 'Countries : ' + $(obj).closest('tr').find('td:eq(7)').html() + '</br>';
+
+            jsondata += 'Status : ' + $(obj).closest('tr').find('td:eq(8)').html() + '</br>';
+            console.log(jsondata);
+            $('#QRCodeModal').modal('show');
+            $('#qrcode').html('');
+            $('#qrcode').qrcode({ width: 300, height: 300, text: jsondata });
+            var down = $('#downloadqrcode');
+            var can = $('canvas');
+            var image = can[0].toDataURL('image/png').replace("image/png", "image/octet-stream");
+            down.attr('href', image);
+        }
+        function ViewReferQRCode(obj) {
+            debugger;
+            var jsondata = '';
+            jsondata += 'RefCode : ' + $(obj).closest('tr').find('td:eq(0)').html() + '</br>';
+            jsondata += 'StartTime : ' + $(obj).closest('tr').find('td:eq(1)').html() + '</br>';
+            jsondata += 'EndTime : ' + $(obj).closest('tr').find('td:eq(2)').html() + '</br>';
+            jsondata += 'Sender Referal Fee : ' + $(obj).closest('tr').find('td:eq(3)').html() + '</br>';
+            jsondata += 'Receipt Referal Fee : ' + $(obj).closest('tr').find('td:eq(4)').html() + '</br>';
+            jsondata += 'Countries : ' + $(obj).closest('tr').find('td:eq(5)').html() + '</br>';
+            jsondata += 'Trigger : ' + $(obj).closest('tr').find('td:eq(6)').html() + '</br>';
+            jsondata += 'Status : ' + $(obj).closest('tr').find('td:eq(7)').html() + '</br>';
+            console.log(jsondata);
+            $('#QRCodeModal').modal('show');
+            $('#qrcode').html('');
+            $('#qrcode').qrcode({ width: 300, height: 300, text: jsondata });
+            var down = $('#downloadqrcode');
+            var can = $('canvas');
+            var image = can[0].toDataURL('image/png').replace("image/png", "image/octet-stream");
+            down.attr('href', image);
+        }
+        function ViewFreeAssetQR(obj) {
+            debugger;
+            var jsondata = '';
+            jsondata += 'RefCode : ' + $(obj).closest('tr').find('td:eq(0)').html() + '</br>';
+            jsondata += 'StartTime : ' + $(obj).closest('tr').find('td:eq(1)').html() + '</br>';
+            jsondata += 'EndTime : ' + $(obj).closest('tr').find('td:eq(2)').html() + '</br>';
+            jsondata += 'MaxAmount : ' + $(obj).closest('tr').find('td:eq(3)').html() + '</br>';
+            jsondata += 'Max Number of Instrument : ' + $(obj).closest('tr').find('td:eq(4)').html() + '</br>';
+            jsondata += 'Min Deposit : ' + $(obj).closest('tr').find('td:eq(5)').html() + '</br>';
+            jsondata += 'Trigger : ' + $(obj).closest('tr').find('td:eq(6)').html() + '</br>';
+            jsondata += 'Countries : ' + $(obj).closest('tr').find('td:eq(7)').html() + '</br>';
+
+            jsondata += 'Status : ' + $(obj).closest('tr').find('td:eq(8)').html() + '</br>';
+            console.log(jsondata);
+            $('#QRCodeModal').modal('show');
+            $('#qrcode').html('');
+            $('#qrcode').qrcode({ width: 300, height: 300, text: jsondata });
+            var down = $('#downloadqrcode');
+            var can = $('canvas');
+            var image = can[0].toDataURL('image/png').replace("image/png", "image/octet-stream");
+            down.attr('href', image);
+        }
+        function download() {
+
+            var down = $('#download');
+            var can = $('canvas');
+            var image = can[0].toDataURL('image/png').replace("image/png", "image/octet-stream");
+            down.attr('href', image);
+        }
+        var CreditDataTable = function () {
+            var Id = $('#hdnPromoRuleId').val();
+            let initTable1 = function () {
+                let table = $('#creditpromoList');
+
+                let oTable = table.dataTable({
+                    "scrollX": true,
+                    "stateSave": true,
+                    "autoWidth": false,
+                    "paging": true,
+                    "language": {
+                        "aria": {
+                            "sortAscending": ": activate to sort column ascending",
+                            "sortDescending": ": activate to sort column descending"
+                        },
+                        "emptyTable": "No data available in table",
+                        "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+                        "infoEmpty": "No entries found",
+                        "infoFiltered": "(filtered1 from MAX total entries)",
+                        //"lengthMenu": "MENU entries",
+                        "search": "Search:",
+                        "zeroRecords": "No matching records found"
+                    },
+                    "pageLength": 10,
+                    "processing": true,
+                    "serverSide": true,
+                    "ajax": {
+                        async: true,
+                        url: '/Promotion/CreditPromo_All',
+                        type: "post",
+                        data: { 'Id': Id }
+                    },
+                    "columns": [
+
+                        {
+                            "title": "CP Ref Code", "data": "promoName", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "StartTime", "data": "postedDateTime", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "EndTime", "data": "acceptedDateTime", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Maximum Amount", "data": "promoAmount", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "% Of Deposit", "data": "perOfDeposit",
+
+                            "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Countries", "data": "countries",
+
+                            "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Enable Trigger", "data": "enableTrigger",
+
+                            "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Status", "data": null,
+                            "render": function (data, type, row) {
+                                let htmlData = "";
+                                htmlData += `<p>-</p>`;
+                                return htmlData;
+                            },
+                            "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Action", "data": null,
+                            "render": function (data, type, row) {
+                                let htmlData = "<div class='' style='width:105px;'>";
+                                htmlData += `<button title="Edit AboutUs" class="btn btn-sm btn-success mr-1" onclick="showAddEdit(this);"><i class="fa fa-edit"></i></button>`;
+                                htmlData += '<input type="hidden" value="' + row['creditPromoId'] + '"/>'
+                                htmlData += `<button title="Delete AboutUs" class="btn btn-sm btn-danger mr-1" onclick="Delete(this);"><i class="fa fa-trash"></i></button>`;
+                                htmlData += `<button title="View QR Code" class="btn btn-sm btn-primary mr-1" onclick="ViewQRCode(this);"><i class="fa fa-qrcode"></i></button>`;
+                                htmlData += "</div>";
+                                return htmlData;
+                            }
+                            , "orderable": false, "width": "3%"
+                        },
+                    ],
+
+                    //setup responsive extension: http://datatables.net/extensions/responsive/
+                    responsive: true,
+                    "scrollX": true,
+                    "lengthMenu": [
+                        [5, 10, 15, 20, 1000],
+                        [5, 10, 15, 20, 1000] // change per page values here
+                    ],
+                    // set the initial value
+
+                    //"dom": "<'row' <'col-md-12'B>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'f>r><'table-scrollable't><'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>", // horizobtal scrollable datatable
+
+                    // Uncomment below line("dom" parameter) to fix the dropdown overflow issue in the datatable cells. The default datatable layout
+                    // setup uses scrollable div(table-scrollable) with overflow:auto to enable vertical scroll(see: assets/global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js).
+                    // So when dropdowns used the scrollable div should be removed.
+                    //"dom": "<'row' <'col-md-12'T>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'f>r>t<'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>",
+                });
+            }
+
+            return {
+                init: function () {
+                    if ($.fn.DataTable.isDataTable("#creditpromoList")) {
+                        $('#creditpromoList').dataTable().fnDestroy();
+                        //$('#divUserTable').html('<table class="table table-striped" width="100%" id="UserTable"></table>');
+                    }
+                    initTable1();
+                }
+            };
+        }();
+
+        var ReferFriendDataTable = function () {
+            let initTable1 = function () {
+                var Id = $('#hdnPromoRuleId').val();
+                let table = $('#referfriendpromoList');
+
+                let oTable = table.dataTable({
+                    "scrollX": true,
+                    "stateSave": true,
+                    "autoWidth": false,
+                    "paging": true,
+                    "language": {
+                        "aria": {
+                            "sortAscending": ": activate to sort column ascending",
+                            "sortDescending": ": activate to sort column descending"
+                        },
+                        "emptyTable": "No data available in table",
+                        "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+                        "infoEmpty": "No entries found",
+                        "infoFiltered": "(filtered1 from MAX total entries)",
+                        //"lengthMenu": "MENU entries",
+                        "search": "Search:",
+                        "zeroRecords": "No matching records found"
+                    },
+                    "pageLength": 10,
+                    "processing": true,
+                    "serverSide": true,
+                    "ajax": {
+                        async: true,
+                        url: '/Promotion/ReferFriendPromo_All',
+                        type: "post",
+                        data: { 'Id': Id }
+                    },
+                    "columns": [
+
+                        {
+                            "title": "Raf Ref Code", "data": "promoRefCode", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "StartTime", "data": "startDate", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "EndTime", "data": "endDate", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Sender Referal Fee", "data": "senderRefFee", "orderable": false, "width": "3%"
+                        },
+
+                        {
+                            "title": "Receipt Referal Fee", "data": "recipientFee", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Countries", "data": "countries", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Enable Trigger", "data": "enableTrigger", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Status", "data": "active",
+                            "render": function (data, type, row) {
+                                let htmlData = "";
+                                if (row['active'] == true) {
+                                    htmlData += '<p>Enable</p>';
+                                }
+                                else {
+                                    htmlData += '<p>Disable</p>';
+                                }
+                                return htmlData;
+                            },
+                            "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Action", "data": "referFriendPromoId",
+                            "render": function (data, type, row) {
+                                let htmlData = "<div class='' style='width:105px;'>";
+                                htmlData += `<button title="Edit AboutUs" class="btn btn-sm btn-success mr-1" onclick="showreferfriendAddEdit(this);"><i class="fa fa-edit"></i></button>`;
+                                htmlData += '<input type="hidden" value="' + row['referFriendPromoId'] + '"/>'
+                                htmlData += `<button title="Delete AboutUs" class="btn btn-sm btn-danger mr-1" onclick="Deletereferfriend(this);"><i class="fa fa-trash"></i></button>`;
+                                htmlData += `<button title="View QR Code" class="btn btn-sm btn-primary mr-1" onclick="ViewReferQRCode(this);"><i class="fa fa-qrcode"></i></button>`;
+                                htmlData += "</div>";
+                                return htmlData;
+                            }
+                            , "orderable": false, "width": "3%"
+                        },
+                    ],
+
+                    responsive: true,
+                    "scrollX": true,
+                    "lengthMenu": [
+                        [5, 10, 15, 20, 1000],
+                        [5, 10, 15, 20, 1000]
+                    ],
+
+                });
+            }
+
+            return {
+                init: function () {
+                    if ($.fn.DataTable.isDataTable("#referfriendpromoList")) {
+                        $('#referfriendpromoList').dataTable().fnDestroy();
+                    }
+                    initTable1();
+                }
+            };
+        }();
+
+        var RebateDataTable = function () {
+            var Id = $('#hdnPromoRuleId').val();
+            let initTable1 = function () {
+                let table = $('#rebatepromoList');
+
+                let oTable = table.dataTable({
+                    "scrollX": true,
+                    "stateSave": true,
+                    "autoWidth": false,
+                    "paging": true,
+                    "language": {
+                        "aria": {
+                            "sortAscending": ": activate to sort column ascending",
+                            "sortDescending": ": activate to sort column descending"
+                        },
+                        "emptyTable": "No data available in table",
+                        "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+                        "infoEmpty": "No entries found",
+                        "infoFiltered": "(filtered1 from MAX total entries)",
+                        //"lengthMenu": "MENU entries",
+                        "search": "Search:",
+                        "zeroRecords": "No matching records found"
+                    },
+                    "pageLength": 10,
+                    "processing": true,
+                    "serverSide": true,
+                    "ajax": {
+                        async: true,
+                        url: '/Promotion/RebatePromo_All',
+                        type: "post",
+                        data: { 'Id': Id }
+                    },
+                    "columns": [
+
+                        {
+                            "title": "Reb Ref Code", "data": "promoRefCode", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "StartTime", "data": "startDate", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "EndTime", "data": "endDate", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Rebate", "data": "rebateAmt", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Enable Trigger", "data": "enableTrigger", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Rebate Volume", "data": "rebateVol", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Countries", "data": "countries", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Status", "data": "active",
+                            "render": function (data, type, row) {
+                                let htmlData = "";
+                                if (row['active'] == true) {
+                                    htmlData += '<p>Enable</p>';
+                                }
+                                else {
+                                    htmlData += '<p>Disable</p>';
+                                }
+                                return htmlData;
+                            },
+                            "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Action", "data": null,
+                            "render": function (data, type, row) {
+                                let htmlData = "<div class='' style='width:105px;'>";
+                                htmlData += `<button title="Edit AboutUs" class="btn btn-sm btn-success mr-1" onclick="showrebateAddEdit(this);"><i class="fa fa-edit"></i></button>`;
+                                htmlData += '<input type="hidden" value="' + row['rebatePromoId'] + '"/>'
+                                htmlData += `<button title="Delete AboutUs" class="btn btn-sm btn-danger mr-1" onclick="Deleterebate(this);"><i class="fa fa-trash"></i></button>`;
+                                htmlData += `<button title="View QR Code" class="btn btn-sm btn-primary mr-1" onclick="ViewRebateQRCode(this);"><i class="fa fa-qrcode"></i></button>`;
+                                htmlData += "</div>";
+                                return htmlData;
+                            }
+                            , "orderable": false, "width": "3%"
+                        },
+                    ],
+
+                    responsive: true,
+                    "scrollX": true,
+                    "lengthMenu": [
+                        [5, 10, 15, 20, 1000],
+                        [5, 10, 15, 20, 1000]
+                    ],
+
+                });
+            }
+
+            return {
+                init: function () {
+                    if ($.fn.DataTable.isDataTable("#rebatepromoList")) {
+                        $('#rebatepromoList').dataTable().fnDestroy();
+                    }
+                    initTable1();
+                }
+            };
+        }();
+
+        var FreeAssetDataTable = function () {
+            var Id = $('#hdnPromoRuleId').val();
+            let initTable1 = function () {
+
+                let table = $('#freeassetpromoList');
+
+                let oTable = table.dataTable({
+                    "scrollX": true,
+                    "stateSave": true,
+                    "autoWidth": false,
+                    "paging": true,
+                    "language": {
+                        "aria": {
+                            "sortAscending": ": activate to sort column ascending",
+                            "sortDescending": ": activate to sort column descending"
+                        },
+                        "emptyTable": "No data available in table",
+                        "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+                        "infoEmpty": "No entries found",
+                        "infoFiltered": "(filtered1 from MAX total entries)",
+                        //"lengthMenu": "MENU entries",
+                        "search": "Search:",
+                        "zeroRecords": "No matching records found"
+                    },
+                    "pageLength": 10,
+                    "processing": true,
+                    "serverSide": true,
+                    "ajax": {
+                        async: true,
+                        url: '/Promotion/FreeAssetPromo_All',
+                        type: "post",
+                        data: { 'Id': Id }
+                    },
+                    "columns": [
+
+                        {
+                            "title": "FAP Ref Code", "data": "promoRefCode", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "StartTime", "data": "startDate", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "EndTime", "data": "endDate", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Max Amount", "data": "maxAmount", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Max num of instruments", "data": "allowedShare", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Min Deposit", "data": "minDeposit", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Enable Trigger", "data": "enableTrigger", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Countries", "data": "countries", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Status", "data": "active",
+                            "render": function (data, type, row) {
+                                let htmlData = "";
+                                if (row['active'] == true) {
+                                    htmlData += '<p>Enable</p>';
+                                }
+                                else {
+                                    htmlData += '<p>Disable</p>';
+                                }
+                                return htmlData;
+                            },
+                            "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Action", "data": null,
+                            "render": function (data, type, row) {
+                                let htmlData = "<div class='' style='width:105px;'>";
+                                htmlData += `<button title="Edit AboutUs" class="btn btn-sm btn-success mr-1" onclick="showfreeassetAddEdit(this);"><i class="fa fa-edit"></i></button>`;
+                                htmlData += '<input type="hidden" value="' + row['freeAssetsPromoId'] + '"/>'
+                                htmlData += `<button title="Delete AboutUs" class="btn btn-sm btn-danger mr-1" onclick="Deletefreeasset(this);"><i class="fa fa-trash"></i></button>`;
+                                htmlData += `<button title="View QR Code" class="btn btn-sm btn-primary mr-1" onclick="ViewFreeAssetQR(this);"><i class="fa fa-qrcode"></i></button>`;
+                                htmlData += "</div>";
+                                return htmlData;
+                            }
+                            , "orderable": false, "width": "3%"
+                        },
+                    ],
+                    responsive: true,
+                    "scrollX": true,
+                    "lengthMenu": [
+                        [5, 10, 15, 20, 1000],
+                        [5, 10, 15, 20, 1000]
+                    ],
+
+                });
+            }
+            return {
+                init: function () {
+                    if ($.fn.DataTable.isDataTable("#freeassetpromoList")) {
+                        $('#freeassetpromoList').dataTable().fnDestroy();
+                    }
+                    initTable1();
+                }
+            };
+        }();
+
+        var VoucherDataTable = function () {
+            var Id = $('#hdnPromoRuleId').val();
+            let initTable1 = function () {
+                let table = $('#voucherpromoList');
+
+                let oTable = table.dataTable({
+                    "scrollX": true,
+                    "stateSave": true,
+                    "autoWidth": false,
+                    "paging": true,
+                    "language": {
+                        "aria": {
+                            "sortAscending": ": activate to sort column ascending",
+                            "sortDescending": ": activate to sort column descending"
+                        },
+                        "emptyTable": "No data available in table",
+                        "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+                        "infoEmpty": "No entries found",
+                        "infoFiltered": "(filtered1 from MAX total entries)",
+                        //"lengthMenu": "MENU entries",
+                        "search": "Search:",
+                        "zeroRecords": "No matching records found"
+                    },
+                    "pageLength": 10,
+                    "processing": true,
+                    "serverSide": true,
+                    "ajax": {
+
+                        async: true,
+                        url: '/Promotion/VoucherPromo_All',
+                        type: "post",
+                        data: { 'Id': Id }
+                    },
+                    "columns": [
+
+                        {
+                            "title": "Vou Ref Code", "data": "promoRefCode", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Vou Name", "data": "name", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "StartTime", "data": "startTime", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "EndTime", "data": "endTime", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Max Amount", "data": "voucherAmt", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Max num of instruments", "data": "maxAllowedShare", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Min Deposit", "data": "minDeposit", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Enable Trigger", "data": "enableTrigger", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Countries", "data": "countries", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Status", "data": "active",
+                            "render": function (data, type, row) {
+                                let htmlData = "";
+                                if (row['active'] == true) {
+                                    htmlData += '<p>Enable</p>';
+                                }
+                                else {
+                                    htmlData += '<p>Disable</p>';
+                                }
+                                return htmlData;
+                            },
+                            "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Action", "data": null,
+                            "render": function (data, type, row) {
+                                let htmlData = "<div class='' style='width:105px;'>";
+                                htmlData += `<button title="Edit AboutUs" class="btn btn-sm btn-success mr-1" onclick="showvoucherAddEdit(this);"><i class="fa fa-edit"></i></button>`;
+                                htmlData += '<input type="hidden" value="' + row['voucherPromoId'] + '"/>'
+                                htmlData += `<button title="Delete AboutUs" class="btn btn-sm btn-danger mr-1" onclick="Deletevoucher(this);"><i class="fa fa-trash"></i></button>`;
+                                htmlData += `<button title="View QR Code" class="btn btn-sm btn-primary mr-1" onclick="ViewVoucherQRCode(this);"><i class="fa fa-qrcode"></i></button>`;
+                                htmlData += "</div>";
+                                return htmlData;
+                            }
+                            , "orderable": false, "width": "3%"
+                        },
+                    ],
+                    responsive: true,
+                    "scrollX": true,
+                    "lengthMenu": [
+                        [5, 10, 15, 20, 1000],
+                        [5, 10, 15, 20, 1000]
+                    ],
+
+                });
+            }
+            return {
+                init: function () {
+                    if ($.fn.DataTable.isDataTable("#voucherpromoList")) {
+                        $('#voucherpromoList').dataTable().fnDestroy();
+                    }
+                    initTable1();
+                }
+            };
+        }();
+    </script>
+}

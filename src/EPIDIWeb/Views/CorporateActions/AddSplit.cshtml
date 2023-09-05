@@ -1,0 +1,425 @@
+﻿@model SplitViewModel
+@{
+    Layout = null;
+}
+
+<div class="row">
+    <div class="col-6">
+        <div class="form-group">
+            @Html.LabelFor(model => model.EquityName,"Equity Name*")
+            <select id="ddlSplitEquity" class="form-control"></select>
+            <label id="lblSplitEquity" class="error">Please select equity name.</label>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-6">
+        <div class="form-group">
+            @Html.LabelFor(model => model.OldValue,"OldValue*")
+            @Html.TextBoxFor(p => p.OldValue, new { @class = "form-control", @placeholder = "OldValue" ,@name="OldValue" })
+            <label id="lblOldValue" class="error">Please enter old value.</label>
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="form-group">
+            @Html.LabelFor(model => model.SplitValue, "SplitValue*")
+            @Html.TextBoxFor(p => p.SplitValue, new { @class = "form-control", @placeholder = "SplitValue" ,@name="SplitValue"})
+            <label id="lblSplitValue" class="error">Please enter split value.</label>
+        </div>
+    </div>
+
+</div>
+<div class="row">
+    <div class="col-3">
+        <div class="form-group">
+            @Html.LabelFor(model => model.MDU,"MDU (Max Decimals Units)*")
+            @Html.TextBoxFor(p => p.MDU, new { @class = "form-control", @placeholder = "Max Decimals Units" ,@name="MDU" })
+            <label id="lblMDU" class="error">Please enter max decimal units.</label>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="form-group">
+            @Html.LabelFor(model => model.IsAdjustment,"Adjustment*")
+            <div class="row" style="margin-top: 6px;">
+                <div class="col-4">
+                    <input id="rdYes" name="adjustment" type="radio" value="1">
+                    <label for="rdYes">Yes</label>
+                </div>
+                <div class="col-4">
+                    <input id="rdNo" name="adjustment" type="radio" value="0">
+                    <label for="rdNo">No</label>
+                </div>
+            </div>
+            <label id="lblAdjustment" class="error">Please select adjustment.</label>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="form-group">
+            @Html.LabelFor(model => model.RoundPriceNUnitsBuy, "Round Price & Units Buy*")
+            <select id="ddlRoundPriceNUnitsBuy" class="form-control">
+                <option value="">select</option>
+                <option value="up">Up</option>
+                <option value="down">Down</option>
+            </select>
+            <label id="lblRoundPriceNUnitsBuy" class="error">Please select one option.</label>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="form-group">
+            @Html.LabelFor(model => model.RoundPriceNUnitsSell, "Round Price & Units Sell*")
+            <select id="ddlRoundPriceNUnitsSell" class="form-control">
+                <option value="">select</option>
+                <option value="up">Up</option>
+                <option value="down">Down</option>
+            </select>
+            <label id="lblRoundPriceNUnitsSell" class="error">Please select one option.</label>
+        </div>
+    </div>
+    <div class="col-12">
+        <button type="button" onclick="GetCalculatedSplitOrderDetails();" class="btn btn-primary">Show Orders</button>
+        <div />
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <table id="tblSplitEquityStockDetails" class="table table-responsive">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="checkBoxAllSplitEquity"></th>
+                        <th>Client Id</th>
+                        <th>Trading Account</th>
+                        <th>Order Id</th>
+                        <th>Side Name</th>
+                        <th>Equity Name</th>
+                        <th>Open DateTime</th>
+                        <th>Legal Entity</th>
+                        <th>Open Price Before</th>
+                        <th>Open Units before</th>
+                        <th>Open Price After Split</th>
+                        <th>Open Units After Split</th>
+                        <th>Leverage</th>
+                        <th>Price No Round</th>
+                        <th>Units No Round</th>
+                        <th>Diff Price</th>
+                        <th>Diff units</th>
+                        <th>Split Adjustment</th>
+                        <th>Position</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button id="btnsave" type="button" onclick="AddUpdateSplitData();" class="btn btn-primary">Apply Changes On Position</button>
+    </div>
+
+    <script type="text/javascript">
+        var countOrder = 1;
+        var CheckboxCount;
+        var CheckboxTotalCount = 0;
+
+        var selectedRows = [];
+        var AllselectedRows = [];
+
+        $('#Loader').show();
+        $("#tblSplitEquityStockDetails").hide();
+        $("#lblSplitEquity").hide();
+        $("#lblOldValue").hide();
+        $("#lblSplitValue").hide();
+        $("#lblMDU").hide();
+        $("#lblAdjustment").hide();
+        $("#lblRoundPriceNUnitsBuy").hide();
+        $("#lblRoundPriceNUnitsSell").hide();
+        $("#btnsave").hide();
+
+        $("body").on("change", "#csAll", function () {
+            debugger;
+            var isChecked = $(this).is(":checked");
+            $(".chk-per").each(function () {
+                if (isChecked)
+                    $(this).prop("checked", true);
+                else
+                    $(this).prop("checked", false);
+            });
+        });
+
+        $("body").on("change", ".chk-per", function () {
+            debugger;
+            var mode = 0;
+            var clsName = "";
+            var mainclass = "";
+            if ($(this).hasClass("chk-per")) {
+                mode = 1;
+                clsName = ".chk-per";
+                mainclass = "#csAll";
+            }
+            if (mode > 0) {
+                var total = $(clsName).length;
+                var totalchecked = $(clsName + ":Checked").length;
+                if (total == totalchecked) {
+                    $(mainclass).prop("checked", true);
+                } else {
+                    $(mainclass).prop("checked", false);
+                }
+            }
+        });
+
+        BindIntruments();
+
+        function BindIntruments() {
+            $.ajax({
+                async: false,
+                type: "POST",
+                url: '/CorporateActions/GetInstrumentsDropDown',
+                dataType: 'json',
+                data: {},
+                success: function (response) {
+                    $("#ddlSplitEquity").append(`<option value = "" > --Select--</option>`)
+                    for (var i = 0; i < response.length; i++) {
+                        $("#ddlSplitEquity").append(`<option value = "${response[i].value}"> ${response[i].text}</option>`)
+                    }
+                    $('#Loader').hide();
+                },
+                error: function (errorTemp) {
+                    console.log('error', errorTemp);
+                }
+            });
+        }
+
+        function GetCalculatedSplitOrderDetails() {
+
+            $("#lblSplitEquity").hide();
+            $("#lblOldValue").hide();
+            $("#lblSplitValue").hide();
+            $("#lblMDU").hide();
+            $("#lblAdjustment").hide();
+            $("#lblRoundPriceNUnitsBuy").hide();
+            $("#lblRoundPriceNUnitsSell").hide();
+
+            if (IsValidate()) {
+                $('#Loader').show();
+                debugger;
+                var instrumentId = $("#ddlSplitEquity").val();
+
+                var param = {};
+                param.InstrumentId = instrumentId;
+                param.OldValue = $("#OldValue").val();
+                param.SplitValue = $("#SplitValue").val();
+                param.MDU = $("#MDU").val();
+                param.IsAdjustment = ($("input[name='adjustment']:checked").val() == '1' ? true : false);
+                param.RoundPriceNUnitsBuy = $("#ddlRoundPriceNUnitsBuy").val();
+                param.RoundPriceNUnitsSell = $("#ddlRoundPriceNUnitsSell").val();
+
+                $.ajax({
+                    async: false,
+                    type: "GET",
+                    url: '/CorporateActions/GetCalculatedSplitOrderDetails',
+                    dataType: 'json',
+                    data: param,
+                    success: function (response) {
+                        console.log(response);
+                        debugger
+
+                        $("#tblSplitEquityStockDetails tbody").empty();
+                        $("#lblSplitEquity").hide();
+                        for (var i = 0; i < response.length; i++) {
+                            CheckboxCount = i;
+                            CheckboxTotalCount = CheckboxTotalCount + 1;
+
+                            BindGridWithStockDetails(response[i]);
+                        }
+                        //BindGridWithStockDetails(response);
+                        $('#Loader').hide();
+                    },
+                    error: function (errorTemp) {
+                        console.log('error', errorTemp);
+                    }
+                });
+            }
+        }
+
+        function BindGridWithStockDetails(response, equityType) {
+
+            $("#tblSplitEquityStockDetails > thead > tr > th").removeAttr("style");
+
+            if (response != null) {
+
+
+
+                var sdEquityData = "";
+
+                sdEquityData += '<tr>';
+                sdEquityData += '<td><input type="checkbox" onclick="CheckValue(' + response.id + ',' + CheckboxCount + ')" id="checkSplitEquity' + CheckboxCount + '"></td>';
+                sdEquityData += '<td>' + response.clientId + '</td>';
+                sdEquityData += '<td>' + response.tradingAccount + '</td>';
+                sdEquityData += '<td>' + response.id + '</td>';
+                sdEquityData += '<td>' + response.sideName + '</td>';
+                sdEquityData += '<td>' + response.equityName + '</td>';
+                sdEquityData += '<td>' + response.openTiming + '</td>';
+                sdEquityData += '<td>' + response.legalEntity + '</td>';
+                sdEquityData += '<td>' + response.openPriceBefore + '</td>';
+                sdEquityData += '<td>' + response.openUnitsBefore + '</td>';
+                sdEquityData += '<td>' + response.openPriceAfterSplit + '</td>';
+                sdEquityData += '<td>' + response.openUnitsAfterSplit + '</td>';
+                sdEquityData += '<td>' + response.leverage + '</td>';
+                sdEquityData += '<td>' + response.priceNoRound + '</td>';
+                sdEquityData += '<td>' + response.unitsNoRound + '</td>';
+                sdEquityData += '<td>' + response.priceDiff + '</td>';
+                sdEquityData += '<td>' + response.unitsDiff + '</td>';
+
+                sdEquityData += '<td>' + response.splitAdjustment + '</td>';
+
+                if (response.position == "Open")
+                    sdEquityData += '<td><span class="badge badge-success">' + response.position + '</span></td>';
+                else
+                    sdEquityData += '<td><span class="badge badge-danger">' + response.position + '</span></td>';
+
+                sdEquityData += '</tr>';
+
+                debugger;
+
+                $("#tblSplitEquityStockDetails tbody").append(sdEquityData);
+                $("#tblSplitEquityStockDetails").show();
+                $("#btnsave").show();
+
+                $("#orderId_" + countOrder + "").val(response.orderId);
+                $("#position_" + countOrder + "").val(response.position);
+                $("#openPrice_" + countOrder + "").val(response.openPriceAfterSplit);
+                $("#splitAdjustment_" + countOrder + "").val(response.splitAdjustment);
+                $("#openUnitsAfterSplit_" + countOrder + "").val(response.openUnitsAfterSplit);
+
+                countOrder = countOrder + 1;
+
+
+            }
+            else {
+                $("#tblSplitEquityStockDetails tbody").empty();
+                $("#tblSplitEquityStockDetails tbody").append('<tr><td class="text-center" colspan="10">No data found</td></tr>');
+                $("#tblSplitEquityStockDetails").show();
+                $("#tblSplitEquityStockDetails > thead > tr > th").attr("style", "width: 120px;");
+
+            }
+        }
+
+        $('#checkBoxAllSplitEquity').change(function () {
+            if ($(this).is(':checked')) {
+                for (var i = 0; i < CheckboxTotalCount + 1; i++) {
+                    $('#checkSplitEquity' + i).prop('checked', true);
+                    selectedRows = AllselectedRows;
+                }
+            } else {
+                for (var i = 0; i < CheckboxTotalCount + 1; i++) {
+                    $('#checkSplitEquity' + i).prop('checked', false);
+                    selectedRows = [];
+                }
+            }
+        });
+
+        function CheckValue(id, BoxId) {
+            debugger;
+
+            if ($("#checkSplitEquity" + BoxId).prop('checked') == true) {
+                selectedRows.push(id);
+            }
+            else {
+                var filteredArray = selectedRows.filter(function (element) {
+                    return element !== id;
+                });
+                selectedRows = filteredArray;
+            }
+
+            $('#checkBoxAllSplitEquity').prop('checked', true);
+            for (var i = 0; i < CheckboxTotalCount; i++) {
+                if ($("#checkSplitEquity" + i).prop('checked') == false) {
+                    $('#checkBoxAllSplitEquity').prop('checked', false);
+                }
+            }
+        }
+
+        function AddUpdateSplitData() {
+            debugger;
+            var ordersData = [];
+            for (var i = 1; i <= countOrder; i++) {
+
+                var isChecked = $("#chk-" + i + "").is(":checked");
+                if (isChecked) {
+                    var obj = {
+
+                        OrderId: $("#orderId_" + i).val(),
+                        Position: $("#position_" + i).val(),
+                        OpenPrice: $("#openPrice_" + i).val(),
+                        SplitAdjustment: $("#splitAdjustment_" + i).val(),
+                        OpenUnits: $("#openUnitsAfterSplit_" + i).val()
+
+                    }
+                    ordersData.push(obj);
+
+                }
+            }
+
+            if (ordersData != null) {
+                $.ajax({
+                    async: false,
+                    type: "POST",
+                    url: '/CorporateActions/AddUpdateSplitValue',
+                    dataType: 'json',
+                    data: { model: ordersData },
+                    success: function (response) {
+                        debugger
+                        NotifyMsg('success', response.message);
+                        location.reload();
+                    },
+                    error: function (errorTemp) {
+                        console.log('error', errorTemp);
+                    }
+                });
+            }
+        }
+
+        function IsValidate() {
+            $("#lblSplitEquity").hide();
+
+            var errorCount = 0;
+            if ($("#ddlSplitEquity").val() == "") {
+                $("#lblSplitEquity").show();
+                errorCount++;
+            }
+            if ($("#OldValue").val() == "" || $("#OldValue").val() == "0") {
+                $("#lblOldValue").show();
+                errorCount++;
+            }
+            if ($("#SplitValue").val() == "" || $("#SplitValue").val() == "0") {
+                $("#lblSplitValue").show();
+                errorCount++;
+            }
+            if ($("#MDU").val() == "" || $("#MDU").val() == "0") {
+                $("#lblMDU").show();
+                errorCount++;
+            }
+            if ($("input[name='adjustment']").is(":checked") == false) {
+                $("#lblAdjustment").show();
+                errorCount++;
+            }
+            if ($("#ddlRoundPriceNUnitsBuy").val() == "") {
+                $("#lblRoundPriceNUnitsBuy").show();
+                errorCount++;
+            }
+            if ($("#ddlRoundPriceNUnitsSell").val() == "") {
+                $("#lblRoundPriceNUnitsSell").show();
+                errorCount++;
+            }
+            else if ($("#tblSplitEquityStockDetails tbody tr").length == 1) {
+                NotifyMsg('error', "No data found.");
+                errorCount++;
+            }
+
+            if (errorCount > 0) {
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+
+    </script>

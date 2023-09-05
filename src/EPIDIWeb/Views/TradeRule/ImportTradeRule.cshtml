@@ -1,0 +1,105 @@
+﻿@model TradeRuleViewModel
+@{
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+    ViewBag.PageTitle = "Import Trade Rule";
+
+    ViewBag.Method = "Add Import Trade Rule";
+
+    ViewBag.DetailName = "Import Trade Rule";
+    ViewBag.DetailURL = "/TradeRule/Index";
+}
+<style>
+    .select2-container {
+        display: block;
+    }
+
+    h3 {
+        color: #dc3545 !important;
+        font-weight: bold;
+    }
+</style>
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3>Import Trade Rule</h3>
+            </div>
+            @using (Html.BeginForm("UploadTradeRule", "TradeRule", FormMethod.Post, new { enctype = "multipart/form-data", id = "frmExcelForm" }))//onsubmit = "return myFunction()"
+            {
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <input type="hidden" id="rulesDetailsData" />
+                                @Html.HiddenFor(model => model.Id,"Id")
+                                @Html.LabelFor(model => model.Name, "Rule Name")
+                                @Html.TextBoxFor(p => p.Name, new { @class = "form-control", @placeholder = "Rule Name" ,@name="Name"})
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.Priority, "Priority")
+                                @Html.TextBoxFor(p => p.Priority, new { @class = "form-control", @placeholder = "Priority" ,@name="Priority", type="number"})
+                            </div>
+                        </div>
+                        <div class="col-6" id="divUploadFile">
+
+                            <div class="custom-file form-group float-sm-left mr-3" style="width:230px">
+                                <input type="file" id="FileUpload" name="FileUpload" class="custom-file-input">
+                                <label id="lblRule" class="custom-file-label" style="text-align:left" for="file">Choose File</label>
+                            </div>
+                            <button type="submit" class="btn btn-info form-group float-sm-left mr-3 ">Import Trade Rule</button>
+
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script>
+        $(document).ready(() => {
+            $('#FileUpload').on('change', function(e) {
+                //get the file name
+                var fileName = e.target.files[0].name;
+                $(this).next('.custom-file-label').html(fileName);
+            })
+            $(document).on("submit", "#frmExcelForm", function(e) {
+                $("#Loader").show();
+                e.preventDefault();
+                var form = $(this);
+                form.ajaxSubmit({
+                    beforeSubmit: function() {
+                        if (!form.valid()) {
+                            return false;
+                        }
+                        else {
+                            return true;
+                        }
+                    },
+                    success: function(res) {
+                        if (res.statusCode == 200) {
+                            $('#FileUpload').val('');
+                            $('#lblRule').html('Choose File')
+                            NotifyMsg('success', res.message);
+                            $('#Id').val(res.response.id);
+                            $('#divUploadFile').hide();
+                            window.location.href = "/TradeRule/Edit?Id=" + res.response.id;
+                            $("#Loader").hide();
+                        } else {
+                            NotifyMsg('error', res.message);
+                            $("#Loader").hide();
+                        }
+                    },
+                    Errors: function() {
+                        console.log('error', res.message);
+                        NotifyMsg('error', res.message);
+                        $("#Loader").hide();
+                    }
+                });
+                return false;
+            });
+        });
+    </script>
+}

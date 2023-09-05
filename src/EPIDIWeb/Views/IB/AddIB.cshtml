@@ -1,0 +1,219 @@
+﻿@model IBViewModel
+@{
+	Layout = "~/Views/Shared/_MainLayout.cshtml";
+	ViewBag.PageTitle = "Add IB";
+	ViewBag.Method = "Add IB ";
+	
+	ViewBag.DetailName = "IB";
+	ViewBag.DetailURL = "/IB/IBListing";
+
+}
+<style>
+	.select2-container {
+		display: block;
+	}
+
+	h3 {
+		color: #dc3545 !important;
+		font-weight: bold;
+	}
+
+	table {
+		border-collapse: collapse;
+		width: 100%;
+	}
+
+	th, td {
+		text-align: left;
+		padding: 8px;
+	}
+
+	tr:nth-child(even) {
+		background-color: #f2f2f2;
+	}
+</style>
+@using (Html.BeginForm("SaveIB", "IB", FormMethod.Post, new { id = "ibForm", enctype = "multipart/form-data" }))
+{
+	<div class="row">
+		<div class="col-12">
+			<div class="card">
+				<div class="card-header">
+					<div class="row">
+						<div class="col-12">
+							<h3>IB</h3>
+						</div>
+					</div>
+				</div>
+				<div class="card-body">
+					<div class="row">
+						<div class="col-12">
+							<div class="form-group">
+								@Html.HiddenFor(model => model.Id)
+								@Html.LabelFor(model => model.Name, "Name")
+								@Html.TextBoxFor(p => p.Name, new { @class = "form-control", @placeholder = "name" ,@name="Name"})
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-6">
+								<div class="form-group">
+									&nbsp;
+									@Html.LabelFor(model => model.BDMId, "BDM")
+									@Html.DropDownListFor(model => model.BDMId, new SelectList(ViewBag.DropdownlistBDM, "Value", "Text", Model.BDMId), "-- Select BDM --", new { @class = "form-control" ,@name="BDMName",@Onchange = "GetBDMListALL($('#BDMID').val());"  })
+								</div>
+							</div>
+
+							<div class="col-6">
+								<div class="form-group">
+									&nbsp;
+									@Html.LabelFor(model => model.LegalEntityId, "LegalEntity")
+									@Html.DropDownListFor(model => model.LegalEntityId, new SelectList(ViewBag.DropdownlistLegalEntity, "Value", "Text", Model.LegalEntityId), "-- Select LegalEntityId --", new { @class = "form-control" ,@name="legalEntityName",@Onchange = "GetLegalEntityListALL($('#LegalEntityId').val());"  })
+								</div>
+							</div>
+						</div>
+
+						<div class="row">
+							<div class=" col-6">
+								<div class="form-group">
+									&nbsp;
+									@Html.LabelFor(model => model.CountryId, "Country")
+									@Html.DropDownListFor(model => model.CountryId, new SelectList(ViewBag.DropdownlistCountry, "Value", "Text", Model.CountryId), "-- Select CountryCode --", new { @class = "form-control" ,@name="countryName",@Onchange = "GetCountryListAll($('#CountryCode').val());"  })
+
+
+								</div>
+							</div>
+
+							<div class="col-6">
+								<div class="form-group">
+									&nbsp;
+									@Html.LabelFor(model => model.ParentIBId, "ParentIB")
+									@Html.DropDownListFor(model => model.ParentIBId, new SelectList(ViewBag.IBParentDropDown, "Value", "Text", Model.ParentIBId), "-- Select ParentIBId --", new { @class = "form-control" ,@name="ParentIBName",@Onchange = "GetIBParentList($('#ParentIBId').val());"  })
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class=" col-6">
+								<div class="form-group">
+									@Html.LabelFor(model => model.ParentCommissionPercentageRebate, "Parent Commission Percentage Rebate")
+									@Html.TextBoxFor(p => p.ParentCommissionPercentageRebate, new {  @type = "number", @class = "form-control", @placeholder = "Parent Commission Percentage Rebate" ,@name="ParentCommissionPercentageRebate"})
+								</div>
+							</div>
+							
+							<div class=" col-6">
+								<div class="form-group">
+									@Html.LabelFor(model => model.BDMCommissionPercentage, "BDM Commission Percentage")
+									@Html.TextBoxFor(p => p.BDMCommissionPercentage, new {  @type = "number", @class = "form-control", @placeholder = "BDM CommissionP ercentage" , @name="BDMCommissionPercentage"})
+								</div>
+							</div>
+							
+						</div>
+						<div class="row">
+							
+							<div class="col-6">
+								<label>File :</label>
+								<div class="form-group">
+									
+									<div class="custom-file form-group float-sm-left mr-3" style="width:230px">
+										<input type="file" id="INSUpload" name="File" class="custom-file-input">
+										<label id="INSlblName" class="custom-file-label" style="text-align:left" for="file">Choose Instruments</label>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal-footer">
+		<button type="submit" class="btn btn-primary">Save</button>
+
+
+	</div>
+}
+<script>
+	$(document).on("submit", "#ibForm", function (e) {
+		debugger;
+		e.preventDefault();
+
+		Validation();
+
+		var form = $(this);
+		form.ajaxSubmit({
+			beforeSubmit: function () {
+				if (!form.valid()) {
+					return false;
+				}
+				else {
+					return true;
+				}
+			},
+			success: function (res) {
+				if (res.code == 200) {
+					NotifyMsg('success', res.message);
+					window.location.href = "/IB/IBListing";
+				} else {
+					NotifyMsg('error', res.message);
+				}
+			},
+			Errors: function () {
+				console.log('error', res.message);
+				NotifyMsg('error', res.message);
+			}
+		});
+		return false;
+	});
+
+	function Validation() {
+		$('#ibForm').validate({
+			rules: {
+				Name: {
+					required: true
+				},
+				ParentCommissionPercentageRebate: {
+					required: true,
+					number: true,
+					min:0
+				},
+				BDMCommissionPercentage: {
+					required: true,
+					number: true,
+					min:0
+				},
+				BDMId: {
+					required: true
+				},
+				LegalEntityId: {
+					required: true
+				} 
+			},
+			messages: {
+				Name: {
+					required: "Please enter name"
+				},
+				ParentCommissionPercentageRebate: {
+					required: "Please enter parent commision percentage rebate"
+				},
+				BDMCommissionPercentage: {
+					required: "Please enter BDM Commission Percentage"
+				},
+				BDMId: {
+					required: "Please enter BDM"
+				},
+				LegalEntityId: {
+					required: "Please enter legal entity"
+				}
+			},
+			errorElement: 'span',
+			errorPlacement: function (error, element) {
+				error.addClass('invalid-feedback');
+				element.closest('.form-group').append(error);
+			},
+			highlight: function (element, errorClass, validClass) {
+				$(element).addClass('is-invalid');
+			},
+			unhighlight: function (element, errorClass, validClass) {
+				$(element).removeClass('is-invalid');
+			}
+		});
+	}
+</script>

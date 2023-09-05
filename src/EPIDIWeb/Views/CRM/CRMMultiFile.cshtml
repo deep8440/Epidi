@@ -1,0 +1,8 @@
+﻿@model List<Epidi.Models.ViewModel.UsersDocuments.UsersDocumentViewModel>
+@{
+	Layout = null;
+}
+@foreach (var item in Model)
+{
+	@Html.Partial("CRMSingleFile", item)
+}

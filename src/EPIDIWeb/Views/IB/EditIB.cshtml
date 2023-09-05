@@ -1,0 +1,562 @@
+﻿@model IBViewModel
+@{
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+    ViewBag.PageTitle = "Edit IB";
+    ViewBag.Method = "Edit IB";
+
+
+
+    ViewBag.DetailName = "IB";
+    ViewBag.DetailURL = "/IB/IBListing";
+}
+<style>
+
+ 
+    .progress {
+        display: block;
+        position: relative;
+        margin: 20px;
+        width: 425px;
+        background-color: #ddd;
+        border: 1px solid blue;
+        padding: 1px;
+        left: 40px;
+        border-radius: 3px;
+    }
+
+
+
+    .percent {
+        position: absolute;
+        display: inline-block;
+        color: #fff;
+        font-weight: bold;
+        top: 100%;
+        left: 50%;
+        margin-top: -9px;
+        margin-left: -20px;
+        -webkit-border-radius: 4px;
+    }
+
+
+
+    .bar {
+        background-color: #007bff;
+        width: 0%;
+        height: 30px;
+        border-radius: 4px;
+        -webkit-border-radius: 4px;
+        -moz-border-radius: 4px;
+    }
+
+
+
+    #status {
+        margin: 20px;
+        color: #008000;
+        font-size: 16px;
+    }
+
+
+
+    .select2-container {
+        display: block;
+    }
+
+    h3 {
+        color: #dc3545 !important;
+        font-weight: bold;
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th, td {
+        text-align: left;
+        padding: 7px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+</style>
+@*@using (Html.BeginForm("SaveIB_new", "IB", FormMethod.Post, new { enctype = "multipart/form-data", id = "frmGATEIOExcelForm" }))
+{*@
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-12">
+                            <h3>IB</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <input type="hidden" id="instrumentData" />
+                                @Html.HiddenFor(model => model.Id)
+                                @Html.LabelFor(model => model.Name, "Name")
+                                @Html.TextBoxFor(p => p.Name, new { @class = "form-control", @placeholder = "name" ,@name="Name"})
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="form-group">    
+                                    &nbsp;
+                                    @Html.LabelFor(model => model.BDMId, "BDM")
+                                    @Html.DropDownListFor(model => model.BDMId, new SelectList(ViewBag.DropdownlistBDM, "Value", "Text", Model.BDMId), "-- Select BDM --", new { @class = "form-control" ,@name="BDMName",@Onchange = "GetBDMListALL($('#BDMID').val());"  })
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    &nbsp;
+                                    @Html.LabelFor(model => model.LegalEntityId, "LegalEntity")
+                                    @Html.DropDownListFor(model => model.LegalEntityId, new SelectList(ViewBag.DropdownlistLegalEntity, "Value", "Text", Model.LegalEntityId), "-- Select LegalEntityId --", new { @class = "form-control" ,@name="legalEntityName",@Onchange = "GetLegalEntityListALL($('#LegalEntityId').val());"  })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class=" col-6">
+                                <div class="form-group">
+                                    &nbsp;
+                                    @Html.LabelFor(model => model.CountryId, "Country")
+                                    @Html.DropDownListFor(model => model.CountryId, new SelectList(ViewBag.DropdownlistCountry, "Value", "Text", Model.CountryId), "-- Select CountryCode --", new { @class = "form-control" ,@name="countryName",@Onchange = "GetCountryListAll($('#CountryCode').val());"  })
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="form-group">
+                                    &nbsp;
+                                    @Html.LabelFor(model => model.ParentIBId, "ParentIB")
+                                    @Html.DropDownListFor(model => model.ParentIBId, new SelectList(ViewBag.IBParentDropDown, "Value", "Text", Model.ParentIBId), "-- Select ParentIBId --", new { @class = "form-control" ,@name="ParentIBName",@Onchange = "GetIBParentList($('#ParentIBId').val());"  })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class=" col-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.ParentCommissionPercentageRebate, "Parent Commission Percentage Rebate")
+                                    @Html.TextBoxFor(p => p.ParentCommissionPercentageRebate, new {  @type = "number",  @Value = "3", @class = "form-control", @placeholder = "Parent Commission Percentage Rebate" ,@name="ParentCommissionPercentageRebate"})
+                                </div>
+                            </div>
+                            <div class=" col-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.BDMCommissionPercentage, "BDM Commission Percentage")
+                                    @Html.TextBoxFor(p => p.BDMCommissionPercentage, new {  @type = "number",  @Value = "1", @class = "form-control", @placeholder = "BDM Commission Percentage" ,@name="BDMCommissionPercentage"})
+                                </div>
+                            </div>
+                        </div>
+@*                        <div class="row">
+                            <div class="col-6">
+                                <label>File :</label>
+                                <div class="form-group">
+                                    <div class="custom-file form-group float-sm-left mr-3" style="width:230px">
+                                        <input type="file" id="INSUpload" name="File" class="custom-file-input">
+                                        <label id="INSlblName" class="custom-file-label" style="text-align:left" for="file">Choose Instruments</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <button type="button" class="btn btn-info mb-3 mt-3" style="margin-left:20px;" onclick="ExportIBData(@Model.Id)">Export IB</button>
+                            </div>
+                        </div>*@
+                    <div class="row">
+                        <div class="col-12">
+                            @using (Html.BeginForm("SaveIB_new", "IB", FormMethod.Post, new { enctype = "multipart/form-data", id = "frmGATEIOExcelForm" }))
+                            {
+                                @Html.HiddenFor(model => model.Id)
+                                <div class="row">
+                                    <div class="col-4" id="divUploadFile">
+                                        <div class="custom-file form-group" style="width:270px">
+                                            <input type="file" id="INSUpload" name="File" class="custom-file-input">
+                                            <label id="INSlblName" class="custom-file-label" style="text-align:left" for="file">Choose Instruments</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-3">
+                                        <button type="submit" id="importToExcel" class="form-group btn btn-info">Import IBInstruments</button>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                        <div class="col-6">
+                            <button type="button" class="btn btn-info mb-3 mt-3" style="margin-left:20px;" onclick="ExportIBData(@Model.Id)">Export IB</button>
+                        </div>
+                    </div>
+                    <br>
+                    <div id="accordion">
+                        <div class="card card-info">
+                            <div class="card-header">
+                                <h3 class="card-title w-100">
+                                    <a class="d-block w-100 collapsed" data-toggle="collapse" href="#collapseOne" aria-expanded="false">
+                                        IB
+                                    </a>
+                                </h3>
+                            </div>
+                            <div id="collapseOne" class="collapse show" data-parent="#accordion" style="overflow:auto">
+                                <div class="card-body">
+                                    <div id="DivInstrument">
+                                        <table id="tblInstrument">
+                                            <tr>
+                                                <th>#</th>
+                                                <th>MasterInstrumental</th>
+                                                <th>Symbol Group </th>
+                                                <th>MarkupPer1000</th>
+                                                <th>MarkUpPer</th>
+                                                <th>BuySwapPer</th>
+                                                <th>BuySwapPer1000</th>
+                                                <th>SellSwapPer1000</th>
+                                                <th>SellSwapPer</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    <div class="row col-12 mt-1" style="float: right;">
+                                        <div class="form-group">
+                                            @*<button type="button" onclick='window.location = "@Url.Action("AddInstrumentRule", "IB", new {Model.Id})";' id="addnewInstrumentRule" class="btn btn-primary">Add IB Instrument</button>*@
+                                            <button type="button" onclick="AddInstrumentRule();" id="addnewInstrumentRule" class="btn btn-primary">Add Instrument Rule</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <h3></h3>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <h3></h3>
+                        </div>
+                    </div>
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-6">
+                                <h3></h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" onclick="SaveInstrumentRule();" class="btn btn-primary">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="ProcessModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title">
+                        <h1>Processing...</h1>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="col-6">
+                        <div class="progress">
+                            <div class="bar"></div>
+                            <div class="percent">0%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+@*}*@
+@section Scripts{
+    <script src="~/js/jquery-validation/jquery.validate.min.js"></script>
+    <script src="~/js/jquery-validation/additional-methods.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+    <script src="~/js/rule_lp_priority.js"></script>
+
+    <script>
+        //$(function() {
+        //    $('#dropDown').select2();
+        //});
+        $(document).ready(() => {
+            var mainId = $('#Id').val();
+
+            if (mainId == "0") {
+                $('#objRuleLpPriorityViewModel_Priority').val(1000);
+            }
+            $('#StartTime').val($('#starttime').val());
+            $('#EndTime').val($('#endtime').val());
+            GetIBCommitionRuleId(mainId);
+            //GetLpRuleByRuleId(mainId);
+            BindFiledNameDynamic(0);
+            $(document).on("submit", "#frmGATEIOExcelForm", function (e) {
+                e.preventDefault();
+                debugger
+                var form = $(this);
+                form.ajaxSubmit({
+                    beforeSubmit: function () {
+                        if (!form.valid()) {
+
+                            return false;
+                        }
+                        else {
+
+                            return true;
+                        }
+                    },
+                    success: function (res) {
+                        debugger
+                        if (res.statusCode == 200) {
+                            $('#FileUpload').val('');
+
+                            NotifyMsg('success', res.message);
+                            window.location.href = '/IB/IBListing'
+
+                        } else {
+                            NotifyMsg('error', res.message);
+                        }
+                    },
+                    Errors: function () {
+
+                        NotifyMsg('error', res.message);
+                    }
+                });
+                return false;
+            });
+
+
+            if ($('#ruleconditionjson').val() != undefined) {
+
+
+                var rulescondition = JSON.parse($('#ruleconditionjson').val());
+                console.log("rulescondition -" + rulescondition);
+                for (var i = 0; i < rulescondition.length; i++) {
+                    if (i > 0) {
+                        AddNewRuleDtl();
+                        var fieldName = rulescondition[i].FieldName;
+
+                        $("#FieldName_" + i).val(rulescondition[i].FieldName);
+                        $("#Opration" + i).val(rulescondition[i].OprationValue);
+                        $("#OprationValue_" + i).val(rulescondition[i].OprationValue);
+
+                        $("#objRuleConditions_Dtl_Id_" + i).val(rulescondition[i].Id);
+                        $("#objRuleConditions_Id_" + i).val(rulescondition[i].RuleConditionsId);
+
+                        var opration = rulescondition[i].Opration;
+                        var oprationValue = rulescondition[i].OprationValue;
+                        BindFiledNameDynamic(i, fieldName, opration, oprationValue);
+                    }
+                    if (i == 0) {
+                        BindFiledNameDynamic(i, rulescondition[i].FieldName, rulescondition[i].Opration, rulescondition[i].OprationValue);
+                        $("#FieldName_" + i).val(rulescondition[i].FieldName);
+                        FieldsNameOnChange(i, rulescondition[i].Opration);
+                        $("#OprationValue_" + i).val(rulescondition[i].OprationValue);
+                        //$("#OprationIdTemp_" + i).val(response.rulesDtlViewModel[i].oprationValue);
+                        $("#objRuleConditions_Dtl_Id_" + i).val(rulescondition[i].Id);
+                        $("#objRuleConditions_Id_" + i).val(rulescondition[i].RuleConditionsId);
+                    }
+                    $("#OprationValue_" + i).val(rulescondition[i].OprationValue);
+                }
+            }
+        });
+
+        function Validation() {
+            $('#frmGATEIOExcelForm').validate({
+                rules: {
+                    Name: {
+                        required: true
+                    },
+                    ParentCommissionPercentageRebate: {
+                        required: true,
+                        number: true,
+                        min: 0
+                    },
+                    BDMCommissionPercentage: {
+                        required: true,
+                        number: true,
+                        min: 0
+                    },
+                    BDMId: {
+                        required: true
+                    },
+                    LegalEntityId: {
+                        required: true
+                    }
+                },
+                messages: {
+                    Name: {
+                        required: "Please enter name"
+                    },
+                    ParentCommissionPercentageRebate: {
+                        required: "Please enter parent commision percentage rebate"
+                    },
+                    BDMCommissionPercentage: {
+                        required: "Please enter BDM Commission Percentage"
+                    },
+                    BDMId: {
+                        required: "Please enter BDM"
+                    },
+                    LegalEntityId: {
+                        required: "Please enter legal entity"
+                    }
+                },
+                errorElement: 'span',
+                errorPlacement: function (error, element) {
+                    error.addClass('invalid-feedback');
+                    element.closest('.form-group').append(error);
+                },
+                highlight: function (element, errorClass, validClass) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function (element, errorClass, validClass) {
+                    $(element).removeClass('is-invalid');
+                }
+            });
+        }
+
+        function BindFiledNameDynamic(count, defaultVal = "", defaultOp = "", defaultOpValue = "") {
+            $.ajax({
+                async: true,
+                type: "POST",
+                url: "@Url.Action("GetUserFieldsForDynamic","LeverageRules")",
+                dataType: 'json',
+                data: { tblName: 'Users' },
+                success: function (response) {
+                    $("#FieldName_" + count).append(`<option value="">--Select--</option>`)
+                    for (var i = 0; i < response.length; i++) {
+                        $("#FieldName_" + count).append(`<option value="${response[i].value}">${response[i].text}</option>`)
+                    }
+                    if (defaultVal != "") {
+                        $("#FieldName_" + count).val(defaultVal);
+                        FieldsNameOnChange(count, defaultOp, defaultOpValue);
+                    }
+                },
+                error: function (errorTemp) {
+                    console.log('error', errorTemp);
+                }
+            })
+        }
+
+        function AddInstrumentRule() {
+            //alert();
+            debugger;
+            var rowCount = $('#tblInstrument tr').length;
+            countRuleInstrument= rowCount-1;
+            GetIBInstrument();
+        }
+
+        function SaveInstrumentRule() {
+            //alert();
+            SaveIB();
+        }
+
+        function ExportIBData(Id) {
+            debugger;
+            updateProgress(0);
+            var table1 = $('#tblInstrument tr').length;
+
+            $("#ProcessModal").modal({ backdrop: 'static', keyboard: false });
+            $("#ProcessModal").focus();
+            $("#ProcessModal").modal('show');
+
+            var totalCnt = table1;//.fnSettings().fnRecordsTotal()
+                var Interval = totalCnt / 100;
+                Interval = Interval * 10;
+                var counter = totalCnt / 100;
+               counter = Math.round(counter);
+            var intervalId = window.setInterval(function () {
+                if (counter < 90) {
+                    updateProgress(counter);
+                    counter = counter + 7;
+                }
+                }, Interval);
+
+            $.ajax({
+                type: "POST",
+                url: '/IB/ExportIBInstrument?Id=' + Id,
+                //contentType: false,
+                dataType: "binary",
+                processData: false,
+                xhrFields: {
+                    'responseType': 'blob'
+                },
+                success: function (res) {
+                    debugger
+                    const date = new Date();
+                    let day = date.getDate();
+                    let month = date.getMonth() + 1;
+                    let year = date.getFullYear();
+                    let currentDate = `${day}_${month}_${year}`;
+                    $("#ProcessModal").modal("hide");
+                    //updateProgress(0);
+                    clearInterval(intervalId);
+                    completeHandler();
+
+                    NotifyMsg('success','The file is exported');
+                    var link = document.createElement('a'),
+                        filename = "IBInstrument_" + currentDate + ".xlsx";
+                    link.href = URL.createObjectURL(res);
+                    link.download = filename;
+                    link.click();
+                 
+                    //completeHandler();
+                       
+                },
+                error: function (errorTemp) {
+                    NotifyMsg('error', errorTemp);
+                
+                    console.log('error', errorTemp);
+                }
+            })
+        }
+            function updateProgress(count) {
+                $('.bar').css('width', count + '%');
+                $('.percent').text(count + '%');
+            }
+            function progressHandler(event) {
+                debugger;
+                if (event.lengthComputable) {
+                    var percent = Math.round((event.loaded / event.total) * 100);
+
+                    $("#ProcessModal").modal('show');
+                    $('.bar').width(percent + "%");
+                    $('.percent').html(percent + "%");
+                }
+            }
+
+            function completeHandler() {
+                $('.bar').width("100%");
+                $('.percent').html("100%");
+                $("#ProcessModal").modal('hide');
+            }
+
+
+                                                //function GetIBCommitionRuleId(mainId) {
+                        //    debugger;
+                        //    $.ajax({
+                        //        async: true,
+                        //        type: "GET",
+                        //        url: '/IB/Get_IBCommitionId',
+                        //        dataType: 'json',
+                        //        data: { Rule_Id: mainId },
+                        //        success: function (response) {
+                        //            $("#tblInstrument").empty();
+                        //            countRuleInstrument = 0;
+                        //            for (var i = 0; i < response.length; i++) {
+                        //                ////Instrument design
+                        //                GetInstrumentWithSwapRuleEditTable(response[i]);
+                        //            }
+                        //        },
+                        //        error: function (errorTemp) {
+                        //            console.log('error', errorTemp);
+                        //        }
+                        //    })
+                        //}
+
+
+    </script>
+}

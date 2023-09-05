@@ -1,0 +1,689 @@
+﻿@model BDMViewModel
+@{
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+    ViewBag.PageTitle = "SkipRule";
+    ViewBag.Method = "SkipRule";
+}
+<style>
+    .error {
+        color: #e73d4a;
+    }
+
+    select#MasterInstrumentalId {
+        color: black !important;
+    }
+
+    .select2-container--default .select2-dropdown .select2-search__field:focus, .select2-container--default .select2-search--inline .select2-search__field:focus {
+        outline: 0;
+        border: none;
+    }
+
+    .progress {
+        display: block;
+        position: relative;
+        margin: 20px;
+        width: 425px;
+        background-color: #ddd;
+        border: 1px solid blue;
+        padding: 1px;
+        left: 40px;
+        border-radius: 3px;
+    }
+
+    .percent {
+        position: absolute;
+        display: inline-block;
+        color: #fff;
+        font-weight: bold;
+        top: 100%;
+        left: 50%;
+        margin-top: -9px;
+        margin-left: -20px;
+        -webkit-border-radius: 4px;
+    }
+
+    .bar {
+        background-color: #007bff;
+        width: 0%;
+        height: 30px;
+        border-radius: 4px;
+        -webkit-border-radius: 4px;
+        -moz-border-radius: 4px;
+    }
+
+    #status {
+        margin: 20px;
+        color: #008000;
+        font-size: 16px;
+    }
+</style>
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                @*<h3 class="card-title">SkipRule List</h3>*@
+                <div class="row">
+                <div class="col-6">
+                    @using (Html.BeginForm("UploadSkipRuleExcel", "Math", FormMethod.Post, new { enctype = "multipart/form-data", id = "frmExcelForm" }))//onsubmit = "return myFunction()"
+                    {
+                        <div class="custom-file form-group float-sm-left mr-3" style="width:230px">
+                            <input type="file" id="FileUpload" name="FileUpload" class="custom-file-input">
+                            <label id="lblSkipRule" class="custom-file-label" style="text-align:left" for="file">Choose SkipRule</label>
+                        </div>
+                        <button type="submit" class="btn btn-info form-group float-sm-left mr-3 ">Import Skip Rule</button>
+                    }
+                    <button class="logo-button mt-1" onclick="GetDefineData($(this))"><i class="fa fa-info-circle"></i></button>
+                </div>
+                    
+                <div class="col-6">
+                    <button type="button" class="btn btn-outline-primary btn-uppercase float-right" onclick="OpenMapModal()"> Add SkipRule</button>
+                </div>
+            </div>
+            <div>
+                   @*<a href="/Math/ExportTradeRule" class="btn btn-info float-sm-left">Export SkipRule</a>*@
+                    <button type="button" class="btn btn-info float-sm-left mr-3 " onclick="ExportSkipRuleData()">Export SkipRule</button>
+            </div>
+            </div>
+            
+            <div class="card-body">
+                <table id="SkipRuleList" class="table table-bordered table-striped">
+                </table>
+            </div>
+            <div class="data-body">
+                <table id=" modal SkipDataRuleList" class="table table-bordered table-striped">
+           
+                
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal mappingmodal" tabindex="-1" role="dialog" id="btnMapModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ModelTitleLable">SkipRule</h5>
+
+            </div>
+            <form id="MathForm" method="post" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <input type="hidden" id="hdnId" value="" />
+                            <label>Rule Name</label>
+                            <input type="text" id="RuleName" name="RuleName" class="form-control" />
+                        </div>
+                        <div class="col-md-6 form-check">
+                            <div style="margin-left: 13px;margin-top: 3px;">
+                                <label></label><br />
+                                <input type="checkbox" id="IsSkip" name="IsSkip" class="form-check-input" />
+                                <label class="form-check-label">Is Skip</label>
+                            </div>
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <label>Equation</label>
+                            <textarea type="text" class="form-control" id="Equation" name="Equation"></textarea>
+                        </div><br />
+                        <div class="col-md-6 form-group" id="divValue" style="display:none;">
+                            <label>Value</label>
+                            <input type="number" step="0.00001" id="Value" name="Value" class="form-control" />
+                        </div>
+                       
+                        <div class="col-md-12 form-group">
+                            @Html.LabelFor(model => model.MasterInstrumentalName, "Master Instrumental")
+                            @Html.DropDownListFor(model => model.MasterInstrumentalId, new SelectList(ViewBag.InstrumentList, "Value", "Text", Model.MasterInstrumentalId),  new { @class = "form-control js-select2" ,@name="MasterInstrumentalName" })
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <input id="btnSave" type="submit" class="btn btn-primary saveBtn" value="Save" />
+                    <button class="btn btn-primary loading" type="button" disabled style="display:none;float:right;">
+                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        Saving...
+                    </button>
+                    <button type="button" onclick="ResetValues()" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal mappingData" tabindex="-1" role="dialog" id="btngetModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ModelTitlelabel">SkipRule Definitions</h5>
+
+            </div>
+            <form id="MathForm" method="post" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <div class="row">
+                     <ul>
+                           
+                         <li>    Current Tick ASK (CTA)                    </li>
+                         <li>    Current Tick BID (CTB)                    </li>
+                         <li>    Previous Tick ASK (PTA)                   </li>
+                         <li>    Previous Tick BID (PTB)                   </li>
+                         <li>    Current Tick Time ASK (CTTA)              </li>
+                         <li>    Current Tick Time BID (CTTB)              </li>
+                         <li>    Previous Tick Time ASK(PTTA)              </li>
+                         <li>    Previous Tick Time BID (PTTB)             </li>
+
+
+                       
+                     </ul>  
+                     
+                    </div>
+                </div>
+                <div class="modal-footer">
+        
+                   
+                    <button type="button" onclick="ResetValues()" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="ProcessModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <h1>Processing...</h1>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="col-6">
+                    <div class="progress">
+                        <div class="bar"></div>
+                        <div class="percent">0%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        $(document).ready(() => {
+            $('#FileUpload').on('change', function (e) {
+                //get the file name
+                var fileName = e.target.files[0].name;
+                $(this).next('.custom-file-label').html(fileName);
+            })
+            $(document).on("submit", "#frmExcelForm", function (e) {
+                e.preventDefault();
+                
+                var form = $(this);
+                form.ajaxSubmit({
+                    beforeSubmit: function () {
+                        if (!form.valid()) {
+
+                            return false;
+                        }
+                        else {
+
+                            return true;
+                        }
+                    },
+                    success: function (res) {
+                        debugger
+                        if (res.statusCode == 200) {
+                            $('#FileUpload').val('');
+                            $('#lblSkipRule').html('Choose File')
+                            NotifyMsg('success', res.message);
+                            MathDataTable.init();
+                        } else {
+                            NotifyMsg('error', res.message);
+                        }
+                    },
+                    Errors: function () {
+
+                        NotifyMsg('error', res.message);
+                    }
+                });
+                return false;
+            });
+            $("#MasterInstrumentalId").select2();
+            $("#MasterInstrumentalId").select2({
+                multiple: true,
+                placeholder: {
+                    id: '-1',
+                    text: '-- Select Country --',
+                    allowClear: true
+                }
+            }).trigger('change');
+            MathDataTable.init()
+            $('#divValue').hide();
+          
+            $('#IsSkip').change(function() {
+                if (this.checked) {
+                    $('#divValue').show();
+                   
+                }
+                else {
+                    $('#divValue').hide();
+                    
+                }
+            });
+
+            $("#MathForm").validate({
+                rules: {
+                    MasterInstrumentalId: "required",
+                    RuleName: "required",
+                    Equation: "required",
+                    Value: "required",
+                   
+                },
+                messages: {
+                    MasterInstrumentalId: {
+                        required: "Please select Master Instrument",
+                    },
+                    RuleName: {
+                        required: "Please enter Rule Name",
+                    },
+                    Equation: {
+                        required: "Please enter Equation",
+                    },
+                    Value: {
+                        required: "Please enter Value",
+                    },
+                  
+
+                },
+
+                errorPlacement: function(error, element) {
+                    if (element.is(":radio")) {
+                        error.appendTo(element.parents(".form-group"));
+                    } else if (element.hasClass('select2-hidden-accessible')) {
+                        error.insertAfter(element.next('span'));  // select2
+                        element.next('span').addClass('error').removeClass('valid');
+                    } else {
+                        error.insertAfter(element);
+                    }
+                },
+                submitHandler: function(form) {
+                    AddEditMathForm();
+                }
+            });
+        });
+        function OpenMapModal() {
+
+            ResetValues();
+            var $alertas = $('#btnMapModal');
+            $alertas.validate().resetForm();
+            $alertas.find('.error').removeClass('error');
+            $('.mappingmodal').modal('show');
+            $('#ModelTitleLable').text('Add SkipRule');
+        }
+        function ResetValues() {
+            $('#hdnId').val(0);
+            $("#MasterInstrumentalId").val([]);
+            $("#MasterInstrumentalId").select2({
+                multiple: true,
+                placeholder: {
+                    id: '-1',
+                    text: '-- Select Instrument --',
+                    allowClear: true
+                }
+            });
+            $('#IsSkip').val('');
+            $("#IsSkip").prop("checked", false);
+            $('#RuleName').val('');
+            $('#Equation').val('');
+            $('#Value').val('');
+            
+        }
+        function AddEditMathForm() {
+            AddMath();
+        }
+        function AddMath() {
+            var SkipRule = {};
+            SkipRule.id = $('#hdnId').val();
+            SkipRule.MasterInstrumentId = $('#MasterInstrumentalId').val();
+            SkipRule.MasterInstrumentIds = $("#MasterInstrumentalId").val().toString();
+            SkipRule.Name = $('#RuleName').val();
+            SkipRule.IsSkip = $("#IsSkip").prop("checked");
+            SkipRule.Equation = $('#Equation').val();
+            SkipRule.Value = $('#Value').val();
+            
+            $.ajax({
+                type: "POST",
+                async: false,
+                url: '/Math/AddMath',
+                data: { SkipRule },
+                success: function(data) {
+                    $('.mappingmodal').modal('hide');
+                    MathDataTable.init();
+                    alert('Data Saved !!');
+
+                }
+            });
+        }
+
+
+        //function DeleteMath(obj) {
+        //    var ID = $(obj).closest('tr').find('input[type="hidden"]')
+        //    if (confirm('Are you sure you want to delete this record')) {
+        //        $.ajax({
+        //            type: "POST",
+        //            async: false,
+        //            url: '/Math/RemoveMath',
+        //            data: ID,
+        //            success: function(data) {
+        //                MathDataTable.init();
+        //                alert('Record Deleted !!');
+
+        //            }
+        //        });
+        //    }
+        //}
+
+        function GetMathById(obj) {
+
+            $('.mappingmodal').modal('show');
+            $('#ModelTitleLable').text('Edit SkipRule');
+
+            var ID = $(obj).closest('tr').find('input[type="hidden"]')
+            $.ajax({
+                type: "POST",
+                async: false,
+                url: '/Math/GetMathById',
+                data: ID,
+                success: function(data) {
+                    debugger;
+                    $('#hdnId').val(data.id);
+                    if (data.masterInstrumentIds != null) {
+                        var ar = data.masterInstrumentIds.split(",");
+                        for (var i = ar.length; i--;) {
+                            var tmp = parseFloat(ar[i]);
+                            ar[i] = (!isNaN(tmp)) ? tmp : ar[i].replace(/['"]/g, "");
+                        }
+                    }
+
+
+                    $('#MasterInstrumentalId').val(ar);
+                    $("#MasterInstrumentalId").select2({
+                        multiple: true,
+                        placeholder: {
+                            id: '-1',
+                            text: '-- Select Country --'
+                        }
+                    });
+                    $('#IsSkip').val(data.isSkip);
+                    if (data.isSkip == 1) {
+                        $("#IsSkip").prop("checked", true);
+                        $('#divValue').show();
+                        
+                    }
+                    else {
+                        $("#IsSkip").prop("checked", false);
+                        $('#divValue').hide();
+                       
+                    }
+                    $('#RuleName').val(data.name);
+                    $('#Equation').val(data.equation);
+                    $('#Value').val(data.value);
+                    
+                }
+            });
+        }
+        var MathDataTable = function(Name) {
+
+         
+            let initTable1 = function() {
+                let table = $('#SkipRuleList');
+
+                let oTable = table.dataTable({
+                    "stateSave": true,
+                    "autoWidth": false,
+                    "paging": true,
+                    // Internationalisation. For more info refer to http://datatables.net/manual/i18n
+                    "language": {
+                        "aria": {
+                            "sortAscending": ": activate to sort column ascending",
+                            "sortDescending": ": activate to sort column descending"
+                        },
+                        "emptyTable": "No data available in table",
+                        "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+                        "infoEmpty": "No entries found",
+                        "infoFiltered": "(filtered1 from MAX total entries)",
+                        //"lengthMenu": "MENU entries",
+                        "search": "Search:",
+                        "zeroRecords": "No matching records found"
+                    },
+                    "pageLength": 10,
+                    "processing": true,
+                    "serverSide": true,
+                    "filter": true,
+                    "columnDefs": [{
+                        "targets": [0],
+                        "visible": false,
+                        "searchable": false
+                    }],
+                    columnDefs: [{
+                        "targets": [0],
+                        "visible": false,
+                        "searchable": false,
+
+                    }],
+                    "ajax": {
+                        async: true,
+                        url: '/Math/SkipRule_All',
+                        type: "post",
+                        data: {}
+                       
+                    },
+                    
+                    "columns": [
+
+                        {
+                            "title": "Id", "data": "id", "orderable": true, "width": "3%", "name": "Id"
+                        },
+                        {
+                            "title": "Rule Name", "data": "name", "orderable": true, "width": "3%", "name": "name"
+                        },
+                        {
+                            "title": "Master Instrument", "data": "masterInstrumentName", "orderable": true, "width": "3%", "name": "masterInstrumentName"
+                        },
+                        {
+                            "title": "Equation", "data": "equation", "orderable": true, "width": "3%", "name": "equation"
+
+                        },
+                        {
+                            "title": "Value", "data": "value", "orderable": true, "width": "3%", "name": "Value"
+                        },
+                       
+                        {
+                            "title": "Is Active ", "data": "isSkip",
+                            "render": function(data, type, row) {
+                                let htmlData = "";
+
+                                if (row["isSkip"] == 1) {
+                                    htmlData += `<p class="btn btn-sm btn-primary mr-1">Yes</p>`;
+                                } else {
+                                    htmlData += `<p class="btn btn-sm btn-danger mr-1">No</p>`;
+                                }
+
+                                return htmlData;
+                            }
+                            , "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Action", "data": "id",
+                            "render": function(data, type, row) {
+                           
+                                let htmlData = "";
+
+                                htmlData += '<input type="hidden" value=' + row['id'] + ' />'
+                                htmlData += `<button title="Edit SkipRule" class="btn btn-sm btn-success mr-1" onclick="GetMathById($(this));"><i class="fa fa-edit"></i></button>`;
+
+                                htmlData += "<a class='btn btn-danger edt-dlt mr-1' href='javascript:void(0);' data-uri='/Math/RemoveMath?id=" + row.id + "' ><i class='fa fa-trash'></i></a>";
+
+
+                                // htmlData += `<button title="Delete SkipRule" class="btn btn-sm btn-danger mr-1" onclick="DeleteMath($(this));"><i class="fa fa-trash"></i></button>`;
+                                htmlData += "<a title='Copy' class='btn btn-sm btn-primary mr-1' onclick='CopyMathRule(" + row.id + ")'><i class='fa fa-copy'></i></a>";
+                                return htmlData;
+                            }
+                            , "orderable": false, "width": "3%"
+                        },
+                    ],
+
+                    // setup responsive extension: http://datatables.net/extensions/responsive/
+                    responsive: true,
+
+                    "lengthMenu": [
+                        [5, 10, 15, 20, 1000],
+                        [5, 10, 15, 20, 1000] // change per page values here
+                    ],
+                    // set the initial value
+
+                    //"dom": "<'row' <'col-md-12'B>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'f>r><'table-scrollable't><'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>", // horizobtal scrollable datatable
+
+                    // Uncomment below line("dom" parameter) to fix the dropdown overflow issue in the datatable cells. The default datatable layout
+                    // setup uses scrollable div(table-scrollable) with overflow:auto to enable vertical scroll(see: assets/global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js).
+                    // So when dropdowns used the scrollable div should be removed.
+                    //"dom": "<'row' <'col-md-12'T>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'f>r>t<'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>",
+                });
+            }
+
+            return {
+                init: function() {
+                  
+
+                    if ($.fn.DataTable.isDataTable("#SkipRuleList")) {
+                        $('#SkipRuleList').dataTable().fnDestroy();
+                        //$('#divUserTable').html('<table class="table table-striped" width="100%" id="UserTable"></table>');
+                    }
+                    initTable1();
+                }
+            };
+        }();
+
+        function GetDefineData(obj) {
+
+            $('.mappingData').modal('show');
+            $('#ModelTitlelabel').text(' SkipRule Definitions');
+
+            var ID = $(obj).closest('tr').find('input[type="hidden"]')
+            $.ajax({
+                type: "POST",
+                async: false,
+                url: '/Math/SkipDataRuleList',
+                data: ID,
+                success: function (data) {
+                    
+                    $('#hdnId').val(data.id);
+                   
+
+
+
+
+                }
+            });
+        }
+        function CopyMathRule(Id) {
+            Swal.fire({
+                title: "Are you sure ?",
+                text: "you want to copy this record!",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+                showCancelButton: false,
+                showCloseButton: true,
+                focusConfirm: false,
+                showDenyButton: true,
+                focusCancelButton: true,
+                confirmButtonText: 'Yes',
+                denyButtonText: 'No',
+            })
+                .then((willdelete) => {
+                    if (willdelete.value == true) {
+                        $.ajax({
+                            async: true,
+                            type: "POST",
+                            url: '/Math/CopyRule',
+                            dataType: 'json',
+                            data: { Id: Id },
+                            success: function (res) {
+                                NotifyMsg('success', 'Copy Succeed');
+                                MathDataTable.init();
+                            },
+                            error: function (errorTemp) {
+                                NotifyMsg('error', errorTemp);
+                                console.log('error', errorTemp);
+                            }
+                        })
+                    }
+                });
+        }
+        function ExportSkipRuleData() {
+            debugger;
+            updateProgress(0);
+            var table1 = $('#SkipRuleList').dataTable();
+
+            //$("#ProcessModal").modal({ backdrop: 'static', keyboard: false });
+            //$("#ProcessModal").focus();
+            $("#ProcessModal").modal('show');
+
+            var totalCnt = table1.fnSettings().fnRecordsTotal()
+            var counter = totalCnt / 100;
+            counter = Math.round(counter);
+            var intervalId = window.setInterval(function () {
+                if (counter < 90) {
+                    updateProgress(counter);
+                    counter = counter + 7;
+                }
+            }, 1000);
+
+            $.ajax({
+                type: "POST",
+                url: 'ExportTradeRule',
+                //contentType: false,
+                dataType: "binary",
+                processData: false,
+                xhrFields: {
+                    'responseType': 'blob'
+                },
+                success: function (res) {
+                    
+                    const date = new Date();
+                    let day = date.getDate();
+                    let month = date.getMonth() + 1;
+                    let year = date.getFullYear();
+                    let currentDate = `${day}_${month}_${year}`;
+                    $("#ProcessModal").modal("hide");
+                    updateProgress(0);
+                    clearInterval(intervalId);
+                    completeHandler();
+
+                    NotifyMsg('success', 'The file is exported');
+                    var link = document.createElement('a'),
+                        filename = "SkipRule_" + currentDate + ".xlsx";
+                    link.href = URL.createObjectURL(res);
+                    link.download = filename;
+                    link.click();
+                    completeHandler();
+                },
+                error: function (errorTemp) {
+                    NotifyMsg('error', errorTemp);
+                    console.log('error', errorTemp);
+                }
+            })
+        }
+        function updateProgress(count) {
+            $('.bar').css('width', count + '%');
+            $('.percent').text(count + '%');
+        }
+        function completeHandler() {
+            debugger
+            $('.bar').width("100%");
+            $('.percent').html("100%");
+            $("#ProcessModal").modal('hide');
+        }
+    </script>
+}

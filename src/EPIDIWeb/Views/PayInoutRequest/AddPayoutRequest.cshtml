@@ -1,0 +1,147 @@
+﻿@model UsersViewModel
+@{
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+    ViewBag.PageTitle = "AddPayoutRequest";
+    ViewBag.Method = "Add Payout Request";
+   
+
+    ViewBag.DetailName = " Payout Request";
+    ViewBag.DetailURL = "/PayInoutRequest/Index";
+
+}
+<style>
+    .select2-container {
+        display: block;
+    }
+
+    h3 {
+        color: #dc3545 !important;
+        font-weight: bold;
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th, td {
+        text-align: left;
+        padding: 8px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+</style>
+@*@using (Html.BeginForm("SavePayout", "PayInoutRequest", FormMethod.Post, new { id = "payoutForm", enctype = "multipart/form-data" }))
+{*@
+    <div class="row">
+        <div class="col-6">
+            <div class="form-group">
+                @Html.HiddenFor(model => model.Id)
+                @Html.LabelFor(model => model.UserName, "UserName")
+                @Html.DropDownListFor(model => model.RequestBy, new SelectList(ViewBag.UsersList, "Value", "Text", "Id"), "-- Select User --", new { @class = "form-control" ,@id="RequestBy" })
+                @*@Html.TextBoxFor(p => p.UserName, new { @class = "form-control", @placeholder = "username" ,@name="username"})*@
+            </div>
+        </div>
+            <div class="col-6">
+                <div class="form-group">
+                    &nbsp;
+                    @Html.LabelFor(model => model.RequestType, "Request Type")
+                    @Html.DropDownListFor(model => model.RequestType, new SelectList(ViewBag.DropdownlistRequestType, "Value", "Text", Model.RequestType), "-- Select RequestType --", new { @class = "form-control" ,@name="RequestType" })
+                </div>
+            </div>
+        <div class="row">
+
+            <div class="col-6">
+                <div class="form-group">
+                    &nbsp;
+                    @Html.LabelFor(model => model.Amount, "Amount")
+                    @Html.TextBoxFor(p => p.Amount, new { @class = "form-control", @placeholder = "amount" ,@name="amount"})
+                </div>
+            </div>
+            <div class=" col-6">
+                <div class="form-group">
+                    &nbsp;
+                    @Html.LabelFor(model => model.CustomerNote, "Customer Note")
+                    @Html.TextBoxFor(p => p.CustomerNote, new { @class = "form-control", @placeholder = "customerNote" ,@name="customerNote"})
+
+
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+
+            <div class="col-6">
+                <div class="form-group">
+                    &nbsp;
+                    @Html.LabelFor(model => model.CurrentBalance, "CurrentxBalance")
+                    @Html.TextBoxFor(p => p.CurrentBalance, new { @class = "form-control", @placeholder = "currentBalance" ,@name="currentBalance"})
+                </div>
+            </div>
+            <div class="col-6">
+            <div class="form-group">
+                &nbsp;
+                @Html.LabelFor(model => model.RequestStatusId, "Request Status")
+                @Html.DropDownListFor(model => model.RequestStatusId, new SelectList(ViewBag.DropdownlistRequestStatus, "Value", "Text",      Model.RequestStatusId), "-- Select RequestStatus --", new { @class = "form-control" ,@name="RequestStatus"})
+            </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" onclick="SaveAddPayout();" class="btn btn-primary">Save</button>
+
+
+    </div>
+@*}*@
+
+@section Scripts{
+    <script src="~/js/jquery-validation/jquery.validate.min.js"></script>
+    <script src="~/js/jquery-validation/additional-methods.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+    @*<script src="~/js/rule_lp_priority.js"></script>*@
+    <script>
+        $(document).ready(() => {
+            var mainId = $('#Id').val();
+        })
+        function SaveAddPayout() {
+            debugger;
+            var model = {};
+            model.Id = $('#Id').val();
+            model.RequestBy = $('#RequestBy').val();
+            model.RequestType = $('#RequestType').val();
+            model.RequestStatusId = $('#RequestStatusId').val();
+            model.Amount = $('#Amount').val();
+            model.CustomerNote = $('#CustomerNote').val();
+            model.CurrentBalance = $('#CurrentBalance').val();
+            /* model.File = $('#INSUpload')[0].files;*/
+
+            $.ajax({
+                type: "POST",
+                url: 'SavePayout_new',
+                data: { 'model': model },
+                //contentType: false,
+                //processData: false,
+                //async: false,
+                success: function (res) {
+                    debugger;
+                    if (res.statusCode == 200) {
+                        //$("#frmModel").modal('hide');
+                        //$("#rulesDetailsData").resetForm();
+                        $("#Loader").hide();
+                        NotifyMsg('success', res.message);
+                        window.location.href = "/PayInoutRequest/Index";
+
+                    } else {
+                        NotifyMsg('error', res.message);
+                    }
+                },
+                error: function (errorTemp) {
+                    NotifyMsg('error', errorTemp);
+                    console.log('error', errorTemp);
+                }
+            })
+        }
+    </script>
+}

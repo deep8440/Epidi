@@ -1,0 +1,27 @@
+﻿@model AnswerViewModel
+@{
+    Layout = null;
+}
+
+@using (Html.BeginForm("SaveAnswer", "Answer", FormMethod.Post, new { id = "ansForm" }))
+{
+    <div class="row">
+        <div class="col-12">
+            <div class="form-group">
+                @Html.HiddenFor(p => p.QuestionId)
+                @Html.HiddenFor(p => p.AnswerId)
+                @Html.LabelFor(model => model.AnswerDesc,"Answer Description")
+                @Html.TextAreaFor(p => p.AnswerDesc, new { @class = "form-control", @placeholder = "Answer Description" ,@name="AnswerDesc" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.Weightage,"Weightage")
+                @Html.TextBoxFor(p => p.Weightage, new { @class = "form-control", @placeholder = "Weightage" ,@name="Weightage" })
+            </div>
+        </div>
+        
+    </div>
+
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+}

@@ -1,0 +1,131 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ECP.Workflow.Api</name>
+    </assembly>
+    <members>
+        <member name="P:ECP.Workflow.Common.BaseResponse.ErrorCode">
+            <summary>
+            Error code of result
+            </summary>
+        </member>
+        <member name="P:ECP.Workflow.Common.BaseResponse.Error">
+            <summary>
+            List of error messages associated with the request.
+            </summary>
+        </member>
+        <member name="P:ECP.Workflow.Common.BaseResponse.ResponseCode">
+            <summary>
+            Response code of result
+            </summary>
+        </member>
+        <member name="P:ECP.Workflow.Common.BaseResponse.ResponseMessage">
+            <summary>
+            Response message of result
+            </summary>
+        </member>
+        <member name="P:ECP.Workflow.Common.BaseResponse.ResponseData">
+            <summary>
+            List of response data
+            </summary>
+        </member>
+        <member name="T:ECP.Workflow.Common.ExceptionMiddleware">
+            <summary>
+            Global Exception handler
+            </summary>
+        </member>
+        <member name="M:ECP.Workflow.Common.ExceptionMiddleware.#ctor(Microsoft.AspNetCore.Http.RequestDelegate,Microsoft.Extensions.Logging.ILogger{ECP.Workflow.Common.ExceptionMiddleware})">
+            <summary>
+            
+            </summary>
+            <param name="next">Process an HTTP request.</param>
+            <param name="logger">Logging the error</param>
+        </member>
+        <member name="M:ECP.Workflow.Common.ExceptionMiddleware.HandleExceptionAsync(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Handle exception
+            </summary>
+            <param name="context">Handling the HTTP exception</param>
+            <returns></returns>
+        </member>
+        <member name="M:ECP.Workflow.Api.Controllers.WorkflowsController.GetData(ECP.KendoGridFilter.DataSourceRequest,System.String,System.String)">
+            <summary>
+            Get Workflow List
+            </summary>
+            <param name="req"></param>
+            <param name="tenantId"></param>
+            <param name="applicationId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECP.Workflow.Api.Controllers.WorkflowsController.GetById(System.String,System.String,System.Int32)">
+            <summary>
+            Get Workflow by Id
+            </summary>
+            <param name="tenantId"></param>
+            <param name="applicationId"></param>
+            <param name="Id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECP.Workflow.Api.Controllers.WorkflowsController.Post(ECP.Workflow.Model.AddWorkflowReq,System.String,System.String)">
+            <summary>
+            Create Workflow
+            </summary>
+            <param name="req"></param>
+            <param name="tenantId"></param>
+            <param name="applicationId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECP.Workflow.Api.Controllers.WorkflowsController.Put(ECP.Workflow.Model.EditWorkflowReq,System.String,System.String)">
+            <summary>
+            Update Workflow
+            </summary>
+            <param name="req"></param>
+            <param name="tenantId"></param>
+            <param name="applicationId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECP.Workflow.Api.Controllers.WorkflowsController.Clone(System.String,System.String,System.Int32,ECP.Workflow.Model.CloneWorkflowReq)">
+            <summary>
+            Clone Workflow
+            </summary>
+            <param name="tenantId"></param>
+            <param name="applicationId"></param>
+            <param name="Id"></param>
+            <param name="req"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECP.Workflow.Api.Controllers.WorkflowsController.Active(ECP.Workflow.Model.EditWorkflowReq,System.String,System.String)">
+            <summary>
+            Activate Workflow
+            </summary>
+            <param name="req"></param>
+            <param name="tenantId"></param>
+            <param name="applicationId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECP.Workflow.Api.Controllers.WorkflowsController.InActive(System.String,System.String,System.Int32)">
+            <summary>
+            Deactivate Workflow
+            </summary>
+            <param name="tenantId"></param>
+            <param name="applicationId"></param>
+            <param name="Id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECP.Workflow.Api.Controllers.WorkflowsController.Delete(System.String,System.String,System.Int32)">
+            <summary>
+            Delete Workflow
+            </summary>
+            <param name="tenantId"></param>
+            <param name="applicationId"></param>
+            <param name="Id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ECP.Workflow.Api.Startup.ConfigureCors(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+             Configures Cross Origin Requests
+            </summary>
+            <param name="services">Collection of services</param>
+        </member>
+    </members>
+</doc>

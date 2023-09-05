@@ -1,0 +1,187 @@
+﻿@model Epidi.Models.ViewModel.TermsCondition.TermsConditionViewModel
+@{
+    Layout = null;
+
+}
+<style>
+    .select2-container {
+        display: block;
+    }
+</style>
+@using (Html.BeginForm("SaveTermsCondition", "TermsCondition", FormMethod.Post, new { id = "termsconditionForm" }))
+{
+    @Html.HiddenFor(model=>model.Id,"Id")
+    @Html.HiddenFor(model=>model.FileUrl,"FileUrl")
+    <div class="row">
+        <div class="col-12">
+            <div class="form-group">
+                @Html.LabelFor(model => model.CountryName, "CountryName")
+                @Html.DropDownListFor(model => model.CountryId, new SelectList(ViewBag.CountryList, "Value", "Text", Model.CountryId), "-- Select Country --", new { @class = "form-control js-select2" ,@name="CountryName" })
+                <span asp-validation-for="CountryId"></span>
+            </div>
+        </div>
+        <div class="col-3">
+            <div class="form-group">
+                @Html.LabelFor(model => model.Title, "Title")
+                @Html.TextBoxFor(p => p.Title, new { @class = "form-control", @placeholder="Enter Here...", @name="Title" })
+                <span asp-validation-for="Title"></span>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="form-group">
+                @Html.TextAreaFor(p => p.TermsConditionText, new { @class = "form-control", @placeholder="Enter Here...", @name="TermsConditionText" })
+                <span asp-validation-for="TermsConditionText"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="custom-file form-group float-sm-left mr-3" style="width:230px">
+                <input type="file" id="FileUpload" name="FileUpload" class="custom-file-input" multiple>
+                <label id="GatelblName" class="custom-file-label" style="text-align:left" for="file">Choose PDF</label>
+            </div>
+            <button type="button" onclick="UploadFile()" class="btn btn-info form-group float-sm-left mr-3 ">Import PDF</button>
+        </div>
+        <div class="col-12">
+            @*@for (int i = 0; i < Model.FileList.Count; i++)
+        {
+        <span>@Model.FileList[i].FileName</span>
+        }*@
+            <table class="table" id="tbl_answer" style="border-collapse:collapse;width:100%;margin-top:20px;">
+
+                @Html.Partial("TCMultipleFile", Model.FileList)
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-1">
+            <div class="form-group">
+                <label for="AutoFill">AutoFill</label>
+            </div>
+        </div>
+        <div class="col-2">
+            @Html.CheckBoxFor(model => model.AutoFill)
+            <span asp-validation-for="Title"></span>
+            <div class="form-group">
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="form-group">
+        </div>
+    </div>
+
+    @*<div id="add">
+        <div class="row">
+
+
+        </div>
+    </div>
+    <div id="edit">
+    </div>*@
+    <div class="modal-footer">
+
+
+
+        <button value="AddTermsCondition" name="action" type="submit" class="btn btn-primary">Save</button>
+    </div>
+}
+<script>
+    var isFileUpload = true;
+    $(document).ready(() => {
+        $('#FileUpload').on('change', function (e) {
+            isFileUpload = false;
+            var fileName = e.target.files[0].name;
+            $(this).next('.custom-file-label').html(fileName);
+        })
+
+        $("body").on("click", ".deletefile", function () {
+            debugger;
+            var tblid = $(this).closest("tr").attr('id');
+            var fileUrl = $(this).closest("tr").find("#hdnFileName").val();
+            var id = $('#Id').val();
+            $.ajax({
+                type: "POST",
+                url: '/TermsCondition/RemoveFile',
+                data: { FileUrl: fileUrl, Id: id },
+                success: function (res) {
+
+                    if (res.statusCode == 200) {
+
+                        $("#" + tblid).remove();
+                        NotifyMsg('success', res.message);
+
+
+                    } else {
+                        NotifyMsg('error', res.message);
+                    }
+                },
+                error: function (errorTemp) {
+                    NotifyMsg('error', errorTemp);
+                    console.log('error', errorTemp);
+                }
+            })
+        });
+
+    });
+
+    function UploadFile() {
+        
+        var fdata = new FormData();
+
+        //var fileInput = $('#FileUpload');
+        var fileInput = document.getElementById('FileUpload');
+
+        for (i = 0; i < fileInput.files.length; i++) {
+
+            var sfilename = fileInput.files[i].name;
+            let srandomid = Math.random().toString(36).substring(7);
+
+            fdata.append("FileUpload", fileInput.files[i]);
+            isFileUpload = true;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: '/TermsCondition/UploadPdf',
+            data: fdata,
+            processData: false,
+            contentType: false,
+            dataType: "html",
+            success: function (res) {
+
+                if (res != null) {
+                    debugger;
+                    if ($('#tbl_answer tr').length >= 1) {
+                        $("#tbl_answer").append(res);
+                        $('#FileUpload').val('');
+
+                        $('#GatelblName').html('Choose File')
+                        //var fileName = $('#hdnFileName').val('');
+                        //$('#FileUrl').val(fileName);
+
+                    }
+                    else {
+                        $("#tbl_answer").html(res);
+                        $('#FileUpload').val('');
+                        $('#GatelblName').html('Choose File')
+                        //var fileName = $('#hdnFileName').val();
+                        //$('#FileUrl').val(fileName);
+                    }
+
+                    //NotifyMsg('success', res.message);
+
+                } else {
+                    NotifyMsg('error', res.message);
+                }
+            },
+            error: function (errorTemp) {
+
+                NotifyMsg('error', errorTemp);
+                console.log('error', errorTemp);
+            }
+        })
+    }
+
+
+</script>

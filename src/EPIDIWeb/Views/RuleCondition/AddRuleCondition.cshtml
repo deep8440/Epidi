@@ -1,0 +1,72 @@
+﻿@model RuleConditionViewModel
+@{
+    Layout = null;
+}
+
+<div>
+    <div class="row">
+        <div class="col-12">
+            <div class="form-group">
+                @Html.HiddenFor(model => model.Id)
+                @Html.LabelFor(model => model.QuoteMarkUpRuleName, "Quote MarkUp Rule")
+                @Html.DropDownListFor(model => model.RuleId, new SelectList(ViewBag.MarkUpRuleDropDown, "Value", "Text", Model.RuleId), "-- Select Rule --", new { @class = "form-control" ,@name="QuoteMarkUpRuleName" })
+            </div>
+        </div>
+
+    </div>
+    <div class="row" id="divRuleDetails">
+        <div class="col-4">
+            <div class="form-group">
+                <label>Fields Name</label>
+                <select id="FieldName_0" name="FieldName_0" class="form-control" onchange="FieldsNameOnChange(0);">
+                    @* @foreach (var filed in ViewBag.UserFieldsList)
+                    {
+                    <option value="@filed.Value">@filed.Text</option>
+                    }*@
+                </select>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="form-group">
+                <label>Operation</label>
+                <select id="Opration_0" name="Opration" class="form-control"></select>
+            </div>
+        </div>
+        <div class="col-4" id="ddlOprationValue_0">
+            <div class="form-group">
+                <label>Operation Value</label>
+                <input type="text" id="OprationValue_0" name="OprationValue_0" class="form-control" placeholder="Operation Value" />
+                @*@Html.TextBoxFor(p => p.OprationValue, new { @class = "form-control", @placeholder = "Opration Value"
+                ,@name="OprationValue",Id = "OprationValue_0"})*@
+            </div>
+        </div>
+        <div class="col-4" id="ddlOprationValueTemp_0" style="display:none;">
+            <div class="form-group">
+                <label>Operation Value</label>
+                <select id="OprationIdTemp_0" name="OprationIdTemp" class="form-control"></select>
+            </div>
+        </div>
+    </div>
+    <br>
+    <div class="row col-12 mt-1" style="float: right;">
+        <div class="form-group">
+            <button type="button" onclick="AddNewRuleDtl();" id="addnewCondition" class="btn btn-primary">Add Condition</button>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="submit" onclick="SaveRuleCondition()" class="btn btn-primary">Save</button>
+</div>
+
+<script>
+    $(document).ready(() => {
+        //alert("HI");
+        BindFiledNameDynamic(0);
+        var val = $("#Id").val();
+        if (val != '0') 
+        {
+           GetDtlData(val);
+        }
+    });
+    
+</script>

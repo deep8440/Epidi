@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "WebSocket": {
+      "commandName": "Project",
+      "commandLineArgs": "\"BTC_USDT,ETH_USDT\" \"spot.tickers\" \"subscribe\""
+    }
+  }
+}

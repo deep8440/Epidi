@@ -1,0 +1,123 @@
+﻿@{
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+    ViewBag.PageTitle = "Promotion Rule Import";
+    ViewBag.Method = "Promotion Rule Import";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                @*<h3 class="card-title">Promotion List</h3>*@
+                <div class="row">
+                    <div class="col-12">
+                        <a id="btnAddLevarageRule" href="/Promotion/AddPromotion" class="btn btn-outline-primary btn-uppercase float-right">
+                            <i class="ti-plus mr-2"></i> Add Promotion
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <br />
+            <div class="col-12">
+                <div>
+                </div>
+            </div>
+            <div class="card-body">
+                <table id="PromotionRuleList" class="table table-bordered table-striped">
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script>
+        $(document).ready(function(){
+            PromotionDataTable.init();
+        })
+        var PromotionDataTable = function (Name) {
+            let initTable1 = function () {
+                let table = $('#PromotionRuleList');
+
+                let oTable = table.dataTable({
+                    //"scrollX": true,
+                    "stateSave": true,
+                    "autoWidth": false,
+                    "paging": true,
+                    // Internationalisation. For more info refer to http://datatables.net/manual/i18n
+                    "language": {
+                        "aria": {
+                            "sortAscending": ": activate to sort column ascending",
+                            "sortDescending": ": activate to sort column descending"
+                        },
+                        "emptyTable": "No data available in table",
+                        "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+                        "infoEmpty": "No entries found",
+                        "infoFiltered": "(filtered1 from MAX total entries)",
+                        //"lengthMenu": "MENU entries",
+                        "search": "Search:",
+                        "zeroRecords": "No matching records found"
+                    },
+                    "pageLength": 10,
+                    "processing": true,
+                    "serverSide": true,
+                    "ajax": {
+                        async: true,
+                        url: '/Promotion/GetAllPromotion',
+                        type: "post"
+                    },
+                    "columns": [
+                        {
+                            "title": "RuleName", "data": "name", "orderable": false, "width": "30%"
+                        },
+                        {
+                            //"title": "LPRule Name", "data": "lPRuleName", "orderable": false, "width": "30%"
+                            "title": "Priority", "data": "priority", "orderable": false, "width": "30%"
+                        },
+                       
+                        {
+                            "title": "Action", "data": "id",
+                            "render": function (data, type, row) {
+                                var html = "<div class='' style='width:92px;'>";
+                                //btn-group dropleft
+                                html += "<a class='btn btn-success mr-1' href='/Promotion/AddPromotion?Id=" + row.id + "'><i class='fa fa-edit'></i></a>";
+                                html += "<a title='Delete' class='btn btn-danger edt-dlt mr-1' ><i class='fa fa-trash'></i></a>";
+                                //html += "<a class='btn btn-success edt-rcd mr-1' href='javascript:void(0);' data-uri='/LeverageRules/ShowUser?Id=" + row.id + "' ><i class='fa fa-user'></i></a>";
+                                //html += "<button title='Effected users' class='btn btn-success mr-1' onclick='OpenUserPopup(" + row.id + ");'><i class='fa fa-user'></i></button>";
+                                html += "</div>";
+                                return html;
+                            }
+                            , "orderable": false, "width": "3%"
+                        },
+                    ],
+
+                    // setup responsive extension: http://datatables.net/extensions/responsive/
+                    responsive: true,
+                   // "scrollX": true,
+                    "lengthMenu": [
+                        [5, 10, 15, 20, 1000],
+                        [5, 10, 15, 20, 1000] // change per page values here
+                    ],
+                    // set the initial value
+
+                    //"dom": "<'row' <'col-md-12'B>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'f>r><'table-scrollable't><'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>", // horizobtal scrollable datatable
+
+                    // Uncomment below line("dom" parameter) to fix the dropdown overflow issue in the datatable cells. The default datatable layout
+                    // setup uses scrollable div(table-scrollable) with overflow:auto to enable vertical scroll(see: assets/global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js).
+                    // So when dropdowns used the scrollable div should be removed.
+                    //"dom": "<'row' <'col-md-12'T>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'f>r>t<'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>",
+                });
+            }
+
+            return {
+                init: function (UserId, FromDate, ToDate, Type) {
+                    if ($.fn.DataTable.isDataTable("#PromotionRuleList")) {
+                        $('#PromotionRuleList').dataTable().fnDestroy();
+                       
+                        //$('#divUserTable').html('<table class="table table-striped" width="100%" id="UserTable"></table>');
+                    }
+                    initTable1();
+                }
+            };
+        }();
+    </script>
+}

@@ -1,0 +1,39 @@
+﻿@model RuleLpPriorityViewModel
+@{
+    Layout = null;
+}
+@using (Html.BeginForm("SaveRuleLpPriority", "RuleLpPriority", FormMethod.Post, new { id = "ruleLpPriorityForm" }))
+{
+    <div id="CommitionDetails">
+        <div class="row">
+            <div class="col-12">
+                <div class="form-group">
+                    @Html.HiddenFor(model => model.Id)
+                    @Html.LabelFor(model => model.QuoteMarkUpRuleName, "Quote MarkUp Rule")
+                    @Html.DropDownListFor(model => model.RuleId, new SelectList(ViewBag.MarkUpRuleDropDown, "Value", "Text", Model.RuleId), "-- Select Rule --", new { @class = "form-control" ,@name="QuoteMarkUpRuleName" })
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.PRuleName, "PRuleName")
+                    @Html.DropDownListFor(model => model.LPId, new SelectList(ViewBag.MarketLPDropDown, "Value", "Text", Model.RuleId), "-- Select LP Rule --", new { @class = "form-control" ,@name="PRuleName" })
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Priority, "Priority")
+                    @Html.TextBoxFor(p => p.Priority, new { @class = "form-control", @placeholder = "Priority" ,@name="Priority",type = "number"})
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.MarkUpValue, "MarkUpValue")
+                    @Html.TextBoxFor(p => p.MarkUpValue, new { @class = "form-control", @placeholder = "MarkUpValue" ,@name="MarkUpValue",type = "number"})
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+}

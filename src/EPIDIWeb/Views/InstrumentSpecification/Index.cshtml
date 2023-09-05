@@ -1,0 +1,543 @@
+﻿@{
+    ViewBag.PageTitle = "Instrument Specification";
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+    ViewBag.Method = "Instrument Specification";
+}
+<style>
+    .progress {
+        display: block;
+        position: relative;
+        margin: 20px;
+        width: 425px;
+        background-color: #ddd;
+        border: 1px solid blue;
+        padding: 1px;
+        left: 40px;
+        border-radius: 3px;
+    }
+
+
+
+    .percent {
+        position: absolute;
+        display: inline-block;
+        color: #fff;
+        font-weight: bold;
+        top: 100%;
+        left: 50%;
+        margin-top: -9px;
+        margin-left: -20px;
+        -webkit-border-radius: 4px;
+    }
+
+
+
+    .bar {
+        background-color: #007bff;
+        width: 0%;
+        height: 30px;
+        border-radius: 4px;
+        -webkit-border-radius: 4px;
+        -moz-border-radius: 4px;
+    }
+
+
+
+    #status {
+        margin: 20px;
+        color: #008000;
+        font-size: 16px;
+    }
+
+    /*#loader {
+        display: block;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        padding: 10px;
+        pointer-events: none;
+    }*/
+
+</style>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    @*<a href="/InstrumentMapping/ExportInstrumentMapping" class="btn btn-info form-group float-sm-left mr-3">Export Instruments Mapping</a>*@
+                    @*<div class="col-4">
+                        <button type="button" class="btn btn-info form-group float-sm-left mr-3 ">Export Instruments Specification</button>
+                    </div>*@
+
+                    @*<div class="col-6">
+                        <a id="exportBtn" href="/InstrumentSpecification/ExportInstrumentSpecification" class="btn btn-info form-group float-sm-left mr-3">Export Instruments Specification</a>
+                    </div>*@
+                    <div class="col-6">
+                        <a id="exportBtn" href="javascript:;" onclick="FileOfExcelDownload()" class="btn btn-info form-group float-sm-left mr-3">Export Instruments Specification</a>
+                        @*<a id="exportBtn" onclick="FileOfExcelDownload()" class="btn btn-info form-group float-sm-left mr-3">Export Instruments Specification</a>*@
+                      @*  <div id="loader" style="display: none;">
+                            <!-- Your loader HTML code or image -->
+                            @*<img src="../instrumentlogoupload/loading-gif.gif" />*@
+                           @* <img src="../lib/images/loader.gif" />
+                        </div>*@
+                    </div>
+                </div>
+            </div>
+
+            <!-- /.card-header -->
+            <div class="card-body">
+                <input type="hidden" id="hdnISTotalRecords">
+                <table id="instrumentSpecification" class="table table-bordered table-striped">
+                </table>
+            </div>
+
+        </div>
+        <!-- /.card -->
+    </div>
+    <!-- /.col -->
+</div>
+<div class="modal fade" id="ProcessModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <h1>Processing...</h1>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="col-6">
+                    <div class="progress">
+                        <div class="bar"></div>
+                        <div class="percent">0%</div>
+                    </div>
+                </div>
+            </div>
+            @*<div class="modal-footer">
+            <button type="submit" onclick="closeModal()" class="btn btn-danger">close</button>
+            </div>*@
+        </div>
+    </div>
+</div>
+@section Scripts
+    {
+    <script src="~/js/jquery-validation/jquery.validate.min.js"></script>
+    <script src="~/js/jquery-validation/additional-methods.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+
+    <script>
+        $(document).ready(() => {
+            debugger;
+            fetchInstrumentGrid.init();
+
+
+            $(document).on("submit", "#instrumentForm", function(e) {
+
+                debugger;
+                TransactionValidation();
+                e.preventDefault();
+                var form = $(this);
+                form.ajaxSubmit({
+                    beforeSubmit: function() {
+                        if (!form.valid()) {
+
+                            return false;
+                        }
+                        else {
+
+                            return true;
+                        }
+                    },
+                    success: function(res) {
+                        debugger;
+                        if (res[0].code == 200) {
+                            debugger;
+                            $("#frmModel").modal('hide');
+                            $("#instrumentForm").resetForm();
+                            NotifyMsg('success', res[0].message);
+                            fetchInstrumentGrid.init();
+                        } else {
+
+                            NotifyMsg('error', res.message);
+                        }
+                    },
+                    Errors: function() {
+
+                        NotifyMsg('error', res.message);
+                    }
+                });
+                return false;
+            });
+        });
+
+        $("#exportBtn").click(function () {
+            // Show the loader when the export button is clicked
+            var totalRecords = $("#hdnISTotalRecords").val();
+            var hrf = "/InstrumentSpecification/ExportInstrumentSpecification?totalRecords=" + totalRecords;
+            window.location.href = hrf;
+         //   $("#loader").show();
+
+        });
+
+        window.onload = function () {
+            // Hide the loader when the document has finished downloading
+        //    $("#loader").hide();
+        };
+
+        var fetchInstrumentGrid = function() {
+        debugger; 
+
+            let initTable1 = function() {
+                let table = $('#instrumentSpecification');
+
+                let oTable = table.dataTable({
+                    "stateSave": true,
+                    "autoWidth": false,
+                    "paging": true,
+                    // Internationalisation. For more info refer to http://datatables.net/manual/i18n
+                    "language": {
+                        "aria": {
+                            "sortAscending": ": activate to sort column ascending",
+                            "sortDescending": ": activate to sort column descending"
+                        },
+                        "emptyTable": "No data available in table",
+                        "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+                        "infoEmpty": "No entries found",
+                        "infoFiltered": "(filtered1 from MAX total entries)",
+                        //"lengthMenu": "MENU entries",
+                        "search": "Search:",
+                        "zeroRecords": "No matching records found"
+                    },
+                    "pageLength": 10,
+                    "processing": true,
+                    "serverSide": true,
+                    "ajax": {
+                        async: false,
+                        cache: false,
+                        url: '/InstrumentSpecification/AllInstrumentSpecification',
+                        type: "post",
+                    },
+                    "columns": [
+                        {
+                            "title": "Instrument Name", "data": "masterInstrumentName",
+                            "render": function(data, type, row) {
+                                let NameHtml = `<p>${row.masterInstrumentName}</p>`;
+                                return NameHtml;
+                            }
+                            , "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "LPName", "data": "lpName",
+                            "render": function(data, type, row) {
+                                let NameHtml = `<p>${row.lpName}</p>`;
+                                return NameHtml;
+                            }
+                            , "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "LPInstrumentName", "data": "lpInstrumentName",
+                            "render": function(data, type, row) {
+                                let NameHtml = `<p>${row.lpInstrumentName}</p>`;
+                                return NameHtml;
+                            }
+                            , "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "TTFrom", "data": "ttFrom",
+                            "render": function(data, type, row) {
+                                let NameHtml = `<p>${row.ttFrom}</p>`;
+                                return NameHtml;
+                            }
+                            , "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "TTTo", "data": "ttTo",
+                            "render": function(data, type, row) {
+                                let NameHtml = `<p>${row.ttTo}</p>`;
+                                return NameHtml;
+                            }
+                            , "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "TradeDays", "data": "tradeDays",
+                            "render": function(data, type, row) {
+                                let NameHtml = `<p>${row.tradeDays}</p>`;
+                                return NameHtml;
+                            }
+                            , "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "QTFrom", "data": "qtFrom",
+                            "render": function(data, type, row) {
+                                let NameHtml = `<p>${row.qtFrom}</p>`;
+                                return NameHtml;
+                            }
+                            , "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "QTTo", "data": "qtTo",
+                            "render": function(data, type, row) {
+                                let NameHtml = `<p>${row.qtTo}</p>`;
+                                return NameHtml;
+                            }
+                            , "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "MinValue", "data": "minValue",
+                            "render": function(data, type, row) {
+                                let NameHtml = `<p>${row.minValue}</p>`;
+                                return NameHtml;
+                            }
+                            , "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "ISIN", "data": "isin",
+                            "render": function(data, type, row) {
+                                let NameHtml = `<p>${row.isin == null ? '' : row.isin}</p>`;
+                                return NameHtml;
+                            }
+                            , "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "ContractSize", "data": "contractSize",
+                            "render": function(data, type, row) {
+                                let NameHtml = `<p>${row.contractSize}</p>`;
+                                return NameHtml;
+                            }
+                            , "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Action", "data": "id",
+                            "render": function(data, type, row) {
+
+                                var html = "<div class='btn-group dropleft'>";
+                                html += '<input type="hidden" name="LPId" value=' + row['lpId'] + ' />';
+                                html += '<input type="hidden" name="MasterInstrumentId" value=' + row['masterInstrumentId'] + ' />';
+                                html += '<input type="hidden" name="LPInstrumentId" value=' + row['lpInstrumentId'] + ' />';
+                                html += '<input type="hidden" name="TradeId" value=' + row['tradeId'] + ' />';
+                                // html += `<button title="Edit Margin" class="btn btn-sm btn-success mr-1" onclick="EditInstrumentSpecification($(this));"><i class="fa fa-edit"></i></button>`;
+
+                                html += "<a class='btn btn-sm btn-success mr-1' href='javascript:void(0);' onclick='EditInstrumentSpecification($(this));' style='padding: 0.375rem 0.65rem; border-radius: 0.25rem;' ><i class='fa fa-edit'></i></a>";
+                                html += "<a class='btn btn-danger edt-dlt mr-1' href='javascript:void(0);' data-uri='/InstrumentSpecification/DeleteInstrumentSpecification?Id=" + row.id + "' ><i class='fa fa-trash'></i></a>";
+
+                                //  html += "<a class='btn btn-danger edt-dlt mr-1' href='javascript:void(0);' data-uri='/Questions/DeleteQuestion?questionId=" + row.questionId + "' style='border-radius: 0.25rem;' ><i class='fa fa-trash'></i></a>";
+                                html += "</div>";
+                                return html;
+                            }
+                            , "orderable": false, "width": "3%"
+                        },
+
+                    ],
+                    scrollX: true,
+                    // setup responsive extension: http://datatables.net/extensions/responsive/
+                    //responsive: true,
+                   // "scrollX": true,
+                    "lengthMenu": [
+                        [5, 10, 15, 20, 1000],
+                        [5, 10, 15, 20, 1000] // change per page values here
+                    ],
+                    "initComplete": function (settings, json) {
+                        $("#hdnISTotalRecords").val(settings._iRecordsTotal);
+                    }
+                    // set the initial value
+
+                    //"dom": "<'row' <'col-md-12'B>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'f>r><'table-scrollable't><'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>", // horizobtal scrollable datatable
+
+                    // Uncomment below line("dom" parameter) to fix the dropdown overflow issue in the datatable cells. The default datatable layout
+                    // setup uses scrollable div(table-scrollable) with overflow:auto to enable vertical scroll(see: assets/global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js).
+                    // So when dropdowns used the scrollable div should be removed.
+                    //"dom": "<'row' <'col-md-12'T>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'f>r>t<'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>",
+                });
+            }
+
+            return {
+                init: function() {
+                    if ($.fn.DataTable.isDataTable("#instrumentSpecification")) {
+                        $('#instrumentSpecification').dataTable().fnDestroy();
+                        //$('#divUserTable').html('<table class="table table-striped" width="100%" id="UserTable"></table>');
+                    }
+                    initTable1();                    
+                }
+            };
+        }();
+
+        function EditInstrumentSpecification(obj) {
+            debugger;
+            var model = {};
+            model.LPId = $(obj).closest('tr').find('input[name="LPId"]').val();
+            model.MasterInstrumentId = $(obj).closest('tr').find('input[name="MasterInstrumentId"]').val();
+            model.LPInstrumentId = $(obj).closest('tr').find('input[name="LPInstrumentId"]').val();
+            model.TradeId = $(obj).closest('tr').find('input[name="TradeId"]').val();
+
+            $.ajax({
+                type: "POST",
+                url: '/InstrumentSpecification/EditInstrumentSpecification',
+                data: { model },
+                success: function(data) {
+                    debugger;
+                    $("#frmModel .modal-body").html(data);
+                    $("#frmModel .modal-title").html("Instrument Specification");
+                    $("#frmModel").modal('show');
+                }
+            });
+
+        }
+
+        function FileOfExcelDownload(){
+             updateProgress(0);
+           // var totalRecords = $("#hdnISTotalRecords").val();
+            var table1 = $('#hdnISTotalRecords tr').length;
+            $("#ProcessModal").modal('show');
+
+            var totalCnt = table1;//.fnSettings().fnRecordsTotal()
+            var counter = totalCnt / 100;
+            counter = Math.round(counter);
+            var intervalId = window.setInterval(function () {
+                if (counter < 90) {
+                    updateProgress(counter);
+                    counter = counter + 7;
+                }
+            }, 50);
+
+
+          
+            $.ajax({
+                type: "GET",
+                url: '/InstrumentSpecification/ExportInstrumentSpecification',
+                dataType: "binary",
+                processData: false,
+                xhrFields: {
+                    'responseType': 'blob'
+                },
+                success: function (data) {
+                    const date = new Date();
+                    let day = date.getDate();
+                    let month = date.getMonth() + 1;
+                    let year = date.getFullYear();
+                    let currentDate = `${day}_${month}_${year}`;
+                    $("#ProcessModal").modal("hide");
+
+                    clearInterval(intervalId);
+            
+
+                    NotifyMsg('success', 'The file is exported');
+                    var link = document.createElement('a'),
+                        filename = "InstrumentSpecification_" + currentDate + ".xlsx";
+                    link.href = URL.createObjectURL(res);
+                    link.download = filename;
+                    link.click();
+                    completeHandler();
+                },
+                error: function (errorTemp) {
+                    NotifyMsg('error', errorTemp);
+                    console.log('error', errorTemp);
+
+
+                   
+                }
+            });
+        }
+
+        function TransactionValidation() {
+            $('#instrumentForm').validate({
+                rules: {
+                    TTFrom: { step: false },
+                    TTTo: { step: false },
+                    QTFrom: { step: false },
+                    QTTo: { step: false },
+                },
+                messages: {
+
+                },
+                errorElement: 'span',
+                errorPlacement: function(error, element) {
+                    error.addClass('invalid-feedback');
+                    element.closest('.form-group').append(error);
+                },
+                highlight: function(element, errorClass, validClass) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function(element, errorClass, validClass) {
+                    $(element).removeClass('is-invalid');
+                }
+            });
+        }
+        //function ExportInstrumentSpecification() {
+        //    debugger;
+        //    updateProgress(0);
+        //    var table1 = $('#instrumentSpecification').dataTable();
+
+        //    $("#ProcessModal").modal({ backdrop: 'static', keyboard: false });
+        //    $("#ProcessModal").focus();
+        //    $("#ProcessModal").modal('show');
+
+        //    var totalCnt = table1.fnSettings().fnRecordsTotal()
+        //    //alert("totalCnt : " + totalCnt);
+        //    var Interval = totalCnt / 100 * 11;
+        //    //Interval = Interval * 10;
+        //    //var counter = totalCnt / 100;
+        //    counter = Math.round(1);
+        //    var intervalId = window.setInterval(function() {
+        //        if (counter <= 99) {
+        //            updateProgress(counter);
+        //            counter = counter + 1;
+        //        }
+        //    }, Interval);
+        //    $.ajax({
+        //        type: "POST",
+        //        url: '/InstrumentSpecification/ExportInstrumentSpecification',
+        //        dataType: "binary",
+        //        processData: false,
+        //        xhrFields: {
+        //            'responseType': 'blob'
+        //        },
+        //        success: function(res, contextType, fileName) {
+        //            debugger;
+        //            const date = new Date();
+        //            let day = date.getDate();
+        //            let month = date.getMonth() + 1;
+        //            let year = date.getFullYear();
+        //            // This arrangement can be altered based on how we want the date's format to appear.
+        //            let currentDate = `${day}_${month}_${year}`;
+
+        //            clearInterval(intervalId);
+        //            completeHandler();
+
+        //            NotifyMsg('success', 'Export Successfully');
+        //            var link = document.createElement('a'),
+        //            filename = "Instrument_Specification_" + currentDate + ".xlsx";
+        //            link.href = URL.createObjectURL(res);
+        //            link.download = filename;
+        //            link.click();
+
+        //            //if (res.statusCode == 200) {
+        //            //    //$("#Loader").hide();
+        //            //    //$("#ProcessModal").modal('hide');
+        //            //    completeHandler();
+        //            //    window.navigator.msSaveBlob(res, "a.xls");
+        //            //    NotifyMsg('success', res.message);
+        //            //} else {
+        //            //    $("#Loader").hide();
+        //            //    NotifyMsg('error', res.message);
+        //            //}
+        //        },
+        //        error: function(errorTemp) {
+        //            $("#Loader").hide();
+        //            NotifyMsg('error', errorTemp);
+        //            console.log('error', errorTemp);
+        //        }
+        //    })
+        //}
+        function updateProgress(count) {
+            $('.bar').css('width', count + '%');
+            $('.percent').text(count + '%');
+        }
+        function completeHandler() {
+            debugger
+            //myApp.hidePleaseWait(); //hide dialog
+            $('.bar').width("100%");
+            $('.percent').html("100%");
+            $("#ProcessModal").modal('hide');
+        }
+    </script>
+}

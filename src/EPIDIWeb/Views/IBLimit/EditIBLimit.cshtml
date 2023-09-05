@@ -1,0 +1,74 @@
+﻿@model IBLimitViewModel
+@{
+    Layout = null;
+}
+@using (Html.BeginForm("SaveIBLimit", "IBLimit", FormMethod.Post, new { id = "iblimitForm" }))
+{
+    <div class="row">
+        <div class="col-6">
+            <div class="form-group">
+                @Html.HiddenFor(model => model.Id)
+                @Html.LabelFor(model => model.MasterInstrumentName, "MasterInstrumentName")
+                @Html.DropDownListFor(model => model.MasterInstrumentId, new SelectList(ViewBag.InstrumentList, "Value", "Text", Model.MasterInstrumentId), "-- Select GetInstrument --", new { @class = "form-control js-select2 disabled" ,@name="MasterInstrumentName" })
+
+
+            </div>
+        </div>
+
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.SymbolName, "SymbolName")
+                @Html.DropDownListFor(model => model.SymbolGroupId, new SelectList(ViewBag.SymbolList, "Value", "Text", Model.SymbolGroupId), "-- Select GetSymbol --", new { @class = "form-control js-select2" ,@name="SymbolName" })
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.MarkUpPer1000,"MarkUpPer1000")
+                @Html.TextBoxFor(p => p.MarkUpPer1000, new { @class = "form-control", @placeholder = "MarkUpPer1000" ,@name="MarkUpPer1000" })
+
+            </div>
+        </div>
+
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.MarkUpPer,"MarkUpPer%")
+                @Html.TextBoxFor(p => p.MarkUpPer, new { @class = "form-control", @placeholder = "MarkUpPer" ,@name="MarkUpPer" })
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.BuySwapPer1000,"BuySwapPer1000")
+                @Html.TextBoxFor(p => p.BuySwapPer1000, new { @class = "form-control", @placeholder = "BuySwapPer1000" ,@name="BuySwapPer1000"})
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.BuySwapPer,"BuySwapPer%")
+                @Html.TextBoxFor(p => p.BuySwapPer, new { @class = "form-control", @placeholder = "BuySwapPer" ,@name="BuySwapPer" })
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.SellSwapPer1000,"SellSwapPer1000")
+                @Html.TextBoxFor(p => p.SellSwapPer1000, new { @class = "form-control", @placeholder = "SellSwapPer1000" ,@name="SellSwapPer1000" })
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.SellSwapPer, "SellSwapPer%")
+                @Html.TextBoxFor(p => p.SellSwapPer, new { @class = "form-control", @placeholder = "SellSwapPer" ,@name="SellSwapPer" })
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("#MasterInstrumentId").select2();
+        $("#SymbolGroupId").select2();
+    });
+</script>

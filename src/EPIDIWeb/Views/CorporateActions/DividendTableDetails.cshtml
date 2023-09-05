@@ -1,0 +1,81 @@
+﻿@using HtmlHelpers.BeginCollectionItemCore;
+
+@model DividendDetailsViewModel
+@{
+    Layout = null;
+    Guid guid = Guid.NewGuid();
+}
+<tr class="tr-row" id="@guid">
+    @using (Html.BeginCollectionItem("response"))
+    {
+        <td>
+            <div class="form-group">
+                @Html.HiddenFor(p => p.Id, new { id = "hdnId" })
+                @Html.HiddenFor(p => p.InstrumentId, new { id = "hdnInstrumentId" })
+                <label>@Model.Id</label>
+            </div>
+        </td>
+        <td>
+            <div class="form-group" style="width:100px">
+                @Html.TextBoxFor(p => p.InstrumentName, new { @class = "form-control", @placeholder = "InstrumentName" ,@name="InstrumentName" })
+            </div>
+        </td>
+        <td>
+            <div class="form-group" style="width:100px">
+                @Html.TextBoxFor(p => p.SymbolGroupName, new { @class = "form-control", @placeholder = "SymbolGroupName" ,@name="SymbolGroupName"})
+            </div>
+        </td>
+        <td>
+            <div class="form-group" style="width:200px">
+                @Html.TextBoxFor(p => p.TimeTo, new {@type="time",@step=2 ,@class = "form-control", @placeholder = "TimeTo" ,@name="TimeTo"})
+            </div>
+        </td>
+        <td>
+            <div class="form-group" style="width:100px">
+                @Html.TextBoxFor(p => p.TaxApplyBuyLeverageEqulTo1, new { @class = "form-control", @placeholder = "TaxApplyBuyLeverageEqulTo1" ,@name="TaxApplyBuyLeverageEqulTo1"})
+
+            </div>
+        </td>
+        <td>
+            <div class="form-group" style="width:100px">
+                @Html.TextBoxFor(p => p.TaxApplyBuyLeverageGreaterThen1, new { @class = "form-control", @placeholder = "TaxApplyBuyLeverageGreaterThen1" ,@name="TaxApplyBuyLeverageGreaterThen1"})
+            </div>
+        </td>
+        <td>
+            <div class="form-group" style="width:100px">
+                @Html.TextBoxFor(p => p.TaxApplySell, new { @class = "form-control", @placeholder = "TaxApplySell" ,@name="TaxApplySell"})
+            </div>
+        </td>
+        <td>
+            <div class="form-group" style="width:100px">
+                @Html.TextBoxFor(model => model.DividendPerUnit, new { @class = "form-control", @placeholder = "DividendPerUnit" ,@name="DividendPerUnit"})
+            </div>
+        </td>
+        <td>
+            <div class="form-group" style="width:100px">
+                @Html.TextBoxFor(p => p.DividendPerUnitSell, new { @class = "form-control", @placeholder = "DividendPerUnitSell" ,@name="DividendPerUnitSell"})
+            </div>
+        </td>
+        <td>
+            <div class="form-group" style="width:100px">
+                @Html.TextBoxFor(p => p.DividendPerUnitBuyLeverageGreaterThen1, new { @class = "form-control", @placeholder = "DividendPerUnitBuyLeverageGreaterThen1" ,@name="DividendPerUnitBuyLeverageGreaterThen1"})
+            </div>
+        </td>
+        <td>
+            <div class="form-group" style="width:100px">
+                @Html.TextBoxFor(p => p.DividendPerUnitBuyLeverageEqualTo1, new { @class = "form-control", @placeholder = "DividendPerUnitBuyLeverageEqualTo1" ,@name="DividendPerUnitBuyLeverageEqualTo1"})
+            </div>
+        </td>
+        <td>
+            <div class="form-group" style="width:100px">
+                @Html.TextBoxFor(p => p.ExDividendDate, new { @class = "form-control", @placeholder = "ExDividendDate" ,@name="ExDividendDate"})
+            </div>
+        </td>
+        <td>
+            <div class="">
+                <a title="View" class="btn btn-sm btn-primary mr-1" onclick="OpenOrderDeailsModal(@Model.InstrumentId);"><i class="fa fa-eye"></i></a>
+            </div>
+        </td>
+
+    }
+</tr>

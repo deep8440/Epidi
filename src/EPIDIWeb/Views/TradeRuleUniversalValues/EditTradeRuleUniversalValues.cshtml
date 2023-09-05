@@ -1,0 +1,102 @@
+﻿@using HtmlHelpers.BeginCollectionItemCore;
+
+@model TradeRuleUniversalValuesViewModel
+@{
+	Layout = null;
+	Guid guid = Guid.NewGuid();
+}
+<tr class="tr-row" id="@guid">
+	@using (Html.BeginCollectionItem("model"))
+	{
+		<td>
+			<div class="form-group">
+				@Html.HiddenFor(p => p.Id, new { id = "hdnId" })
+				<label>@Model.Id</label>
+			</div>
+		</td>
+		<td>
+			<div class="form-group" style="width:100px">
+				@Html.TextBoxFor(p => p.Priority, new { @class = "form-control", @placeholder = "Priority" ,@name="Priority" })
+			</div>
+		</td>
+		<td>
+			<div class="form-group" style="width:100px">
+				@Html.TextBoxFor(p => p.Values, new { @class = "form-control", @placeholder = "Values" ,@name="Values"})
+			</div>
+		</td>
+		<td>
+			<div class="form-group" style="width:300px">
+				@Html.TextAreaFor(p => p.Formulas, new { @class = "form-control", @placeholder = "Formulas" ,@name="Values"})
+			</div>
+		</td>
+		<td>
+			<div class="form-group" style="width:200px">
+				@Html.DropDownListFor(model => model.ActionsDefintiionsId, new SelectList(ViewBag.ActionsDefintiions, "Value", "Text", Model.ActionsDefintiionsId), "-- Select ActionsDefintiions --", new { @class = "form-control js-select2" ,onchange = "",@name="ActionsDefintiions" })
+			</div>
+		</td>
+		<td>
+			<div class="form-group" style="width:200px">
+				@Html.DropDownListFor(model => model.FunctionsId, new SelectList(ViewBag.Functions, "Value", "Text", Model.FunctionsId), "-- Select Function --", new { @class = "form-control js-select2" ,onchange = "",@name="Functions" })
+			</div>
+		</td>
+		<td>
+			<div class="form-group" style="width:200px">
+				@Html.DropDownListFor(model => model.TablesId, new SelectList(ViewBag.Tables, "Value", "Text", Model.TablesId), "-- Select Table --", new { @class = "form-control js-select2" ,onchange = "",@name="Tables" })
+			</div>
+		</td>
+		<td>
+			<div class="form-group" style="width:200px">
+				@Html.DropDownListFor(model => model.WhenToCheckId, new SelectList(ViewBag.WhenToCheck, "Value", "Text", Model.WhenToCheckId), "-- Select WhenToCheck --", new { @class = "form-control js-select2" ,onchange = "",@name="WhenToCheck" })
+			</div>
+		</td>
+		<td>
+			<div class="form-group" style="width:300px">
+				@Html.TextAreaFor(p => p.Comment, new { @class = "form-control", @placeholder = "Comment" ,@name="Comment"})
+			</div>
+		</td>
+		<td>
+			<div class="form-group" style="width:200px">
+				<select class="form-control" asp-for="Action">
+					<option value="">--Select--</option>
+					@foreach (var item in Model.itemlists)
+					{
+						<option value="@item.Value">@item.Text</option>
+					}
+				</select>
+				@*@Html.TextBoxFor(p => p.Action, new { @class = "form-control", @placeholder = "Action" ,@name="Action"})*@
+				@*@Html.DropDownListFor(model => model.Action, new SelectList(ViewBag.ActionsDefintiions, "Text", "Text", Model.ActionsDefintiionsId), "-- Select Action --", new { @class = "form-control js-select2" ,@name="Action" })*@
+				@*<select class="form-control js-select2" id="Action" name="Action">
+					<option value="">-- Select Action --</option>
+					<option value="Floating">Floating</option>
+					<option value="Avaialble Balance">Avaialble Balance</option>
+					<option value="LPClose">LPClose</option>
+					<option value="LPOpen">LPOpen</option>
+					<option value="LPCurrentPriceAsk">LPCurrentPriceAsk</option>
+					<option value="LPCurrentPriceBid">LPCurrentPriceBid</option>
+					<option value="LPOpenPrice">LPOpenPrice</option>
+					<option value="Open Price">Open Price</option>
+					<option value="OpenReqPrice">OpenReqPrice</option>
+					<option value="CloseReqPrice">CloseReqPrice</option>
+					<option value="Close Price">Close Price</option>
+					<option value="Current Bid">Current Bid</option>
+					<option value="Current Ask">Current Ask</option>
+					<option value="SLTriggeredPrice">SLTriggeredPrice</option>
+					<option value="SLReqPRice">SLReqPRice</option>
+					<option value="SLPRice">SLPRice</option>
+					<option value="TPTriggeredPrice">TPTriggeredPrice</option>
+					<option value="TPReqPrice">TPReqPrice</option>
+					<option value="TPPrice">TPPrice</option>
+					<option value="MarginLevel">MarginLevel</option>
+					<option value="Decimals">Decimals</option>
+
+				</select>*@
+			</div>
+		</td>
+		<td>
+			<div class="">
+				<a class='btn btn-danger mr-1 deleteitem'href='javascript:void(0);'><i class='fa fa-trash'></i></a>
+			</div>
+		</td>
+
+	}
+</tr>

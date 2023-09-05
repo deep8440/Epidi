@@ -1,0 +1,108 @@
+﻿@model LeverageRulesViewModel
+@{
+    Layout = null;
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="form-group">
+            @Html.HiddenFor(p => p.Id)
+            @Html.LabelFor(model => model.RuleName,"Rule Name")
+            @Html.TextBoxFor(p => p.RuleName, new { @class = "form-control", @placeholder = "Rule Name" ,@name="RuleName" })
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="form-group">
+            @Html.LabelFor(model => model.LevregeValue, "Levrege Value")
+            @Html.TextBoxFor(p => p.LevregeValue, new { @class = "form-control", @placeholder = "Levrege Value" ,@name="LevregeValue"})
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="form-group">
+            @Html.LabelFor(model => model.Priority, "Rules Priority")
+            @Html.TextBoxFor(p => p.Priority, new { @class = "form-control", @placeholder = "Rules Priority" ,@name="RulesPriority"})
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="form-group">
+            @Html.LabelFor(model => model.IsActive, "Is Active")
+            <br>
+            @Html.CheckBoxFor(m => m.IsActive, new { @checked = "checked" })
+        </div>
+    </div>
+    @{
+        int i = 0;
+    }
+    @foreach (var item in Model.leverageRulesDtlViewModels)
+    {
+        <div id="divRuleDetails" class="row col-12">
+            <div class="col-3">
+                <div class="form-group">
+                    <label>Table Name</label>
+                    <select id=@("TableName_"+i) name="Opration" onchange="tableNameOnChange(@i)" class="form-control">
+                        <option value="">--Select--</option>
+                        <option value="Users">Customer</option>
+                        <option value="LookUpInstrument">LookUpInstrument</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="form-group">
+                    <label>Fields Name</label>
+                    @*@Html.Raw(Html.DropDownList("FieldName", (IEnumerable<SelectListItem>)ViewBag.UserFieldsList, new { @Id = "FieldName_0", @class = "form-control" }))*@
+                    <select id=@("FieldName_"+i) name="FieldName_0" class="form-control" onchange="FieldsNameOnChange(@i)">
+                        @*@foreach (var filed in ViewBag.UserFieldsList)
+                    {
+                    <option value="@filed.Value">@filed.Text</option>
+                    }*@
+                    </select>
+                    @*    @Html.DropDownList(model => model.FieldName, new SelectList(ViewBag.UserFieldsList, "Value", "Text", Model.FieldName), "-- Select Fields --",
+                new { @class = "form-control" ,@name="FieldName",@onchange="FieldsNameOnChange(0);",Id = "FieldName_0"  })*@
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="form-group">
+                    <label>Opration</label>
+                    <select id=@("Opration_"+i) name="Opration" class="form-control"></select>
+                </div>
+            </div>
+            <div class="col-3" id="ddlOprationValue_0">
+                <div class="form-group">
+                    <label>Opration Value</label>
+                    <input type="text" id=@("OprationValue_"+i) name="OprationValue_0" class="form-control" placeholder="Opration Value" />
+                    @*@Html.TextBoxFor(p => p.OprationValue, new { @class = "form-control", @placeholder = "Opration Value"
+                ,@name="OprationValue",Id = "OprationValue_0"})*@
+                </div>
+            </div>
+            <div class="col-3" id="ddlOprationValueTemp_0" style="display:none;">
+                <div class="form-group">
+                    <label>Opration Value</label>
+                    <select id=@("OprationIdTemp_"+i) name="OprationIdTemp" class="form-control" onchange="ddlOprationValueTempOnChange(@i)"></select>
+                </div>
+            </div>
+        </div>
+        <span style="display:none;">@(i++)</span>
+    }
+    <br>
+    <div class="row col-12 mt-1" style="float: right;">
+        <div class="form-group">
+            <button type="button" onclick="AddNewRuleDtl()" id="addnewCondition" class="btn btn-primary">Add Condition</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-footer">
+    <button type="submit" onclick="SaveLeverageRule()" class="btn btn-primary">Save</button>
+</div>
+<script>
+    $(document).ready(() => {
+        //alert("HI");
+        debugger;
+        BindFiledNameDynamic(0);
+        var val = $("#Id").val();
+        if (val != '0') {
+            GetLeverageDtlData(val);
+        }
+    });
+
+</script>

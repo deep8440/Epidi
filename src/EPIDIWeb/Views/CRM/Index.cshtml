@@ -1,0 +1,161 @@
+﻿@{
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+    ViewBag.PageTitle = "CRM";
+    ViewBag.Method = "CRM";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+
+                <div class="col-12">
+                    @* <button id="btnAddQue" type="button" class="btn btn-outline-secondary btn-uppercase float-right">
+                    <i class="ti-plus mr-2"></i> Add Question
+                    </button>*@
+                </div>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+                <table id="crmList" class="table table-bordered table-striped">
+                </table>
+            </div>
+            <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+    </div>
+    <!-- /.col -->
+</div>
+@section Scripts{
+    <script>
+        $(document).ready(() => {
+
+            UsersDataTable.init();
+
+        });
+
+        var UsersDataTable = function () {
+            let initTable1 = function () {
+                let table = $('#crmList');
+
+                let oTable = table.dataTable({
+                    "stateSave": true,
+                    "autoWidth": false,
+                    "paging": true,
+                    // Internationalisation. For more info refer to http://datatables.net/manual/i18n
+                    "language": {
+                        "aria": {
+                            "sortAscending": ": activate to sort column ascending",
+                            "sortDescending": ": activate to sort column descending"
+                        },
+                        "emptyTable": "No data available in table",
+                        "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+                        "infoEmpty": "No entries found",
+                        "infoFiltered": "(filtered1 from MAX total entries)",
+                        //"lengthMenu": "MENU entries",
+                        "search": "Search:",
+                        "zeroRecords": "No matching records found"
+                    },
+                    "pageLength": 10,
+                    "processing": true,
+                    "serverSide": true,
+                    "ajax": {
+                        async: true,
+                        url: '/CRM/Users_All',
+                        type: "post"
+                    },
+                    columnDefs: [{
+                        "targets": [0],
+                        "visible": false,
+                        "searchable": false
+                    }],
+                    "columns": [
+                        {
+                            "title": "Id", "data": "id", "name": "Id", "orderable": true, "width": "2%"
+                        },
+                        {
+                            "title": "Name", "data": "name", "orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "Surname", "data": "surname", "orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "Address", "data": "address", "orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "Postcode", "data": "postCode", "orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "Telephone", "data": "mobile", "orderable": true, "width": "3%"
+                        },
+                        //{
+                        //    "title": "Appropriateness and Suitability Test Results", "data": "appropriatenessAndSuitabilityTestResults", "orderable": false, "width": "3%"
+                        //},
+                        {
+                            "title": "Onboarding Entity", "data": "onboardingEntity", "orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "Legal Entity Name", "data": "lName", "orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "View Payment Request", "data": "id",
+                            "render": function (data, type, row) {
+                                let htmlData = "";
+                                htmlData += '<a class="btn btn-success btn-xs  mr-1" href="/CRM/ViewPaymentRequestListByUser?Id=' + row.id + '">View Payment</i></a>';
+                                return htmlData;
+                            }
+                            , "orderable": false, "width": "3%"
+                        },
+
+                        {
+                            "title": "View Question Detail", "data": "id",
+                            "render": function (data, type, row) {
+                                let htmlData = "";
+                                htmlData += '<a class="btn btn-success btn-xs  mr-1" href="/CRM/ViewQuestionAnswerListByUser?UserId=' + row.id + '">View Question</i></a>';
+                                return htmlData;
+                            }
+                            , "orderable": false, "width": "3%"
+                        },
+
+                        {
+                            "title": "Action", "data": "id",
+                            "render": function (data, type, row) {
+                                let htmlData = "";                                
+                                htmlData += '<a class="btn btn-success  mr-1" href="/CRM/EditCRM?Id=' + row.id + '"><i class="fa fa-edit"></i></a>';
+                                return htmlData;
+                            }
+                            , "orderable": false, "width": "3%"
+                        },
+                    ],
+
+                    // setup responsive extension: http://datatables.net/extensions/responsive/
+                    responsive: true,
+
+                    "lengthMenu": [
+                        [5, 10, 15, 20, 1000],
+                        [5, 10, 15, 20, 1000] // change per page values here
+                    ],
+                    // set the initial value
+
+                    //"dom": "<'row' <'col-md-12'B>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'f>r><'table-scrollable't><'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>", // horizobtal scrollable datatable
+
+                    // Uncomment below line("dom" parameter) to fix the dropdown overflow issue in the datatable cells. The default datatable layout
+                    // setup uses scrollable div(table-scrollable) with overflow:auto to enable vertical scroll(see: assets/global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js).
+                    // So when dropdowns used the scrollable div should be removed.
+                    //"dom": "<'row' <'col-md-12'T>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'f>r>t<'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>",
+                });
+            }
+
+            return {
+                init: function () {
+                    if ($.fn.DataTable.isDataTable("#crmList")) {
+                        $('#crmList').dataTable().fnDestroy();
+
+                        //$('#divUserTable').html('<table class="table table-striped" width="100%" id="UserTable"></table>');
+                    }
+                    initTable1();
+                }
+            };
+        }();
+    </script>
+}

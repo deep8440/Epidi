@@ -1,0 +1,163 @@
+﻿@model List<AnswerViewModel>
+@{
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+    ViewBag.PageTitle = "Add Answer";
+    ViewBag.Method = "Add Answer";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-6">
+                        <a class='btn btn-sm btn-success mr-1' href='/Questions/Index'>Back</a>
+                    </div>
+                    <div class="col-6">
+                        <button id="btnAddAns" type="button" class="btn btn-outline-secondary btn-uppercase float-right">
+                            <i class="ti-plus mr-2"></i> Add Answer
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+                <table id="answerList" class="table table-bordered table-striped">
+                    <tr>
+                        <th>Id</th>
+                        <th>AnswerDesc</th>
+                        <th>Action</th>
+                    </tr>
+                    @Html.Hidden("questionId", new { @id="questionId", @value = ViewBag.QuestionId })
+
+                    @if(Model.Count > 0)
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.AnswerId</td>
+                                <td>@item.AnswerDesc</td>
+                                <td>
+                                    <a class='btn btn-success edt-rcd mr-1' href='javascript:void(0);' data-uri='/Answer/Edit?answerId=+ @item.AnswerId + '><i class='fa fa-edit'></i></a>
+                                    <a class='btn btn-danger edt-dlt mr-1' href='javascript:void(0);' data-uri='/Answer/DeleteAnswer?answerId= + @item.AnswerId +'><i class='fa fa-trash'></i></a>
+                                </td>
+                            </tr>
+                        }
+
+                    }
+                </table>
+
+            </div>
+            <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+    </div>
+    <!-- /.col -->
+</div>
+
+@section Scripts{
+    <script src="~/js/jquery-validation/jquery.validate.min.js"></script>
+    <script src="~/js/jquery-validation/additional-methods.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+
+    <script>
+        $(document).ready(() => {
+
+            var questionId = $("#questionId").val();
+
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000
+            });
+
+            $("body").on("click", "#btnAddAns", function () {
+                debugger;
+                
+                AddModal("/Answer/AddAnswer?questionId=" + questionId, "Add New Answer")
+            });
+
+            $(document).on("submit", "#ansForm", function (e) {
+
+                debugger;
+                e.preventDefault();
+                AnswerValidation();
+
+                var form = $(this);
+                form.ajaxSubmit({
+                    beforeSubmit: function () {
+                        if (!form.valid()) {
+
+                            return false;
+                        }
+                        else {
+
+                            return true;
+                        }
+                    },
+                    success: function (res) {
+                        debugger;
+                        if (res[0].code == 200) {
+                            $("#frmModel").modal('hide');
+                            $("#ansForm").resetForm();
+
+                            Toast.fire({
+                                icon: 'success',
+                                title: " " + res[0].message
+                            })
+
+                            window.location.href = "/Answer/AnsDetails?questionId=" + questionId
+
+                        } else {
+                            //$("#Loader").hide();
+                            Toast.fire({
+                                icon: 'error',
+                                title: " " + res[0].message
+                            })
+                        }
+                    },
+                    Errors: function () {
+                        //$("#Loader").hide();
+                        Toast.fire({
+                            icon: 'error',
+                            title: " " + res[0].message
+                        })
+                    }
+                });
+                return false;
+            });
+
+
+        });
+
+        function AnswerValidation() {
+            $('#ansForm').validate({
+                rules: {
+                    AnswerDesc: {
+                        required: true
+                    }
+                },
+                messages: {
+                    AnswerDesc: {
+                        required: "Please enter a Answer Description"
+                    },
+
+                },
+                errorElement: 'span',
+                errorPlacement: function (error, element) {
+                    error.addClass('invalid-feedback');
+                    element.closest('.form-group').append(error);
+                },
+                highlight: function (element, errorClass, validClass) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function (element, errorClass, validClass) {
+                    $(element).removeClass('is-invalid');
+                }
+            });
+        }
+
+
+    </script>
+}

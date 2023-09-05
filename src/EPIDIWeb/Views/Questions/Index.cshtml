@@ -1,0 +1,339 @@
+﻿@model QuestionViewModel
+@{
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+}
+<style>
+	.select2-container {
+		display: inline-block;
+	}
+</style>
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="col-3">
+                    <div class="btn btn-uppercase float-left">
+                        <div class="form-group">
+                            @Html.DropDownList("CountryId", new SelectList(ViewBag.CountryList, "Value", "Text", "CountryId"), "-- Select Country --", new { @class = "form-control js-select2" ,@id="countryId" ,@Onchange = "GetQuestionListData($('#countryId').val());" })
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <button id="btnAddQue" type="button" class="btn btn-outline-primary btn-uppercase float-right">
+                        <i class="ti-plus mr-2"></i> Add Question
+                    </button>
+                </div>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+                <table id="questionList" class="table table-bordered table-striped">
+                </table>
+            </div>
+            <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+    </div>
+    <!-- /.col -->
+</div>
+
+@section Scripts
+    {
+    <script src="~/js/jquery-validation/jquery.validate.min.js"></script>
+    <script src="~/js/jquery-validation/additional-methods.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+    <script>
+
+        $(document).ready(() => {
+            GetQuestionListData(0);
+
+            $("#countryId").select2();
+
+            //QuestionDataTable.init(0);
+
+
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000
+            });
+
+            $("body").on("click", "#btnAddQue", function () {
+                AddModal("/Questions/AddQuestion", "Add New Question")
+                $("label[for='QuestionDesc']").append("<i class='fa fa-info-circle' title='Question description'></i>");
+                $("label[for='QuestionInfo']").append("<i class='fa fa-info-circle' title='Question information in detail'></i>");
+                $("label[for='CountryName']").append("<i class='fa fa-info-circle' title='Question is belong to this country'></i>");
+                $("label[for='StepId']").append("<i class='fa fa-info-circle' title='Step is render as per country selection'></i>");
+                $("label[for='AnsType']").append("<i class='fa fa-info-circle' title='Select which type of answer you have to use'></i>");
+                $("label[for='DefaultWeightage']").append("<i class='fa fa-info-circle' title='Weightage of the question'></i>");
+                $("label[for='Priority']").append("<i class='fa fa-info-circle' title='Questions priority'></i>");
+                $("label[for='PageNumber']").append("<i class='fa fa-info-circle' title='In which page you have to show this question'></i>");
+            });
+
+            $(document).on("submit", "#questionForm", function (e) {
+                e.preventDefault();
+                QuestionValidation();
+
+                var form = $(this);
+                form.ajaxSubmit({
+                    beforeSubmit: function () {
+                        if (!form.valid()) {
+
+                            return false;
+                        }
+                        else {
+
+                            return true;
+                        }
+                    },
+                    success: function (res) {
+                        if (res[0].code == 200) {
+                            $("#frmModel").modal('hide');
+                            $("#questionForm").resetForm();
+                            var countryId = $("#countryId").val()
+                            //alert(countryId);
+                            GetQuestionListData(countryId);
+
+                            Toast.fire({
+                                icon: 'success',
+                                title: " " + res[0].message
+                            })
+
+                        } else {
+                            //$("#Loader").hide();
+                            Toast.fire({
+                                icon: 'error',
+                                title: " " + res[0].message
+                            })
+                        }
+                    },
+                    Errors: function () {
+                        //$("#Loader").hide();
+                        Toast.fire({
+                            icon: 'error',
+                            title: " " + res[0].message
+                        })
+                    }
+                });
+                return false;
+            });
+
+
+        });
+
+        function GetQuestionListData(countryId) {
+            debugger
+            $('#questionList').DataTable(
+                {
+                    ajax: {
+                        url: "/Questions/Question_All",
+                        type: "POST",
+                        data: { countryId: countryId }
+                    },
+                   // scrollX: true,
+                    destroy: true,
+                    stateSave: true,
+                    autoWidth: false,
+                    paging: true,
+                    pageLength: 10,
+                    processing: true,
+                    serverSide: true,
+                    //columnDefs: [{
+                    //    "targets": [0],
+                    //    "visible": false,
+                    //    "searchable": false
+                    //}],
+                    columns: [
+                        
+                        {
+                            "title": "QuestionInfo", "data": "questionInfo","name":"QuestionInfo", "orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "QuestionDesc", "data": "questionDesc","name":"QuestionDesc", "orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "CountryName", "data": "countryName", "name": "CountryName", "orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "Steps", "data": "stepsTitle","name":"StepsTitle", "orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "Priority", "data": "priority","name":"Priority", "orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "Page Number", "data": "pageNumber", "name": "PageNumber", "orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "Page Title", "data": "pageTitle", "name": "PageTitle", "orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "AnsType <i class='fa fa-info-circle' title='This is type of answer'></i>", "data": "ansTypeName", "name": "AnsTypeName", "orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "Action", "data": "questionId",
+                            "render": function (data, type, row) {
+                                var html = "<div style='width:158px;'>";
+                                html += "<a class='btn btn-success edt-rcd mr-1' href='javascript:void(0);' data-uri='/Questions/Edit?questionId=" + row.questionId + "' ><i class='fa fa-edit'></i></a>";
+                                html += "<a class='btn btn-danger edt-dlt mr-1' href='javascript:void(0);' data-uri='/Questions/DeleteQuestion?questionId=" + row.questionId + "' ><i class='fa fa-trash'></i></a>";
+                                if (row.ansType != 4) {
+
+                                    html += "<a class='btn btn-sm btn-success mr-1' href='/Answer/AnsDetails?questionId=" + row.questionId + "&&questionName="+row.questionDesc+"' >Manage</br> Ans</a>";
+                                }
+                                html += "</div>";
+                                return html;
+                            }
+                            , "orderable": false, "width": "3%"
+                        },
+                    ],
+                    scrollX: true,
+                    // responsive: true,
+                    "lengthMenu": [
+                                [5, 10, 15, 20, 1000],
+                                [5, 10, 15, 20, 1000] // change per page values here
+                            ],
+                
+                }
+            );
+
+        }
+
+        function QuestionValidation() {
+            $('#questionForm').validate({
+                rules: {
+                    QuestionDesc: {
+                        required: true
+                    },
+                    QuestionInfo: {
+                        required: true
+                    },
+                    CountryName: {
+                        required: true
+                    },
+                    //StepId: {
+                    //    required: true
+                    //},
+                    AnsType: {
+                        required: true
+                    },
+                    PageTitle: {
+                        required: true
+                    }
+                },
+                messages: {
+                    QuestionDesc: {
+                        required: "Please enter a Question Description"
+                    },
+                    QuestionInfo: {
+                        required: "Please enter Qusetion Info"
+                    },
+                    CountryName: "Please select Country Name",
+                    //StepId: "Please enter Step no",
+                    AnsType: "Please select AnsType",
+                    PageTitle: "Please enter Page Title"
+
+                },
+                errorElement: 'span',
+                errorPlacement: function (error, element) {
+                    error.addClass('invalid-feedback');
+                    element.closest('.form-group').append(error);
+                },
+                highlight: function (element, errorClass, validClass) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function (element, errorClass, validClass) {
+                    $(element).removeClass('is-invalid');
+                }
+            });
+        }
+
+
+        //var QuestionDataTable = function (countryId) {
+        //    let initTable1 = function () {
+        //        let table = $('#questionList');
+
+        //        let oTable = table.dataTable({
+        //            "stateSave": true,
+        //            "autoWidth": false,
+        //            "paging": true,
+        //            // Internationalisation. For more info refer to http://datatables.net/manual/i18n
+        //            "language": {
+        //                "aria": {
+        //                    "sortAscending": ": activate to sort column ascending",
+        //                    "sortDescending": ": activate to sort column descending"
+        //                },
+        //                "emptyTable": "No data available in table",
+        //                "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+        //                "infoEmpty": "No entries found",
+        //                "infoFiltered": "(filtered1 from MAX total entries)",
+        //                //"lengthMenu": "MENU entries",
+        //                "search": "Search:",
+        //                "zeroRecords": "No matching records found"
+        //            },
+        //            "pageLength": 10,
+        //            "processing": true,
+        //            "serverSide": true,
+        //            "ajax": {
+        //                async: true,
+        //                url: '/Questions/Question_All',
+        //                type: "post",
+        //                data:{countryId: countryId},
+        //            },
+        //            "columns": [
+
+        //                {
+        //                    "title": "QuestionDesc", "data": "questionDesc","orderable": true, "width": "3%"
+        //                },
+        //                {
+        //                    "title": "QuestionInfo", "data": "questionInfo","orderable": true, "width": "3%"
+        //                },
+        //                {
+        //                    "title": "CountryName", "data": "countryName", "orderable": true, "width": "3%"
+        //                },
+        //                {
+        //                    "title": "Action", "data": "questionId",
+        //                    "render": function (data, type, row) {
+        //                        var html = "<div class='btn-group dropleft'>";
+        //                        html += "<a class='btn btn-success edt-rcd mr-1' href='javascript:void(0);' data-uri='/Questions/Edit?questionId=" + row.questionId + "' ><i class='fa fa-edit' style='margin-top: 10px;margin-left: 3px;'></i></a>";
+        //                        html += "<a class='btn btn-danger edt-dlt mr-1' href='javascript:void(0);' data-uri='/Questions/DeleteQuestion?questionId=" + row.questionId + "' ><i class='fa fa-trash' style='margin-top: 10px;margin-left: 3px;'></i></a>";
+        //                        if (row.ansType != 4) {
+
+        //                            html += "<a class='btn btn-sm btn-success mr-1' href='/Answer/AnsDetails?questionId=" + row.questionId + "' >Manage Ans</a>";
+        //                        }
+        //                        html += "</div>";
+        //                        return html;
+        //                    }
+        //                    , "orderable": false, "width": "3%"
+        //                },
+        //            ],
+
+        //            // setup responsive extension: http://datatables.net/extensions/responsive/
+        //            responsive: true,
+
+        //            "lengthMenu": [
+        //                [5, 10, 15, 20, 1000],
+        //                [5, 10, 15, 20, 1000] // change per page values here
+        //            ],
+        //            // set the initial value
+
+        //            //"dom": "<'row' <'col-md-12'B>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'f>r><'table-scrollable't><'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>", // horizobtal scrollable datatable
+
+        //            // Uncomment below line("dom" parameter) to fix the dropdown overflow issue in the datatable cells. The default datatable layout
+        //            // setup uses scrollable div(table-scrollable) with overflow:auto to enable vertical scroll(see: assets/global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js).
+        //            // So when dropdowns used the scrollable div should be removed.
+        //            //"dom": "<'row' <'col-md-12'T>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'f>r>t<'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>",
+        //        });
+        //    }
+
+        //    return {
+        //        init: function () {
+        //            if ($.fn.DataTable.isDataTable("#questionList")) {
+        //                $('#questionList').dataTable().fnDestroy();
+        //                //$('#divUserTable').html('<table class="table table-striped" width="100%" id="UserTable"></table>');
+        //            }
+        //            initTable1();
+        //        }
+        //    };
+        //}();
+
+    </script>
+}

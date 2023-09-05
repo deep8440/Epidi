@@ -1,0 +1,367 @@
+﻿@model CountryWiseDocumentViewModel
+@{
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+}
+<style>
+    .select2-container {
+        display: inline-block;
+    }
+</style>
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="col-3">
+                </div>
+                <div class="col-12">
+                    <button id="btnAddDocument" type="button" class="btn btn-outline-primary btn-uppercase float-right">
+                        <i class="ti-plus mr-2"></i> Add Document
+                    </button>
+                </div>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+                <table id="documentList" class="table table-bordered table-striped">
+                </table>
+            </div>
+            <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+    </div>
+    <!-- /.col -->
+</div>
+
+@section Scripts
+    {
+    <script src="~/js/jquery-validation/jquery.validate.min.js"></script>
+    <script src="~/js/jquery-validation/additional-methods.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+    <script>
+
+        $(document).ready(() => {
+            GetQuestionListData();
+
+
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000
+            });
+
+            $("body").on("click", "#btnAddDocument", function () {
+                AddModal("/CountryWiseDocument/AddCountryWiseDocument", "Add New Document")
+            });
+
+            $(document).on("submit", "#documentForm", function (e) {
+                e.preventDefault();
+                DocumentValidation();
+
+                var form = $(this);
+                form.ajaxSubmit({
+                    beforeSubmit: function () {
+                        if (!form.valid()) {
+
+                            return false;
+                        }
+                        else {
+
+                            return true;
+                        }
+                    },
+                    success: function (res) {
+                        if (res[0].code == 200) {
+                            $("#frmModel").modal('hide');
+                            $("#documentForm").resetForm();
+                            GetQuestionListData();
+
+                            Toast.fire({
+                                icon: 'success',
+                                title: " " + res[0].message
+                            })
+
+                        } else {
+                            //$("#Loader").hide();
+                            Toast.fire({
+                                icon: 'error',
+                                title: " " + res[0].message
+                            })
+                        }
+                    },
+                    Errors: function () {
+                        //$("#Loader").hide();
+                        Toast.fire({
+                            icon: 'error',
+                            title: " " + res[0].message
+                        })
+                    }
+                });
+                return false;
+            });
+
+            $(document).on("submit", "#copyCountryDataForm", function (e) {
+                e.preventDefault();
+                
+                var form = $(this);
+                form.ajaxSubmit({
+                    beforeSubmit: function () {
+                        if (!form.valid()) {
+
+                            return false;
+                        }
+                        else {
+
+                            return true;
+                        }
+                    },
+                    success: function (res) {
+                        if (res[0].code == 200) {
+                            $("#frmModel").modal('hide');
+                            $("#copyCountryDataForm").resetForm();
+                            GetQuestionListData();
+
+                            Toast.fire({
+                                icon: 'success',
+                                title: " " + res[0].message
+                            })
+
+                        } else {
+                            //$("#Loader").hide();
+                            Toast.fire({
+                                icon: 'error',
+                                title: " " + res[0].message
+                            })
+                        }
+                    },
+                    Errors: function () {
+                        //$("#Loader").hide();
+                        Toast.fire({
+                            icon: 'error',
+                            title: " " + res[0].message
+                        })
+                    }
+                });
+                return false;
+            });
+        });
+
+        function GetQuestionListData() {
+            $('#documentList').DataTable(
+                {
+                    ajax: {
+                        url: "/CountryWiseDocument/GetCountryWiseDocument_All",
+                        type: "POST",
+                    },
+
+                    destroy: true,
+                    stateSave: true,
+                    autoWidth: false,
+                    paging: true,
+                    pageLength: 10,
+                    processing: true,
+                    serverSide: true,
+
+                    columns: [
+                        {
+                            "title": "Id", "data": "id","name":"Id" ,"orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "DocumentName", "data": "documentName","name":"DocumentName" ,"orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "CountryName", "data": "countryName","name":"CountryName" ,"orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "Action", "data": "questionId",
+                            "render": function (data, type, row) {
+                                var html = "<div class='btn-group dropleft'>";
+                                html += "<a class='btn btn-success edt-rcd mr-1' href='javascript:void(0);' data-uri='/CountryWiseDocument/Edit?Id=" + row.id + "' ><i class='fa fa-edit'></i></a>";
+                                html += "<a class='btn btn-danger edt-dlt mr-1' href='javascript:void(0);' data-uri='/CountryWiseDocument/DeleteCountryWiseDocument?Id=" + row.id + "' ><i class='fa fa-trash'></i></a>";
+                                html += "<a class='btn btn-primary mr-1' href='javascript:void(0);' onclick='CopyData("+row.id+","+row.countryId+")'; ><i class='fa fa-copy'></i></a>";
+                               
+                                html += "</div>";
+                                return html;
+                            }
+                            , "orderable": false, "width": "3%"
+                        },
+                    ]
+                }
+            );
+
+        }
+
+        function DocumentValidation() {
+            $('#documentForm').validate({
+                rules: {
+                    DocumentName: {
+                        required: true
+                    },
+                    CountryName: {
+                        required: true
+                    }
+                   
+                },
+                messages: {
+                    DocumentName: {
+                        required: "Please enter a Document Name"
+                    },
+                    CountryName: "Please Select Country Name",
+                 
+
+                },
+                errorElement: 'span',
+                errorPlacement: function (error, element) {
+                    error.addClass('invalid-feedback');
+                    element.closest('.form-group').append(error);
+                },
+                highlight: function (element, errorClass, validClass) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function (element, errorClass, validClass) {
+                    $(element).removeClass('is-invalid');
+                }
+            });
+        }
+
+        var documentCnt = 0;
+        function AddMoreDocument(response) {
+            $("#dvError").hide();
+            var strHTML = "";
+            if (documentCnt == 0) {
+                strHTML += `<tr id="trId_${documentCnt}">`;
+                strHTML += `<th> </th>`;
+                strHTML += `<th></th>`;
+                strHTML += `</tr>`;
+            }
+            strHTML += `<tr id="trId_${documentCnt}">`;
+            strHTML += `<td>`;
+            strHTML += `<div class="form-group">`;
+            strHTML += `<input id="CountryWiseDocumentId_${documentCnt}" type="hidden">`;
+            strHTML += `<input class="form-control" id="documentName_${documentCnt}" placeholder="Document Name" type="text">`;
+            strHTML += `</div>`;
+            strHTML += `</td>`;
+            strHTML += `<td>`;
+            strHTML += `<div class="form-group">`;
+            strHTML += `<a href="javascript:void(0)" value="Delete" onclick="DeleteDocument(${documentCnt})" style="margin-right:-30px; width: 100%; height: calc(2.25rem + 2px); padding: 0.375rem 0.75rem;">`;
+            strHTML += `<i class="fa fa-trash" style="font-size: large;margin-top: 8px;" aria-hidden="true"></i>`;
+            strHTML += `</a>`;
+            strHTML += `</div>`;
+            strHTML += `</td>`;
+            strHTML += `</tr>`;
+            $("#tblDocuments").append(strHTML);
+            if (response != undefined) {
+                $("#CountryWiseDocumentId_" + documentCnt).val(response.id);
+                $("#documentName_" + documentCnt).val(response.documentName);
+            }
+            documentCnt = documentCnt + 1;
+        }
+        function DeleteDocument(counter) {
+            $("#trId_" + counter).remove();
+        }
+
+        function SaveCountryWiseDocumentData() {
+            $("#dvError").hide();
+            debugger
+            if($("#CountryId").val()=="")
+            {
+                $("#dvError").show();
+                $("#lblDocumentError").text("Please select country");
+                return false;
+            }
+            var countryWiseDocumentViewModel = {};
+            SaveCountryWiseDocumentDataDtl();
+            
+             
+            var countryWiseDocumentDataStr = $("#countryWiseDocumentData").val();
+            if (countryWiseDocumentDataStr != null && countryWiseDocumentDataStr != "" && countryWiseDocumentDataStr != '[]' && $("#CountryId").val() !="" && countryWiseDocumentDataStr.length > 0) {
+                try
+                {
+                $.ajax({
+                    type: "POST",
+                    url: '/CountryWiseDocument/CountryWiseDocument_Upsert',
+                    data: { countryWiseDocumentDataStr: countryWiseDocumentDataStr },
+                    success: function (data) {
+                        $('.modal').modal('hide');
+                   
+                        NotifyMsg('success', 'Countrywise document data save');
+                        GetQuestionListData();
+                    },
+                    error: function(data){
+                        console.log(data);
+                    }
+                });
+                }
+                catch (e)
+                {
+                    console.log(e.message);
+                }
+            }
+            else
+            {
+                $("#lblDocumentError").text("Please add document/s.");
+                $("#dvError").show();
+                return false;
+            }
+        }
+
+        function SaveCountryWiseDocumentDataDtl() {
+            var countryWiseDocumentDtl = [];
+            for (var i = 0; i <= documentCnt; i++) {
+                if (($("#documentName_" + i).val() != "") && ($("#documentName_" + i).val() != null)) {
+                    var obj = {
+                        Id: $("#CountryWiseDocumentId_" + i).val() == "" ? 0 : $("#CountryWiseDocumentId_" + i).val(),
+                        CountryId: $("#CountryId").val() == "" ? 0 : $("#CountryId").val(),
+                        DocumentName: $("#documentName_" + i).val(),
+                    }
+                    countryWiseDocumentDtl.push(obj);
+                }
+            }
+
+            $("#countryWiseDocumentData").val(JSON.stringify(countryWiseDocumentDtl));
+        }
+
+        function GetCountryWiseDocumentDetailsByCountryId(marginId) {
+            $.ajax({
+                async: true,
+                type: "GET",
+                url: 'GetMarginDetails_All',
+                dataType: 'json',
+                data: { MarginId: marginId },
+                success: function (response) {
+                    $("#tblInstrument").empty();
+                    conversionCnt = 0;
+                    for (var i = 0; i < response.length; i++) {
+                        ////design
+                        AddConversion(response[i]);
+                    }
+                },
+                error: function (errorTemp) {
+                    console.log('error', errorTemp);
+                }
+            })
+        }
+
+        function CopyData(id,countryId)
+        {
+            debugger
+            $.ajax({
+                type: "POST",
+                url: 'CopyCountryData',
+                data: { Id: id, FromCountryId: countryId },
+                success: function (response) {
+                    debugger
+                    if(response != null)
+                    {
+                        $("#frmModel .modal-body").html(response);
+                        $("#frmModel .modal-title").html("Copy DocumentWise Country Data");
+                        $("#frmModel").modal('show');
+                        $("#frmModel").focus();
+                    }
+                },
+                error: function (errorTemp) {
+                    console.log('error', errorTemp);
+                }
+            })
+        }
+    </script>
+}

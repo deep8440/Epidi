@@ -1,0 +1,110 @@
+﻿@{
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+    ViewBag.PageTitle = "Change password";
+    ViewBag.Method = "Change password";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Change Password</title>
+
+    <!-- Google Font: Source Sans Pro -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="~/css/fontawesome-free/css/all.min.css">
+    <!-- icheck bootstrap -->
+    <link rel="stylesheet" href="~/css/icheck-bootstrap/icheck-bootstrap.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="~/css/adminlte.min.css">
+    <link rel="stylesheet" href="~/css/Changepassword.css">
+</head>
+<body class="hold-transition login-page">
+    <div class="login-box center" style="height: 400px; width: 400px;">
+        <!-- /.login-logo -->
+        <div class="card card-outline card-primary">
+            <div class="card-header text-center">
+                <img src="~/lib/images/Logo.jpeg" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8;height: 55px;width: 65px;">
+            </div>
+            <div class="card-body">
+                <span class="alert-danger errormsg"></span>
+                <form action="/Changepassword/Login" method="post">
+                    <div class="input-group mb-3">
+                        <input type="password" class="form-control" placeholder="Old password" name="OldPassword" id="oldPassword">
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-lock"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-group mb-3">
+                        <input type="password" class="form-control" placeholder="New password" name="NewPassword" id="newPassword">
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-lock"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-group mb-3">
+                        <input type="password" class="form-control" placeholder="Confirm password" name="ConfirmPassword" id="confirmPassword">
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-lock"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <!-- /.col -->
+                        <div class="col-12">
+                            <button type="button" id="btnLogin" class="btn btn-primary btn-block">Change password</button>
+                        </div>
+                        <!-- /.col -->
+                    </div>
+                </form>
+            </div>
+            <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+    </div>
+    <!-- /.login-box -->
+    <!-- jQuery -->
+    <script src="~/js/jquery/jquery.min.js"></script>
+    <!-- Bootstrap 4 -->
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- AdminLTE App -->
+    <script src="~/js/adminlte.min.js"></script>
+</body>
+</html>
+
+
+<script>
+    $('#btnLogin').click(function () {
+        var model = {
+            OldPassword: $('#oldPassword').val(),
+            NewPassword: $('#newPassword').val(),
+            ConfirmPassword: $('#confirmPassword').val()
+        };
+        $.ajax({
+            type: "POST",
+            url: '/ChangePassword/ChangePassword',
+            data: { 'model': model },
+            success: function (data) {
+                if (data == true) {
+                    window.location.href = '/Home/Index';
+                }
+                else if (data == "InvalidOldPassword") {
+                    alert('Old password is incorrect');
+                    return;
+                }
+                else if (data == "NewAndConfirmPasswordIncorrect") {
+                    alert('New and Confirm password should be same');
+                    return;
+                } else {
+                    alert('Change password Failed');
+                    return;
+                }
+            }
+        });
+    })
+</script>

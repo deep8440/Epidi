@@ -1,0 +1,34 @@
+2023-07-27 10:56:18.195 -04:00 [INF] User profile is available. Using 'C:\Users\helLO\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2023-07-27 10:56:19.900 -04:00 [INF] Application started. Press Ctrl+C to shut down.
+2023-07-27 10:56:19.901 -04:00 [INF] Hosting environment: Development
+2023-07-27 10:56:19.901 -04:00 [INF] Content root path: D:\Projects\Epidi\EpidiAdminAPI\src\Epidi.API\
+2023-07-27 10:56:20.099 -04:00 [INF] Request starting HTTP/2 GET https://localhost:44395/index.html - -
+2023-07-27 10:56:21.579 -04:00 [INF] Request finished HTTP/2 GET https://localhost:44395/index.html - - - 200 - text/html;charset=utf-8 1480.0441ms
+2023-07-27 10:56:21.649 -04:00 [INF] Request starting HTTP/2 GET https://localhost:44395/swagger-ui-standalone-preset.js - -
+2023-07-27 10:56:21.667 -04:00 [INF] Request starting HTTP/2 GET https://localhost:44395/_framework/aspnetcore-browser-refresh.js - -
+2023-07-27 10:56:21.667 -04:00 [INF] Request starting HTTP/2 GET https://localhost:44395/swagger-ui-bundle.js - -
+2023-07-27 10:56:21.680 -04:00 [INF] Request finished HTTP/2 GET https://localhost:44395/_framework/aspnetcore-browser-refresh.js - - - 200 11976 application/javascript;+charset=utf-8 12.2660ms
+2023-07-27 10:56:21.681 -04:00 [INF] Request starting HTTP/2 GET https://localhost:44395/swagger-ui.css - -
+2023-07-27 10:56:21.725 -04:00 [INF] Sending file. Request path: '/swagger-ui.css'. Physical path: 'N/A'
+2023-07-27 10:56:21.725 -04:00 [INF] Sending file. Request path: '/swagger-ui-standalone-preset.js'. Physical path: 'N/A'
+2023-07-27 10:56:21.763 -04:00 [INF] Sending file. Request path: '/swagger-ui-bundle.js'. Physical path: 'N/A'
+2023-07-27 10:56:21.796 -04:00 [INF] Request finished HTTP/2 GET https://localhost:44395/swagger-ui.css - - - 200 144929 text/css 114.1407ms
+2023-07-27 10:56:21.811 -04:00 [INF] Request finished HTTP/2 GET https://localhost:44395/swagger-ui-standalone-preset.js - - - 200 312163 application/javascript 161.3936ms
+2023-07-27 10:56:21.951 -04:00 [INF] Request finished HTTP/2 GET https://localhost:44395/swagger-ui-bundle.js - - - 200 1061536 application/javascript 275.2395ms
+2023-07-27 10:56:22.890 -04:00 [INF] Request starting HTTP/2 GET https://localhost:44395/swagger/v1/swagger.json - -
+2023-07-27 10:56:23.414 -04:00 [INF] Request finished HTTP/2 GET https://localhost:44395/swagger/v1/swagger.json - - - 200 - application/json;charset=utf-8 523.5028ms
+2023-07-27 10:58:28.254 -04:00 [INF] Request starting HTTP/2 POST https://localhost:44395/api/Account application/json-patch+json 213
+2023-07-27 10:58:28.304 -04:00 [INF] CORS policy execution successful.
+2023-07-27 10:58:28.307 -04:00 [INF] CORS policy execution successful.
+2023-07-27 10:58:28.401 -04:00 [INF] Route matched with {action = "Post", controller = "Account"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult] Post(Epidi.Models.ViewModel.User.RegisterUserViewModel) on controller Epidi.API.Controllers.Account.AccountController (Epidi.API).
+2023-07-27 10:58:32.066 -04:00 [INF] Inserting the Data
+2023-07-27 10:58:33.370 -04:00 [INF] Executing ObjectResult, writing value of type 'Epidi.API.Common.BaseResponse`1[[Epidi.Models.ViewModel.User.ApplicationUserDetail, Epidi.Models, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2023-07-27 10:58:33.413 -04:00 [INF] Executed action Epidi.API.Controllers.Account.AccountController.Post (Epidi.API) in 5002.6494ms
+2023-07-27 10:58:33.416 -04:00 [INF] Request finished HTTP/2 POST https://localhost:44395/api/Account application/json-patch+json 213 - 201 392 application/json;+charset=utf-8 5162.2969ms
+2023-07-27 10:58:58.495 -04:00 [INF] Request starting HTTP/2 POST https://localhost:44395/api/Account application/json-patch+json 211
+2023-07-27 10:58:58.507 -04:00 [INF] CORS policy execution successful.
+2023-07-27 10:58:58.507 -04:00 [INF] CORS policy execution successful.
+2023-07-27 10:58:58.508 -04:00 [INF] Route matched with {action = "Post", controller = "Account"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult] Post(Epidi.Models.ViewModel.User.RegisterUserViewModel) on controller Epidi.API.Controllers.Account.AccountController (Epidi.API).
+2023-07-27 10:58:58.863 -04:00 [INF] Executing ObjectResult, writing value of type 'Epidi.API.Common.BaseResponse`1[[Epidi.Models.ViewModel.User.ApplicationUserDetail, Epidi.Models, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2023-07-27 10:58:58.864 -04:00 [INF] Executed action Epidi.API.Controllers.Account.AccountController.Post (Epidi.API) in 356.3143ms
+2023-07-27 10:58:58.865 -04:00 [INF] Request finished HTTP/2 POST https://localhost:44395/api/Account application/json-patch+json 211 - 201 227 application/json;+charset=utf-8 369.2086ms

@@ -1,0 +1,38 @@
+﻿@model UsersTransactionViewModel
+@{
+    Layout = null;
+}
+
+@using (Html.BeginForm("SaveUserTransaction", "UserTransactions", FormMethod.Post, new { id = "transactionForm" }))
+{
+    <div class="row">
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.UserName, "UserName")
+                @Html.DropDownListFor(model => model.UserId, new SelectList(ViewBag.UsersList, "Value", "Text", Model.UserId), "-- Select Users --", new { @class = "form-control" ,@name="UserName" })
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.Type, "Type")
+                @Html.DropDownListFor(model => model.Type, new SelectList(ViewBag.transactionType, "Value", "Text", Model.Type), "-- Select Type --", new { @class = "form-control" ,@name="Type" })
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.Amount, "Amount")
+                @Html.TextBoxFor(p => p.Amount, new { @class = "form-control", @placeholder = "Amount" ,@name="Amount"})
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.Comment, "Comment")
+                @Html.TextBoxFor(p => p.Comment, new { @class = "form-control", @placeholder = "Comment" ,@name="Comment"})
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+}

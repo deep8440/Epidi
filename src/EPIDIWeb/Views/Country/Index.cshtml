@@ -1,0 +1,480 @@
+﻿@{
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+    ViewBag.PageTitle = "Country";
+    ViewBag.Method = "Country";
+}
+<style>
+    .progress {
+        display: block;
+        position: relative;
+        margin: 20px;
+        width: 425px;
+        background-color: #ddd;
+        border: 1px solid blue;
+        padding: 1px;
+        left: 40px;
+        border-radius: 3px;
+    }
+
+
+
+    .percent {
+        position: absolute;
+        display: inline-block;
+        color: #fff;
+        font-weight: bold;
+        top: 100%;
+        left: 50%;
+        margin-top: -9px;
+        margin-left: -20px;
+        -webkit-border-radius: 4px;
+    }
+
+
+
+    .bar {
+        background-color: #007bff;
+        width: 0%;
+        height: 30px;
+        border-radius: 4px;
+        -webkit-border-radius: 4px;
+        -moz-border-radius: 4px;
+    }
+
+
+
+    #status {
+        margin: 20px;
+        color: #008000;
+        font-size: 16px;
+    }
+</style>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    @*<div class="col-4"></div>*@
+                    <div class="col-5" id="divUploadFile">
+                        @using (Html.BeginForm("UploadCountryData", "Country", FormMethod.Post, new { enctype = "multipart/form-data", id = "frmExcelForm" }))//onsubmit = "return myFunction()"
+                        {
+                            <div class="row">
+                                <div class="col-7">
+                                    <div class="custom-file form-group float-sm-left mr-3" style="width: 100%;">
+                                        <input type="file" id="FileUpload" name="FileUpload" class="custom-file-input">
+                                        <label id="lblRule" class="custom-file-label" style="text-align:left" for="file">Choose Country</label>
+                                    </div>
+                                </div>
+                                <div class="col-5">
+                                    <div class="form-group">
+                                        <button type="submit" class="btn btn-info">Import Country</button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    
+                    <div class="col-7">
+                        <button id="btnAddCountry" type="button" class="btn btn-outline-primary btn-uppercase float-right"><i class="ti-plus mr-2"></i> Create Country</button>
+                    </div>
+                </div>
+                <div class="">
+                    @*<a href="/Country/ExportCountryData" id="exportToExcel" class="btn btn-info">Export Country</a>*@
+                    <button type="button" class="btn btn-info float-sm-left mr-3 " onclick="ExportCountryData()">Export Country</button>
+                </div>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+                <table id="countryList" class="table table-bordered table-striped">
+                </table>
+            </div>
+            <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+    </div>
+    <!-- /.col -->
+</div>
+<div class="modal fade" id="ProcessModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <h1>Processing...</h1>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="col-6">
+                    <div class="progress">
+                        <div class="bar"></div>
+                        <div class="percent">0%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+
+        $(document).ready(() => {
+
+            CountryDataTable.init();
+
+            $("body").on("click", "#btnAddCountry", function() {
+                AddModal("/Country/AddCountry", "Add Country")
+                $("label[for='NumCode']").append("<i class='fa fa-info-circle' title='Number code'></i>");
+                $("label[for='PhoneCode']").append("<i class='fa fa-info-circle' title='Phone code ex: 91'></i>");
+                $("label[for='OnboardingSteps']").append("<i class='fa fa-info-circle' title='No.of steps'></i>");
+                $("label[for='Nationality']").append("<i class='fa fa-info-circle' title='ex: Indian'></i>");
+                $("label[for='TaxResidence']").append("<i class='fa fa-info-circle' title='ex: Indian'></i>");
+            });
+
+            $(document).on("submit", "#countryForm", function(e) {
+                e.preventDefault();
+                Validation();
+
+                var form = $(this);
+                form.ajaxSubmit({
+                    beforeSubmit: function() {
+                        if (!form.valid()) {
+
+                            return false;
+                        }
+                        else {
+
+                            return true;
+                        }
+                    },
+                    success: function(res) {
+                        console.log(res);
+                        if (res.code == 200) {
+                            $("#frmModel").modal('hide');
+                            $("#countryForm").resetForm();
+                            CountryDataTable.init(0);
+
+                            Toast.fire({
+                                icon: 'success',
+                                title: " " + res.message
+                            })
+
+                        } else {
+                            //$("#Loader").hide();
+                            Toast.fire({
+                                icon: 'error',
+                                title: " " + res.message
+                            })
+                        }
+                    },
+                    Errors: function() {
+                        console.log("error");
+                        //$("#Loader").hide();
+                        Toast.fire({
+                            icon: 'error',
+                            title: " " + res.message
+                        })
+                    }
+                });
+                return false;
+            });
+
+        });
+
+        function Validation() {
+            $('#countryForm').validate({
+                rules: {
+                    CountryCode: {
+                        required: true
+                    },
+                    CountryName: {
+                        required: true
+                    },
+                    NiceName: {
+                        required: true
+                    },
+                    Nationality: {
+                        required: true
+                    },
+                    TaxResidence: {
+                        required: true
+                    },
+                    PhoneCode: {
+                        required: true
+                    }
+                },
+                messages: {
+                    CountryCode: {
+                        required: "Please enter CountryCode"
+                    },
+                    CountryName: {
+                        required: "Please enter CountryName"
+                    },
+                    Opration: {
+                        required: "Please enter Opration"
+                    },
+                    NiceName: {
+                        required: "Please enter NiceName"
+                    },
+                    Nationality: {
+                        required: "Please enter Nationality"
+                    },
+                    TaxResidence: {
+                        required: "Please enter TaxResidence"
+                    },
+                    PhoneCode: {
+                        required: "Please enter PhoneCode"
+                    },
+                },
+                errorElement: 'span',
+                errorPlacement: function(error, element) {
+                    error.addClass('invalid-feedback');
+                    element.closest('.form-group').append(error);
+                },
+                highlight: function(element, errorClass, validClass) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function(element, errorClass, validClass) {
+                    $(element).removeClass('is-invalid');
+                }
+            });
+        }
+        var CountryDataTable = function () {
+            let initTable1 = function () {
+                let table = $('#countryList');
+
+                let oTable = table.dataTable({
+                    "stateSave": true,
+                    "autoWidth": false,
+                    "paging": true,
+                    // Internationalisation. For more info refer to http://datatables.net/manual/i18n
+                    "language": {
+                        "aria": {
+                            "sortAscending": ": activate to sort column ascending",
+                            "sortDescending": ": activate to sort column descending"
+                        },
+                        "emptyTable": "No data available in table",
+                        "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+                        "infoEmpty": "No entries found",
+                        "infoFiltered": "(filtered1 from MAX total entries)",
+                        //"lengthMenu": "MENU entries",
+                        "search": "Search:",
+                        "zeroRecords": "No matching records found"
+                    },
+                    "pageLength": 10,
+                    "processing": true,
+                    "serverSide": true,
+                    "ajax": {
+                        async: true,
+                        url: '/Country/Country_All',
+                        type: "post",
+                    },
+                    columnDefs: [{
+                        "targets": [0],
+                        "visible": false,
+                        "searchable": false
+                    }],
+                    "columns": [
+                        {
+                            "title": "CountryId", "data": "countryId", "name": "CountryId", "orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "Country Code", "data": "countryCode","name":"CountryCode" ,"orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "Country Name", "data": "countryName","name":"CountryName" ,"orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "Nice Name", "data": "niceName","name":"NiceName" ,"orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "Iso3", "data": "iso3","name":"Iso3" ,"orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "Number Code", "data": "numCode", "name":"NumCode","orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "Phone Code", "data": "phoneCode","name":"PhoneCode" ,"orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "Onboarding Steps", "data": "onboardingSteps","name":"OnboardingSteps" ,"orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "Nationality", "data": "nationality","name":"Nationality" ,"orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "Tax Residence", "data": "taxResidence","name":"TaxResidence" ,"orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "Action", "data": "countryId",
+                            "render": function (data, type, row) {
+                                let htmlData = "";
+                                htmlData += "<a class='btn btn-success edt-rcd mr-1' href='javascript:void(0);' data-uri='/Country/Edit?Id=" + row.countryId + "' ><i class='fa fa-edit'></i></a>";
+                                htmlData += "<a class='btn btn-danger edt-dlt mr-1' href='javascript:void(0);' data-uri='/Country/DeleteCountry?Id=" + row.countryId + "' ><i class='fa fa-trash'></i></a>";
+                                
+                                //htmlData += `<button class="btn btn-sm btn-danger mr-1" onclick="OpenDeleteItem('${row.countryId}');"><i class="fa fa-trash"></i></button>`;
+                                return htmlData;
+                            }
+                            , "orderable": false, "width": "3%"
+                        },
+                    ],
+
+                    // setup responsive extension: http://datatables.net/extensions/responsive/
+                    responsive: true,
+
+                    "lengthMenu": [
+                        [5, 10, 15, 20, 1000],
+                        [5, 10, 15, 20, 1000] // change per page values here
+                    ],
+                    // set the initial value
+
+                    //"dom": "<'row' <'col-md-12'B>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'f>r><'table-scrollable't><'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>", // horizobtal scrollable datatable
+
+                    // Uncomment below line("dom" parameter) to fix the dropdown overflow issue in the datatable cells. The default datatable layout
+                    // setup uses scrollable div(table-scrollable) with overflow:auto to enable vertical scroll(see: assets/global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js).
+                    // So when dropdowns used the scrollable div should be removed.
+                    //"dom": "<'row' <'col-md-12'T>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'f>r>t<'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>",
+                });
+            }
+
+            return {
+                init: function () {
+                    if ($.fn.DataTable.isDataTable("#countryList")) {
+                        $('#countryList').dataTable().fnDestroy();
+                        //$('#divUserTable').html('<table class="table table-striped" width="100%" id="UserTable"></table>');
+                    }
+                    initTable1();
+                }
+            };
+        }();
+
+        $('#FileUpload').on('change', function (e) {
+            //get the file name
+            var fileName = e.target.files[0].name;
+            $(this).next('.custom-file-label').html(fileName);
+        })
+        $(document).on("submit", "#frmExcelForm", function (e) {
+            e.preventDefault();
+            var form = $(this);
+            form.ajaxSubmit({
+                beforeSubmit: function () {
+                    if (!form.valid()) {
+                        return false;
+                    }
+                    else {
+                        return true;
+                    }
+                },
+                success: function (res) {
+                    if (res.statusCode == 200) {
+                        $('#FileUpload').val('');
+                        $('#lblRule').html('Choose File')
+                        NotifyMsg('success', res.message);
+                        $('#Id').val(res.response.id);
+                        $('#divUploadFile').hide();
+                        window.location.href = "/Country/index";
+                    } else {
+                        NotifyMsg('error', res.message);
+                    }
+                },
+                Errors: function () {
+                    console.log('error', res.message);
+                    NotifyMsg('error', res.message);
+                }
+            });
+            return false;
+        });
+
+       
+        function ExportCountryData() {
+            updateProgress(0);
+            var table1 = $('#countryList').dataTable();
+
+            $("#ProcessModal").modal({ backdrop: 'static', keyboard: false });
+            $("#ProcessModal").focus();
+            $("#ProcessModal").modal('show');
+
+            var totalCnt = table1.fnSettings().fnRecordsTotal()
+            var Interval = totalCnt / 100;
+            Interval = Interval * 10;
+            var counter = totalCnt / 100;
+            counter = Math.round(10);
+            var intervalId = window.setInterval(function () {
+                if (counter < 90) {
+                    updateProgress(counter);
+                    counter = counter + 7;
+                }
+            }, Interval);
+
+            $.ajax({
+                type: "POST",
+                url: 'ExportCountryData',
+                //contentType: false,
+                dataType: "binary",
+                processData: false,
+                xhrFields: {
+                    'responseType': 'blob'
+                },
+                success: function (res) {
+                    debugger
+                    const date = new Date();
+                    let day = date.getDate();
+                    let month = date.getMonth() + 1;
+                    let year = date.getFullYear();
+                    let currentDate = `${day}_${month}_${year}`;
+                    $("#ProcessModal").modal("hide");
+                    clearInterval(intervalId);
+                    completeHandler();
+                    
+                    NotifyMsg('success', 'The file is exported');
+                    var link = document.createElement('a'),
+                        filename = "Country_" + currentDate + ".xlsx";
+                    link.href = URL.createObjectURL(res);
+                    link.download = filename;
+                    link.click();
+                },
+                error: function (errorTemp) {
+                    NotifyMsg('error', errorTemp);
+                    console.log('error', errorTemp);
+                }
+            })
+        }
+
+        function updateProgress(count) {
+            $('.bar').css('width', count + '%');
+            $('.percent').text(count + '%');
+        }
+        function progressHandler(event) {
+            debugger;
+            if (event.lengthComputable) {
+                var percent = Math.round((event.loaded / event.total) * 100);
+
+                $("#ProcessModal").modal('show');
+                $('.bar').width(percent + "%");
+                $('.percent').html(percent + "%");
+            }
+        }
+        function completeHandler() {
+            $('.bar').width("100%");
+            $('.percent').html("100%");
+            $("#ProcessModal").modal('hide');
+        }
+
+        function OpenDeleteItem(Id)
+        {
+            var b=confirm('Are you sure you want to delete ?');
+            if(b){
+                $.ajax({
+                    type: "POST",
+                    url: 'DeleteCountry',
+                    data: {'Id':Id},
+                    success: function (data) {
+                        NotifyMsg('success', data.message);
+                        location.reload();
+                    }
+            })
+        }
+        }
+    </script>
+}
+

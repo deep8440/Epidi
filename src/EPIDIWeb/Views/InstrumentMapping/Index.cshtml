@@ -1,0 +1,368 @@
+﻿@{
+    ViewBag.PageTitle = "Instrument Mapping";
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+    ViewBag.Method = "Instrument Mapping";
+}
+<style>
+    .progress {
+        display: block;
+        position: relative;
+        margin: 20px;
+        width: 425px;
+        background-color: #ddd;
+        border: 1px solid blue;
+        padding: 1px;
+        left: 40px;
+        border-radius: 3px;
+    }
+
+
+
+    .percent {
+        position: absolute;
+        display: inline-block;
+        color: #fff;
+        font-weight: bold;
+        top: 100%;
+        left: 50%;
+        margin-top: -9px;
+        margin-left: -20px;
+        -webkit-border-radius: 4px;
+    }
+
+
+
+    .bar {
+        background-color: #007bff;
+        width: 0%;
+        height: 30px;
+        border-radius: 4px;
+        -webkit-border-radius: 4px;
+        -moz-border-radius: 4px;
+    }
+
+
+
+    #status {
+        margin: 20px;
+        color: #008000;
+        font-size: 16px;
+    }
+</style>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-12" id="divUploadFile">
+                        @using (Html.BeginForm("UploadInstrumentsMappingExcel", "InstrumentMapping", FormMethod.Post, new { enctype = "multipart/form-data", id = "frmExcelForm" }))//onsubmit = "return myFunction()"
+                        {
+                            <div class="row">
+                                <div class="col-3">
+                                    <div custom-file form-group float-sm-left mr-3" style="width: 100%;">
+                                        <input type="file" id="FileUpload" name="FileUpload" class="custom-file-input">
+                                        <label id="GatelblName" class="custom-file-label" style="text-align:left" for="file">Choose       Instrument</label>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <button type="submit" class="btn btn-info form-group mr-3">Import Instruments Mapping</button>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <div class="col-4" style="padding:0px;">
+                        <a id="exportBtn" onclick="ExportInstrumentMappingData()" class="btn btn-info form-group float-sm-left mr-3">Export Instruments Mapping</a>
+                    </div>
+                </div>
+                @*<a href="/InstrumentMapping/ExportInstrumentMapping" class="btn btn-info form-group float-sm-left mr-3">Export Instruments Mapping</a>*@
+                @*<div class="row">
+                <button type="button" class="btn btn-info form-group float-sm-left mr-3 " onclick="ExportInstrumentMapping()">Export Instruments Mapping</button>
+                </div>*@
+                @*<div class="row">
+                <div class="col-md-6">
+                <div id="progress-bar-container" class="progress">
+                <div id="progress-bar" class="progress-bar progress-bar-primary progress-bar-striped">
+                <span class="sr-only">40% Complete (success)</span>
+                </div>
+                </div>
+                <div id="progress-text">0%</div>
+                </div>
+                </div>*@
+            </div>
+
+
+            <!-- /.card-header -->
+            <div class="card-body">
+                <input type="hidden" id="ISTotalRecords">
+                <table id="instrumentMapping" class="table table-bordered table-striped">
+                </table>
+            </div>
+            <div class="card-footer">
+                <div class="float-right">
+                    <button type="button" class="btn btn-primary" onclick="saveInstrumentMapping()">Save</button>
+                </div>
+            </div>
+            <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+    </div>
+    <!-- /.col -->
+</div>
+<div id="Loader" class="Loader" style="display: none;">
+    <img src="~/lib/images/loader.gif" alt="EPIDI" class="loadingImage" />
+</div>
+<div class="modal fade" id="ProcessModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <h1>Processing...</h1>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="col-6">
+                    <div class="progress">
+                        <div class="bar"></div>
+                        <div class="percent">0%</div>
+                    </div>
+                </div>
+            </div>
+            @*<div class="modal-footer">
+            <button type="submit" onclick="closeModal()" class="btn btn-danger">close</button>
+            </div>*@
+        </div>
+    </div>
+</div>
+@section Scripts
+    {
+    <script src="~/js/jquery-validation/jquery.validate.min.js"></script>
+    <script src="~/js/jquery-validation/additional-methods.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+    <script>
+        var ioInstrument = JSON.parse(JSON.stringify(@Json.Serialize(ViewBag.IoInstrument)));
+        var lmaxInstrument = JSON.parse(JSON.stringify(@Json.Serialize(ViewBag.LMaxInstrument)));
+    </script>
+    <script src="~/js/customscript/instrumentmapping/custominstrumentmapping.js"></script>
+
+    <script>
+        $(document).ready(() => {
+
+            const dropdowns = document.querySelectorAll('.form-control.js-select2');
+            dropdowns.forEach(function (dropdown) {
+                // Do something with each dropdown element
+                const dropdownId = dropdown.id;
+                $("#" + dropdownId + "").select2();                
+            });
+
+            $('#FileUpload').on('change', function (e) {
+                //get the file name
+                var fileName = e.target.files[0].name;
+                $(this).next('.custom-file-label').html(fileName);
+            })
+            $('#MasterInstrimentUpload').on('change', function (e) {
+                //get the file name
+                debugger
+                var fileName = e.target.files[0].name;
+                $(this).next('.custom-file-label').html(fileName);
+            })
+            $(document).on("submit", "#frmExcelForm", function (e) {
+                debugger;
+                $('#Loader').show();
+                e.preventDefault();
+                $('#Loader').show();
+                var form = $(this);
+                form.ajaxSubmit({
+                    beforeSubmit: function () {
+                        if (!form.valid()) {
+                            $('#Loader').show();
+                            return false;
+                        }
+                        else {
+                            $('#Loader').show();
+                            return true;
+                        }
+                    },
+                    success: function (res) {
+                        if (res.statusCode == 200) {
+                            $('#FileUpload').val('');
+                            $('#GatelblName').html('Choose Instrument')
+                            window.location.href = "/InstrumentMapping/Index";
+                            NotifyMsg('success', res.message);
+                            $('#Loader').hide();
+
+                        } else {
+                            NotifyMsg('error', res.message);
+                            $('#Loader').hide();
+                        }
+                    },
+                    Errors: function () {
+
+                        NotifyMsg('error', res.message);
+                        $('#Loader').hide();
+                    }
+                });
+                //$('#Loader').hide();
+                return false;
+            });
+            $(document).on("submit", "#frmMasterInstrumentExcelForm", function (e) {
+                e.preventDefault();
+                var form = $(this);
+                form.ajaxSubmit({
+                    beforeSubmit: function () {
+                        if (!form.valid()) {
+
+                            return false;
+                        }
+                        else {
+
+                            return true;
+                        }
+                    },
+                    success: function (res) {
+                        debugger
+                        if (res.statusCode == 200) {
+                            $('#MasterInstrimentUpload').val('');
+                            $('#LmaxlblName').html('Choose file');
+                            debugger;
+                            NotifyMsg('success', res.message);
+
+                        } else {
+                            NotifyMsg('error', res.message);
+                        }
+                    },
+                    Errors: function () {
+
+                        NotifyMsg('error', res.message);
+                    }
+                });
+                return false;
+            });
+        });
+
+        function ExportInstrumentMappingData() {
+            debugger
+
+            updateProgress(0);
+             var table1 = $('#instrumentMapping tr').length;
+
+            
+        //    var table1 = $('#instrumentMapping').dataTable();
+
+          //  $("#ProcessModal").modal({ backdrop: 'static', keyboard: false });
+         //   $("#ProcessModal").focus();
+            $("#ProcessModal").modal('show');
+
+            var totalCnt = table1            //.fnSettings().fnRecordsTotal()
+          //  var Interval = totalCnt / 100;
+           // Interval = Interval * 10;
+            var counter = totalCnt / 100;
+            counter = Math.round(counter);
+            var intervalId = window.setInterval(function () {
+                if (counter < 90) {
+                    updateProgress(counter);
+                    counter = counter + 7;
+                }
+            }, 50);
+
+            
+            
+            
+            
+            
+            //$('#Loader').show();
+
+            $.ajax({
+                type: "POST",
+                url: '/InstrumentMapping/ExportInstrumentMapping',
+                //contentType: false,
+                dataType: "binary",
+                processData: false,
+                xhrFields: {
+                    'responseType': 'blob'
+                },
+                success: function (res) {
+                    const date = new Date();
+                    let day = date.getDate();
+                    let month = date.getMonth() + 1;
+                    let year = date.getFullYear();
+                    let currentDate = `${day}_${month}_${year}`;
+                    $("#ProcessModal").modal("hide");
+                    clearInterval(intervalId);
+                  //  completeHandler();
+
+                    NotifyMsg('success','The file is exported');
+                    var link = document.createElement('a'),
+                    filename = "InstrumentMapping_" + currentDate + ".xlsx";
+                        link.href = URL.createObjectURL(res);
+                             link.download = filename;
+                    link.click();
+                    completeHandler();
+//                   $('#Loader').hide();
+                },
+                error: function (errorTemp) {
+                    NotifyMsg('error', errorTemp);
+                    console.log('error', errorTemp);
+                }
+            })
+        }
+
+        function updateProgress(count) {
+            $('.bar').css('width', count + '%');
+            $('.percent').text(count + '%');
+        }
+        //function progressHandler(event) {
+        //    debugger;
+        //    if (event.lengthComputable) {
+        //        var percent = Math.round((event.loaded / event.total) * 100);
+
+        //        $("#ProcessModal").modal('show');
+        //        $('.bar').width(percent + "%");
+        //        $('.percent').html(percent + "%");
+        //    }
+        //}
+
+        function completeHandler() {
+            $('.bar').width("100%");
+            $('.percent').html("100%");
+            $("#ProcessModal").modal('hide');
+        }
+
+
+
+        //function progressBar(totalRecord) {
+        //    for (var i = 0; i < 90; i++) {
+        //        //count1 = parseInt(count / (max / 100));
+        //        //var myVar = setTimeout(
+        //        //    updateProgress, 2000, i
+        //        //);
+        //        var intervalId = window.setInterval(function () {
+        //            updateProgress(i);
+        //        }, 2000);
+        //        //totalper = Math.round((i / totalRecord) * 100);
+        //        //var myVar = setTimeout(updateProgress, 100, totalper, result.length, html);
+        //    }
+        //}
+        //function updateProgress(count) {
+        //    $('.bar').css('width', count + '%');
+        //    $('.percent').text(count + '%');
+        //}
+        //function progressHandler(event) {
+        //    debugger;
+        //    if (event.lengthComputable) {
+        //        var percent = Math.round((event.loaded / event.total) * 100);
+
+        //        $("#ProcessModal").modal('show');
+        //        $('.bar').width(percent + "%");
+        //        $('.percent').html(percent + "%");
+        //    }
+        //}
+        //function completeHandler() {
+        //    debugger
+        //    //myApp.hidePleaseWait(); //hide dialog
+        //    $('.bar').width("100%");
+        //    $('.percent').html("100%");
+        //    $("#ProcessModal").modal('hide');
+        //}
+    </script>
+}

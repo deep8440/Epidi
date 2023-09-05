@@ -1,0 +1,406 @@
+﻿@model CommisionMarkUpSetting
+@{
+    Layout = null;
+}
+
+<div id="DivCommission" style="width: 100%;overflow-x: auto;">
+    <input type="hidden" id="commissionData" />
+    <div class="row">
+        <div class="col-3">
+            <label>Instruments</label>
+            <select class="form-control" id="instrumentid_filter" style="border:1px solid;">
+            </select>
+        </div>
+        <div class="col-2">
+            <div class="form-group mt-3">
+                <button type="button" onclick="btnSearchClick();" id="Search" class="btn btn-info mt-3">Search</button>
+            </div>
+        </div>
+
+        <div class="col-6" id="divUploadFile">
+            @using (Html.BeginForm("UploadBDMInstrument", "BDM", FormMethod.Post, new { enctype = "multipart/form-data", id = "frmExcelForm" }))//onsubmit = "return myFunction()"
+            {
+                @Html.HiddenFor(model => model.IbId ,new {@Id="IBId"})
+                <div class="row">
+                    <div class="col-7">
+                        <label>Import Excel file</label>
+                        <div class="custom-file form-group float-sm-left mr-3" style="width:173px;">
+                            <input type="file" id="FileUpload" name="FileUpload" class="custom-file-input">
+                            <label id="lblRule" class="custom-file-label" style="text-align:left" for="file">Choose File</label>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="form-group mt-3">
+                            <button type="submit" class="btn btn-info mt-3">Import</button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="col-1">
+            <div class="form-group mt-3">
+                <button type="button" onclick="ExportCommissionInstrument();" id="Export" class="btn btn-info mt-3">Export</button>
+            </div>
+        </div>
+    </div>
+    <table id="tblIBCommission">
+        <tr>
+            <th>Instruments</th>
+            <th>Symbol Groups</th>
+            <th>Mark Up Per1000</th>
+            <th>Mark Up Per%</th>
+            <th>Buy Swap Per1000</th>
+            <th>Buy Swap Per%</th>
+            <th>Sell Swap Per1000</th>
+            <th>Sell Swap Per%</th>
+        </tr>
+        @*<tr>
+        <td>
+        <div class="form-group">
+        <input id="Id_0" type="hidden">
+        <input id="IbId_0" type="hidden">
+        <select class="form-control" id="instrumentid_0" style="border:1px solid;">
+        <option value=""> --Select--</option>
+        <option value="7">Apple</option>
+        <option value="8">JBL</option>
+        <option value="11">EURUSD</option>
+        <option value="12">JBL123</option>
+        </select>
+        </div>
+        </td>
+        <td>
+        <div class="form-group">
+        <input class="form-control" id="SymbolGroups_0" placeholder="SymbolGroups" type="text" readonly="readonly">
+        </div>
+        </td>
+        <td>
+        <div class="form-group">
+        <input class="form-control" id="MarkUpPer1000_0" placeholder="Mark Up Per1000" type="number">
+        </div>
+        </td>
+        <td>
+        <div class="form-group">
+        <input class="form-control" id="MarkUpPer_0" placeholder="Mark Up Per%" type="number">
+        </div>
+        </td>
+        <td>
+        <div class="form-group">
+        <input class="form-control" id="BuySwapPer1000_0" placeholder="Buy Swap Per1000" type="number">
+        </div>
+        </td>
+        <td>
+        <div class="form-group">
+        <input class="form-control" id="BuySwapPer_0" placeholder="Buy Swap Per%" type="number">
+        </div>
+        </td>
+        <td>
+        <div class="form-group">
+        <input class="form-control" id="SellSwapPer1000_0" placeholder="Sell Swap Per1000" type="number">
+        </div>
+        </td>
+        <td>
+        <div class="form-group">
+        <input class="form-control" id="SellSwapPer_0" placeholder="Sell Swap Per%" type="number">
+        </div>
+        </td>
+        <td>
+        <div class="form-group">
+        <a href="javascript:void(0)" value="Delete" onclick="DeleteLpRule(1,1)" style=" display: block; width: 100%; height: calc(2.25rem + 2px); padding: 0.375rem 0.75rem;">
+        <i class="fa fa-trash" style="font-size: large;margin-top: 8px;" aria-hidden="true"></i>
+        </a>
+        </div>
+        </td>
+        </tr>*@
+    </table>
+</div>
+<div class="row" style="display:none;">
+
+    <div class="col-12">
+        <div class="form-group">
+            
+            @Html.HiddenFor(model => model.IbName, new {@Id="IBName"})
+            @*@Html.LabelFor(model => model.MasterInstrumentalId, "MasterInstrumentalName")
+            @Html.DropDownListFor(model => model.MasterInstrumentalId, new SelectList(ViewBag.InstrumentList, "Value", "Text", Model.MasterInstrumentalId), "-- Select Instrumental --", new { @class = "form-control" ,@name="MasterInstrumentalName" })*@
+            @*<label>Instrument</label>*@
+            @*@Html.DropDownList("Instrument", (IEnumerable<SelectListItem>)ViewBag.InstrumentList, "-- Select Instrument --", new { @Id = "Instrument", @class = "form-control" })*@
+        </div>
+    </div>
+</div>
+<div class="row col-12 mt-1" style="float: right;">
+    <div class="form-group">
+        <button type="button" onclick="AddNewCommissionRow();" id="addnewInstrumentRule" class="btn btn-primary">Add Instrument Rule</button>
+    </div>
+</div>
+<div class="modal-footer">
+    <button onclick="SaveCommission()" class="btn btn-primary">Save</button>
+</div>
+
+
+<script>
+    $(document).ready(() => {
+        debugger;
+        //document.getElementsByClassName("modal-title")[0].textContent = 'Testing here';
+        var ibname = $("#IBName").val();
+        var ibid = $("#IBId").val();
+        $(".modal-title").text("IB -" + ibname + " - Commision");
+        BindIntruments("filter");
+        GetIBCommission(ibid);
+        //if (countCommiRow == "0") {
+        //    CreateNewCommissionRow();
+        //}
+    });
+    function AddNewCommissionRow() {
+        CreateNewCommissionRow();
+    }
+    var countCommiRow = 0;
+    function CreateNewCommissionRow(response) {
+        var strHTML = "";
+        if (countCommiRow == "0") {
+            strHTML += `<tr> `;
+            strHTML += `<th style="width:165px;">Instruments</th> `;
+            strHTML += `<th style="width:65px;">Mark Up Per1000</th> `;
+            strHTML += `<th style="width:65px;">Mark Up Per%</th> `;
+            strHTML += `<th style="width:65px;">Buy Swap Per1000</th> `;
+            strHTML += `<th style="width:65px;">Buy Swap Per%</th> `;
+            strHTML += `<th style="width:65px;">Sell Swap Per1000</th> `;
+            strHTML += `<th style="width:65px;">Sell Swap Per%</th> `;
+            strHTML += `</tr> `;
+        }
+        strHTML += `<tr>`;
+        strHTML += `<td>`;
+        strHTML += `<div class="form-group">`;
+        strHTML += `<input id="Id_${countCommiRow}" type="hidden">`;
+        strHTML += `<input id="IbId_${countCommiRow}" type="hidden">`;
+        strHTML += `<select class="form-control" id="instrumentid_${countCommiRow}" style="border:1px solid;">`;
+        strHTML += `</select>`;
+        strHTML += `</div>`;
+        strHTML += `</td>`;
+        //strHTML += `<td>`;
+        //strHTML += `<div class="form-group">`;
+        //strHTML += `<input class="form-control" id="SymbolGroups_${countCommiRow}" placeholder="SymbolGroups" type="text" readonly="readonly">`;
+        //strHTML += `</div>`;
+        //strHTML += `</td>`;
+        strHTML += `<td>`;
+        strHTML += `<div class="form-group" style="width: 65px;">`;
+        strHTML += `<input class="form-control" id="MarkUpPer1000_${countCommiRow}" placeholder="Mark Up Per1000" type="number">`;
+        strHTML += `</div>`;
+        strHTML += `</td>`;
+        strHTML += `<td>`;
+        strHTML += `<div class="form-group" style="width: 65px;">`;
+        strHTML += `<input class="form-control" id="MarkUpPer_${countCommiRow}" placeholder="Mark Up Per%" type="number">`;
+        strHTML += `</div>`;
+        strHTML += `</td>`;
+        strHTML += `<td>`;
+        strHTML += `<div class="form-group" style="width: 65px;">`;
+        strHTML += `<input class="form-control" id="BuySwapPer1000_${countCommiRow}" placeholder="Buy Swap Per1000" type="number">`;
+        strHTML += `</div>`;
+        strHTML += `</td>`;
+        strHTML += `<td>`;
+        strHTML += `<div class="form-group" style="width: 65px;">`;
+        strHTML += `<input class="form-control" id="BuySwapPer_${countCommiRow}" placeholder="Buy Swap Per%" type="number">`;
+        strHTML += `</div>`;
+        strHTML += `</td>`;
+        strHTML += `<td>`;
+        strHTML += `<div class="form-group" style="width: 65px;">`;
+        strHTML += `<input class="form-control" id="SellSwapPer1000_${countCommiRow}" placeholder="Sell Swap Per1000" type="number">`;
+        strHTML += `</div>`;
+        strHTML += `</td>`;
+        strHTML += `<td>`;
+        strHTML += `<div class="form-group" style="width: 65px;">`;
+        strHTML += `<input class="form-control" id="SellSwapPer_${countCommiRow}" placeholder="Sell Swap Per%" type="number">`;
+        strHTML += `</div>`;
+        strHTML += `</td>`;
+        strHTML += `<td>`;
+        strHTML += `<div class="form-group">`;
+        strHTML += `<a href="javascript:void(0)" value="Delete" onclick="DeleteLpRule(1,1)" style=" display: block; width: 100%; height: calc(2.25rem + 2px); padding: 0.375rem 0.75rem;">`;
+        strHTML += `<i class="fa fa-trash" style="font-size: large;margin-top: 8px;" aria-hidden="true"></i>`;
+        strHTML += `</a>`;
+        strHTML += `</div>`;
+        strHTML += `</td>`;
+        strHTML += `</tr>`;
+        $("#tblIBCommission").append(strHTML);
+        if (response != undefined) {
+            $("#Id_" + countCommiRow).val(response.id);
+            $("#IbId_" + countCommiRow).val(response.ibId);
+            $("#MarkUpPer1000_" + countCommiRow).val(response.markUpPer1000);
+            $("#MarkUpPer_" + countCommiRow).val(response.markUpPer);
+            $("#BuySwapPer_" + countCommiRow).val(response.buySwapPer);
+            $("#BuySwapPer1000_" + countCommiRow).val(response.buySwapPer1000);
+            $("#SellSwapPer1000_" + countCommiRow).val(response.sellSwapPer1000);
+            $("#SellSwapPer_" + countCommiRow).val(response.sellSwapPer);
+
+            BindIntruments(countCommiRow, response.masterInstrumentalId);
+
+        }
+        else {
+            BindIntruments(countCommiRow);
+        }
+
+        countCommiRow = countCommiRow + 1;
+    }
+    function BindIntruments(count, defaultVal = "") {
+        $.ajax({
+            async: true,
+            type: "POST",
+            url: '/QuoteMarkUpRule/GetInstrumentsDropDown',
+            dataType: 'json',
+            data: {},
+            success: function (response) {
+                $("#instrumentid_" + count).append(`<option value = "" > --Select--</option>`)
+                for (var i = 0; i < response.length; i++) {
+                    $("#instrumentid_" + count).append(`<option value = "${response[i].value}"> ${response[i].text}</option>`)
+                }
+                if (defaultVal != "") {
+                    $("#instrumentid_" + count).val(defaultVal);
+                }
+            },
+            error: function (errorTemp) {
+                console.log('error', errorTemp);
+            }
+        })
+    }
+    function SaveIBCommissionData() {
+        debugger;
+        IsValid = true;
+        var commissionList = [];
+        //var total_cnt = document.getElementById("myTable").rows.length;
+        for (var i = 0; i <= countCommiRow; i++) {
+            if (($("#instrumentid_" + i).val() != "") && ($("#instrumentid_" + i).val() != null)) {
+                var obj = {
+                    MasterInstrumentalId: $("#instrumentid_" + i).val() == "" ? 0 : $("#instrumentid_" + i).val(),
+                    Id: $("#Id_" + i).val() == "" ? 0 : $("#Id_" + i).val(),
+                    IbId: $("#IBId").val(),
+                    MarkUpPer1000: $("#MarkUpPer1000_" + i).val() == "" ? 0 : $("#MarkUpPer1000_" + i).val(),
+                    MarkUpPer: $("#MarkUpPer_" + i).val() == "" ? 0 : $("#MarkUpPer_" + i).val(),
+                    BuySwapPer: $("#BuySwapPer_" + i).val() == "" ? 0 : $("#BuySwapPer_" + i).val(),
+                    BuySwapPer1000: $("#BuySwapPer1000_" + i).val() == "" ? 0 : $("#BuySwapPer1000_" + i).val(),
+                    MaxCoefficient: $("#MaxCoeffient_" + i).val() == "" ? 0 : $("#MaxCoeffient_" + i).val(),
+                    SellSwapPer1000: $("#SellSwapPer1000_" + i).val() == "" ? 0 : $("#SellSwapPer1000_" + i).val(),
+                    SellSwapPer: $("#SellSwapPer_" + i).val() == "" ? 0 : $("#SellSwapPer_" + i).val(),
+                }
+                commissionList.push(obj);
+            }
+        }
+        $("#commissionData").val(JSON.stringify(commissionList));
+    }
+    function SaveCommission() {
+        SaveIBCommissionData();
+        var formData = new FormData();
+        formData.append("objCommissionString", $("#commissionData").val());
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("SaveIBInstrumentCommission","BDM")",
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (res) {
+                debugger;
+                if (res.statusCode == 200) {
+                    //$("#frmModel").modal('hide');
+                    //$("#rulesDetailsData").resetForm();
+                    NotifyMsg('success', res.message);
+                    window.location.href = "/BDM/index";
+
+                } else {
+                    NotifyMsg('error', res.message);
+                }
+            },
+            error: function (errorTemp) {
+                NotifyMsg('error', errorTemp);
+                console.log('error', errorTemp);
+            }
+        })
+    }
+    function GetIBCommission(ibid, instrumentsFilter = 0) {
+        $.ajax({
+            async: true,
+            type: "GET",
+            url: 'Get_CommissionInstrumentWise',
+            dataType: 'json',
+            data: { Ib_Id: ibid, instrument_filter: instrumentsFilter },
+            success: function (response) {
+                $("#tblIBCommission").empty();
+                countRuleInstrument = 0;
+                for (var i = 0; i < response.length; i++) {
+                    ////Instrument design
+                    CreateNewCommissionRow(response[i]);
+                }
+            },
+            error: function (errorTemp) {
+                console.log('error', errorTemp);
+            }
+        })
+    }
+    function btnSearchClick() {
+        debugger;
+        var instrumentFilter = $("#instrumentid_filter").val();
+        var ibid = $("#IBId").val();
+        GetIBCommission(ibid, instrumentFilter);
+    }
+
+    $('#FileUpload').on('change', function(e) {
+                //get the file name
+                var fileName = e.target.files[0].name;
+                $(this).next('.custom-file-label').html(fileName);
+            })
+    $(document).on("submit", "#frmExcelForm", function (e) {
+        e.preventDefault();
+        var form = $(this);
+        form.ajaxSubmit({
+            beforeSubmit: function () {
+                if (!form.valid()) {
+                    return false;
+                }
+                else {
+                    return true;
+                }
+            },
+            success: function (res) {
+                if (res.statusCode == 200) {
+                    $('#FileUpload').val('');
+                    $('#lblRule').html('Choose File')
+                    NotifyMsg('success', res.message);
+                    $('#Id').val(res.response.id);
+                    $('#divUploadFile').hide();
+                    window.location.href = "/BDM/index";
+                } else {
+                    NotifyMsg('error', res.message);
+                }
+            },
+            Errors: function () {
+                console.log('error', res.message);
+                NotifyMsg('error', res.message);
+            }
+        });
+        return false;
+    });
+
+    function ExportCommissionInstrument() {
+        SaveIBCommissionData();
+        var formData = new FormData();
+        formData.append("Id", $("#IBId").val());
+        formData.append("objCommissionString", $("#commissionData").val());
+        $.ajax({
+            type: "POST",
+            url: 'ExportBDMCommission',
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (res) {
+                debugger;
+                if (res.statusCode == 200) {
+                    //$("#frmModel").modal('hide');
+                    //$("#rulesDetailsData").resetForm();
+                    NotifyMsg('success', res.message);
+
+                } else {
+                    NotifyMsg('error', res.message);
+                }
+            },
+            error: function (errorTemp) {
+                NotifyMsg('error', errorTemp);
+                console.log('error', errorTemp);
+            }
+        })
+    }
+</script>

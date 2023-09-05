@@ -1,0 +1,404 @@
+﻿@model RenameOfStockViewModel
+@{
+    Layout = null;
+}
+<style>
+    /*#tblEquityStockDetails > thead > tr > th {
+                                            width: 120px;
+                                        }
+
+                                        #tblEquityStockDetailsNew > thead > tr > th {
+                                            width: 120px;
+                                        }*/
+</style>
+@using (Html.BeginForm("UpdateInstrumentSpecification", "InstrumentSpecification", FormMethod.Post, new { id = "instrumentForm" }))
+{
+    <div class="row">
+        <div class="col-5">
+            <div class="form-group">
+                @Html.HiddenFor(p => p.Id)
+                @Html.LabelFor(model => model.EquityName,"Equity Name")
+                <select id="ddlEquity" class="form-control"></select>
+                <label id="lblEquity" class="error">Please select equity name.</label>
+            </div>
+        </div>
+        <div class="col-5">
+            <div class="form-group">
+                @Html.LabelFor(model => model.NewEquityName,"New Equity Name")
+                <select id="ddlNewEquity" class="form-control"></select>
+                <label id="lblNewEquity" class="error">Please select new equity name.</label>
+            </div>
+        </div>
+        <div class="col-2">
+            <button type="button" class="btn btn-primary" onclick="GetStockDetails();" style="margin-top: 30px;">Show</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <H5 id="titleOld" class="card-header" style="background-color: #007bff; color:#ffffff">OLD Position</H5>
+            <table id="tblEquityStockDetails" class="table table-responsive">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="checkBoxForAllData"></th>
+                        <th>Client Id</th>
+                        <th>Trading Account</th>
+                        <th>Order Id</th>
+                        <th>Side Name</th>
+                        <th>Equity Name</th>
+                        <th>Open DateTime</th>
+                        <th>Legal Entity</th>
+                        <th>Open Price</th>
+                        <th>Open Units</th>
+                        <th>Close Price</th>
+                        <th>Close DateTime</th>
+                        <th>Swaps</th>
+                        <th>Commission</th>
+                        <th>Profit</th>
+                        <th>Leverage</th>
+                        <th>Position</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <H5 id="titleNew" class="card-header" style="background-color: #007bff; color:#ffffff">NEW Position</H5>
+            <table id="tblEquityStockDetailsNew" class="table table-responsive">
+                <thead>
+                    <tr>
+
+                        <th>Client Id</th>
+                        <th>Trading Account</th>
+                        <th>Order Id</th>
+                        <th>Side Name</th>
+                        <th>Equity Name</th>
+                        <th>Open DateTime</th>
+                        <th>Legal Entity</th>
+                        <th>Open Price</th>
+                        <th>Open Units</th>
+                        <th>Close Price</th>
+                        <th>Swaps</th>
+                        <th>Commission</th>
+                        <th>Leverage</th>
+                        <th>Position</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary" onclick="SaveNewEquityStockDetails();">Apply Changes</button>
+    </div>
+}
+
+<script type="text/javascript">
+    $('#Loader').show();
+    BindIntruments();
+    $("#tblEquityStockDetails").hide();
+    $("#titleOld").hide();
+    $("#tblEquityStockDetailsNew").hide();
+    $("#titleNew").hide();
+    //$("#ddlNewEquity").attr("disabled", "disabled");
+
+    $("#lblNewEquity").hide();
+    $("#lblEquity").hide();
+    var countIds;
+    var selectedRows = [];
+    var AllselectedRows = [];
+    function BindIntruments() {
+        $.ajax({
+            async: false,
+            type: "POST",
+            url: '/CorporateActions/GetInstrumentsDropDown',
+            dataType: 'json',
+            data: {},
+            success: function (response) {
+                $("#ddlEquity").append(`<option value = "" > --Select--</option>`)
+                $("#ddlNewEquity").append(`<option value = "" > --Select--</option>`)
+                for (var i = 0; i < response.length; i++) {
+                    $("#ddlEquity").append(`<option value = "${response[i].value}"> ${response[i].text}</option>`)
+                    $("#ddlNewEquity").append(`<option value = "${response[i].value}"> ${response[i].text}</option>`)
+                }
+                $('#Loader').hide();
+            },
+            error: function (errorTemp) {
+                console.log('error', errorTemp);
+            }
+        });
+    }
+    function GetStockDetails() {
+        GetStockDetailsByInstrumentId('old')
+        GetStockDetailsByInstrumentId('new')
+    }
+    function GetStockDetailsByInstrumentId(equityType) {
+        $("#lblNewEquity").hide();
+        $("#lblEquity").hide();
+        $('#Loader').show();
+        var instrumentId = $("#ddlEquity").val();
+
+        $.ajax({
+            async: false,
+            type: "GET",
+            url: '/CorporateActions/GetStockDetailsByInstrumentId',
+            dataType: 'json',
+            data: { InstrumentId: instrumentId },
+            success: function (response) {
+                console.log(response);
+                BindGridWithStockDetails(response, equityType);
+                $('#Loader').hide();
+            },
+            error: function (errorTemp) {
+                console.log('error', errorTemp);
+            }
+        });
+    }
+
+    function BindGridWithStockDetails(response, equityType) {
+        $("#tblEquityStockDetails > thead > tr > th").removeAttr("style");
+
+        if (response.length > 0) {
+            //$("#ddlNewEquity").removeAttr("disabled");
+
+            if (equityType == "old") {
+                $("#tblEquityStockDetails tbody").empty();
+                $("#lblEquity").hide();
+
+                var sdEquityData = "";
+                for (var i = 0; i < response.length; i++) {
+                    countIds = i;
+                    AllselectedRows.push(response[i].id);
+                    sdEquityData += '<tr>';
+                    sdEquityData += '<td><input type="checkbox" onclick="unCheckValue(' + response[i].id + ',' + i + ')" id="checkvalue' + i + '"></td>';
+                    sdEquityData += '<td>' + response[i].clientId + '</td>';
+                    sdEquityData += '<td>' + response[i].tradingAccount + '</td>';
+                    sdEquityData += '<td>' + response[i].id + '</td>';
+                    sdEquityData += '<td>' + response[i].sideName + '</td>';
+                    sdEquityData += '<td>' + response[i].equityName + '</td>';
+                    sdEquityData += '<td>' + response[i].openTimingStr + '</td>';
+                    sdEquityData += '<td>' + response[i].legalEntity + '</td>';
+                    sdEquityData += '<td>' + response[i].openPrice.toFixed(2) + '</td>';
+                    sdEquityData += '<td>' + response[i].openUnits.toFixed(2) + '</td>';
+                    sdEquityData += '<td>' + response[i].closePrice + '</td>';
+                    sdEquityData += '<td>' + response[i].closeTimingStr + '</td>';
+                    sdEquityData += '<td>' + response[i].swap + '</td>';
+                    sdEquityData += '<td>' + response[i].commission + '</td>';
+                    sdEquityData += '<td>' + response[i].leverage + '</td>';
+                    sdEquityData += '<td>' + response[i].profit + '</td>';
+                    if (response[i].position == "Open")
+                        sdEquityData += '<td><span class="badge badge-success">' + response[i].position + '</span></td>';
+                    else
+                        sdEquityData += '<td><span class="badge badge-danger">' + response[i].position + '</span></td>';
+
+                    sdEquityData += '</tr>';
+                }
+                $("#tblEquityStockDetails tbody").append(sdEquityData);
+                $("#tblEquityStockDetails").show();
+                $("#titleOld").show();
+            }
+            else {
+                $("#tblEquityStockDetailsNew tbody").empty();
+                $("#lblNewEquity").hide();
+                var sdEquityData = "";
+                for (var i = 0; i < response.length; i++) {
+                    var order_id = parseInt(response[i].id + response.length);
+                    sdEquityData += '<tr>';
+                    sdEquityData += '<td>' + response[i].clientId + '</td>';
+                    sdEquityData += '<td>' + response[i].tradingAccount + '</td>';
+                    sdEquityData += '<td>' + order_id + '</td>';
+                    sdEquityData += '<td>' + response[i].sideName + '</td>';
+                    sdEquityData += '<td>' + $("#ddlNewEquity option:selected").text() + '</td>';
+                    sdEquityData += '<td>' + response[i].openTimingStr + '</td>';
+                    sdEquityData += '<td>' + response[i].legalEntity + '</td>';
+                    sdEquityData += '<td>' + response[i].openPrice.toFixed(2) + '</td>';
+                    sdEquityData += '<td>' + response[i].openUnits.toFixed(2) + '</td>';
+                    sdEquityData += '<td></td>';
+                    sdEquityData += '<td></td>';
+                    sdEquityData += '<td></td>';
+                    sdEquityData += '<td></td>';
+                    sdEquityData += '<td>--</td>';
+                    sdEquityData += '</tr>';
+                }
+                $("#tblEquityStockDetailsNew tbody").append(sdEquityData);
+                $("#tblEquityStockDetailsNew").show();
+                $("#titleNew").show();
+            }
+        }
+        else {
+            $("#tblEquityStockDetails tbody").empty();
+            $("#tblEquityStockDetailsNew tbody").empty();
+            $("#tblEquityStockDetails tbody").append('<tr><td class="text-center" colspan="16">No data found</td></tr>');
+            $("#tblEquityStockDetailsNew tbody").append('<tr><td class="text-center" colspan="16">No data found</td></tr>');
+            $("#tblEquityStockDetailsNew").hide();
+            $("#titleNew").hide();
+            $("#tblEquityStockDetails").show();
+            $("#titlOld").show();
+            $("#tblEquityStockDetails > thead > tr > th").attr("style", "width: 120px;");
+
+        }
+    }
+    $('#checkBoxForAllData').change(function () {
+        if ($(this).is(':checked')) {
+            for (var i = 0; i < countIds + 1; i++) {
+                $('#checkvalue' + i).prop('checked', true);
+                selectedRows = AllselectedRows;
+            }
+        } else {
+            for (var i = 0; i < countIds + 1; i++) {
+                $('#checkvalue' + i).prop('checked', false);
+                selectedRows = [];
+            }
+        }
+    });
+
+    function unCheckValue(orderid, id) {
+
+        if ($("#checkvalue" + id).prop('checked') == true) {
+            selectedRows.push(orderid);
+        }
+        else {
+            var filteredArray = selectedRows.filter(function (element) {
+                return element !== orderid;
+            });
+            selectedRows = filteredArray;
+        }
+
+        $('#checkBoxForAllData').prop('checked', true);
+        for (var i = 0; i < countIds + 1; i++) {
+            if ($("#checkvalue" + i).prop('checked') == false) {
+                $('#checkBoxForAllData').prop('checked', false);
+            }
+        }
+    }
+
+    function SaveNewEquityStockDetails() {
+       var orderIds = selectedRows.join(',');
+        Swal.fire({
+            title: "Are you sure ?",
+            text: "Do you want to proceed!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+            showDenyButton: true,
+            showCloseButton: true,
+            focusConfirm: false,
+            focusCancelButton: true,
+            confirmButtonText: 'Yes',
+            denyButtonText: 'No',
+
+        })
+            .then((willdelete) => {
+                if (willdelete.isConfirmed == true) {
+                    if (IsValidate()) {
+                        $('#Loader').show();
+                        var oldInstrumentId = $("#ddlEquity").val();
+                        var newInstrumentId = $("#ddlNewEquity").val();
+
+                        $.ajax({
+                            async: false,
+                            type: "POST",
+                            url: '/CorporateActions/SaveNewEquityStockDetails',
+                            dataType: 'json',
+                            data: { OldInstrumentId: oldInstrumentId, NewInstrumentId: newInstrumentId, OrderIds: orderIds },
+                            success: function (res) {
+                                $('#Loader').hide();
+                                if (res.statusCode == 200) {
+                                    NotifyMsg('success', res.message);
+                                    ////Get old and new data
+                                    GetOldNewStockDetails(oldInstrumentId, newInstrumentId);
+                                }
+                                else {
+                                    NotifyMsg('error', res.message);
+                                }
+
+                            },
+                            error: function (res) {
+                                console.log('error', response);
+                                NotifyMsg('error', res.message);
+                            }
+                        });
+
+                    }
+                }
+            });
+
+    }
+
+    function IsValidate() {
+        $("#lblNewEquity").hide();
+        $("#lblEquity").hide();
+
+        var errorCount = 0;
+        if ($("#ddlEquity").val() == "") {
+            $("#lblEquity").show();
+            errorCount++;
+        }
+        else if ($("#tblEquityStockDetails tbody tr").length == 1) {
+            if ($("#tblEquityStockDetails tbody tr td").html() == "No data found") {
+                NotifyMsg('error', "No data found.");
+                errorCount++;
+            }
+        }
+
+        if (!$("#ddlNewEquity").is(":disabled") && $("#ddlNewEquity").val() == "") {
+            $("#lblNewEquity").show();
+            errorCount++;
+        }
+        else if (!$("#ddlNewEquity").is(":disabled") && $("#tblEquityStockDetailsNew tbody tr").length == 1) {
+            if ($("#tblEquityStockDetails tbody tr td").html() == "No data found") {
+                NotifyMsg('error', "No data found.");
+                errorCount++;
+            }
+        }
+        if (errorCount > 0) {
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+
+    function RefereshStockDetailsPage() {
+        $("#ddlEquity").val("");
+        $("#ddlNewEquity").val("");
+
+        $("#tblEquityStockDetails tbody").empty();
+        $("#tblEquityStockDetails").hide();
+        $("#titlOld").hide();
+        $("#tblEquityStockDetailsNew tbody").empty();
+        $("#tblEquityStockDetailsNew").hide();
+        $("#titlNew").hide();
+
+        //$("#ddlNewEquity").attr("disabled", "disabled");
+    }
+    function GetOldNewStockDetails(oldInstrumentId, newInstrumentId) {
+        $.ajax({
+            async: false,
+            type: "POST",
+            url: '/CorporateActions/GetOldStockDetailsPage',
+            dataType: 'json',
+            data: { OldInstrumentId: oldInstrumentId, NewInstrumentId: newInstrumentId },
+            success: function (res) {
+                $('#Loader').hide();
+                if (res.statusCode == 200) {
+                    NotifyMsg('success', res.message);
+                    ////Get old and new data
+
+                }
+                else {
+                    NotifyMsg('error', res.message);
+                }
+
+            },
+            error: function (res) {
+                console.log('error', response);
+                NotifyMsg('error', res.message);
+            }
+        });
+    }
+</script>
+

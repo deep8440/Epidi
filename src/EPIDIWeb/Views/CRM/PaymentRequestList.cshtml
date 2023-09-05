@@ -1,0 +1,168 @@
+﻿@model List<PaymentRequestList>
+@{
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+    ViewBag.PageTitle = "View Payment Request List By User";
+    ViewBag.Method = "CRM";
+}
+<style>
+    .select2-container {
+        display: block;
+    }
+
+    h3 {
+        color: #dc3545 !important;
+        font-weight: bold;
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th, td {
+        text-align: left;
+        padding: 8px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+</style>
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-12">
+                        <h3>View Payment Request List By User</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-3">
+                        <button type="button" class="btn btn-info" onclick='window.location = "@Url.Action("AddDepositMoney", "CRM", new { Id = @ViewBag.Id , name = "Deposite"})";'>Add Deposit Money</button>
+                    </div>
+                    <div class="col-3">
+                        <button type="button" class="btn btn-info" onclick='window.location = "@Url.Action("AddDepositMoney", "CRM", new { Id = @ViewBag.Id , name = "Withdrawal"})";'>Add Withdrawal Money</button>
+                    </div>
+                </div>
+
+            </div>
+            <div class="card-body">
+                <table id="paymentRquestList" class="table table-bordered table-striped">
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+
+
+
+@section Scripts{
+    <script src="~/js/jquery-validation/jquery.validate.min.js"></script>
+    <script src="~/js/jquery-validation/additional-methods.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+
+    <script>
+        var id = @ViewBag.Id;
+        $(document).ready(() => {
+
+            PaymentRquestList.init();
+
+        });
+
+        var PaymentRquestList = function () {
+            let initTable1 = function () {
+                let table = $('#paymentRquestList');
+
+                let oTable = table.dataTable({
+                    "stateSave": true,
+                    "autoWidth": false,
+                    "paging": true,
+                    // Internationalisation. For more info refer to http://datatables.net/manual/i18n
+                    "language": {
+                        "aria": {
+                            "sortAscending": ": activate to sort column ascending",
+                            "sortDescending": ": activate to sort column descending"
+                        },
+                        "emptyTable": "No data available in table",
+                        "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+                        "infoEmpty": "No entries found",
+                        "infoFiltered": "(filtered1 from MAX total entries)",
+                        //"lengthMenu": "MENU entries",
+                        "search": "Search:",
+                        "zeroRecords": "No matching records found"
+                    },
+                    "pageLength": 10,
+                    "processing": true,
+                    "serverSide": true,
+                    "ajax": {
+                        async: true,
+                        url: '/CRM/GetPaymentRequestListByUserId',
+                        type: "post",
+                        data: { Id: id }
+                    },
+                    columnDefs: [{
+                        "targets": [0],
+                        "visible": false,
+                        "searchable": false
+                    }],
+                    "columns": [
+                        {
+                            "title": "Id", "data": "id", "name": "Id", "orderable": true, "width": "2%"
+                        },
+                        {
+                            "title": "Amount", "data": "amount", "orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "Status", "data": "status", "orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "UserName", "data": "userName", "orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "RequestDate", "data": "requestDate", "orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "PayoutRequestTypeName", "data": "payoutRequestTypeName", "orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "CustomerNote", "data": "customerNote", "orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "AdminNote", "data": "adminNote", "orderable": true, "width": "3%"
+                        }
+                    ],
+
+                    // setup responsive extension: http://datatables.net/extensions/responsive/
+                    responsive: true,
+
+                    "lengthMenu": [
+                        [5, 10, 15, 20, 1000],
+                        [5, 10, 15, 20, 1000] // change per page values here
+                    ],
+                    // set the initial value
+
+                    //"dom": "<'row' <'col-md-12'B>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'f>r><'table-scrollable't><'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>", // horizobtal scrollable datatable
+
+                    // Uncomment below line("dom" parameter) to fix the dropdown overflow issue in the datatable cells. The default datatable layout
+                    // setup uses scrollable div(table-scrollable) with overflow:auto to enable vertical scroll(see: assets/global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js).
+                    // So when dropdowns used the scrollable div should be removed.
+                    //"dom": "<'row' <'col-md-12'T>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'f>r>t<'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>",
+                });
+            }
+
+            return {
+                init: function () {
+                    if ($.fn.DataTable.isDataTable("#paymentRquestList")) {
+                        $('#paymentRquestList').dataTable().fnDestroy();
+                    }
+                    initTable1();
+                }
+            };
+        }();
+    </script>
+}

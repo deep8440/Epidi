@@ -1,0 +1,88 @@
+﻿@model PayoutRequest
+@{
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+}
+<style>
+    .select2-container {
+        display: block;
+    }
+
+    h3 {
+        color: #dc3545 !important;
+        font-weight: bold;
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th, td {
+        text-align: left;
+        padding: 8px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+</style>
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-12">
+                        <h3>@ViewBag.MethodName</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                @using (Html.BeginForm("AddDepositMoney", "CRM", FormMethod.Post, new { enctype = "multipart/form-data"}))
+                {
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                @Html.HiddenFor(model => model.RequestBy)
+                                @Html.HiddenFor(model => model.RequestType)
+                                @Html.HiddenFor(model => model.IsDelete)
+                                    &nbsp;
+                                    @Html.LabelFor(model => model.Amount, "Amount")
+                                    @Html.TextBoxFor(p => p.Amount, new { @class = "form-control", @placeholder = "amount" ,@name="amount"})
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                &nbsp;
+                                @Html.LabelFor(model => model.RequestStatusId, "Request Status")
+                                @Html.DropDownListFor(model => model.RequestStatusId, new SelectList(ViewBag.DropdownlistRequestStatus, "Value", "Text",      Model.RequestStatusId), "-- Select RequestStatus --", new { @class = "form-control" ,@name="RequestStatus"})
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                &nbsp;
+                                @Html.LabelFor(model => model.CustomerNote, "Customer Note")
+                                @Html.TextBoxFor(p => p.CustomerNote, new { @class = "form-control", @placeholder = "customerNote" ,@name="customerNote"})
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                &nbsp;
+                                @Html.LabelFor(model => model.AdminNote, "Admin Note")
+                                @Html.TextBoxFor(p => p.AdminNote, new { @class = "form-control", @placeholder = "adminNote" ,@name="adminNote"})
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script src="~/js/jquery-validation/jquery.validate.min.js"></script>
+    <script src="~/js/jquery-validation/additional-methods.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+ }

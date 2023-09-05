@@ -1,0 +1,28 @@
+﻿@model List<PaymentTransactionRespViewModel>
+
+@{
+	Layout = null;
+}
+<table class="table table-bordered" id="">
+	<tr>
+		<th>CustomerName</th>
+		<th>CardName</th>
+		<th>Currency</th>
+		<th>Amount</th>
+		<th>CreatedAt</th>
+	</tr>
+@if (Model != null)
+{
+		@for (int i = 0; i < Model.Count; i++)
+		{
+			<tr class="tr-row" id="">
+
+				<td>@Model[i].CustomerName</td>
+				<td>@Model[i].CardName</td>
+				<td>@Model[i].Currency</td>
+				<td>@Model[i].Amount</td>
+				<td>@Model[i].CreatedAt</td>
+			</tr>
+		}
+}
+</table>

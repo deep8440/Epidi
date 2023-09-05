@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": false,
+    "noEmitOnError": true,
+    "removeComments": false,
+    "sourceMap": true,
+    "target": "es5"
+  },
+  "CommonUrl": {
+    "ApiKey": "29f3c9d3bf3ce27ccdb49c487f4a5f6a",
+    "ApiSecret": "8b7586952708210e46d06db45240e3886e35d14607dccd778c528e51120b10b9",
+    "EventHubConnectionString": "Endpoint=sb://streaminggateio.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=bAYCAaWM2pbA2CHUunH07YPP1K/qB9RA8/kOUdba1WU=",
+    "ConnectionString": "Server=epidi-sql-server.database.windows.net;Database=Epidi_Dev;User Id=epidiadmin;Password=*aA123123;MultipleActiveResultSets=true;"
+
+  },
+  "exclude": [
+    "node_modules",
+    "wwwroot"
+  ]
+}

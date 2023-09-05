@@ -1,0 +1,237 @@
+﻿@model CommissionRuleViewModel
+@{
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+    ViewBag.PageTitle = "Add Commission Rule";
+    ViewBag.Method = "Add Commission Rule";
+
+    ViewBag.DetailName = "Commission Rule";
+    ViewBag.DetailURL = "/CommissionRule/Index";
+
+
+}
+<style>
+    .select2-container {
+        display: block;
+    }
+
+    h3 {
+        color: #dc3545 !important;
+        font-weight: bold;
+    }
+    #IsMobileView {
+        top: 10px;
+        left: 0;
+        height: 20px;
+        width: 20px;
+        background-color: #eee;
+        margin-top:10px;
+        margin-left:10px;
+    }
+
+    #IsBrokerCommission {
+        top: 10px;
+        left: 0;
+        height: 20px;
+        width: 20px;
+        background-color: #eee;
+        margin-top: 10px;
+        margin-left: 10px;
+    }
+
+</style>
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3>Add Commission Rule</h3>
+            </div>
+            @using (Html.BeginForm("SaveCommissionRule", "CommissionRule", FormMethod.Post, new { enctype = "multipart/form-data", id = "frmAddCommissionRule" }))//onsubmit = "return myFunction()"
+            {
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                @Html.HiddenFor(p => p.Id)
+                                @Html.LabelFor(model => model.Comment,"Comment")
+                                @Html.TextBoxFor(p => p.Comment, new { @class = "form-control", @placeholder = "Comment" ,@name="Comment" })
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.Priority, "Priority")
+                                @Html.TextBoxFor(p => p.Priority, new { @class = "form-control", @placeholder = "Priority" ,@name="Priority" })
+
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.TimeToApply,"TimeToApply")
+                                @Html.TextBoxFor(p => p.TimeToApply, new {@type="time",@step=2 ,@class = "form-control", @placeholder = "TimeToApply" ,@name="TimeToApply"})
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.OrderComment,"OrderComment")
+                                @Html.TextBoxFor(p => p.OrderComment, new {@class = "form-control", @placeholder = "OrderComment" ,@name="OrderComment"})
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.Leverage,"Leverage")
+                                @Html.TextBoxFor(p => p.Leverage, new {@class = "form-control", @placeholder = "Leverage" ,@name="Leverage"})
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.WhenToApplyComboId, "WhenToApplyCombo")
+                                @Html.DropDownListFor(model => model.WhenToApplyComboId, new SelectList(ViewBag.WhenToApplyCombo, "Value", "Text", Model.WhenToApplyComboId), "-- Select WhenToApplyCombo --", new { @class = "form-control js-select2" ,@name="WhenToApplyCombo" })
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.UnitsTypeId, "Chargeble Units")
+                                @Html.DropDownListFor(p => p.UnitsTypeId, new SelectList(ViewBag.UnitsType, "Value", "Text", Model.UnitsTypeId), "-- Select Chargeble Units --", new { @class = "form-control js-select2" ,@name="UnitsType" })
+                            </div>
+                        </div>
+                         <div class="col-6">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.WhereToApplyId, "WhereToApplyId")
+                                @Html.DropDownListFor(model => model.WhereToApplyId, new SelectList(ViewBag.WhereToApplyId, "Value", "Text", Model.WhereToApplyId), "-- Select WhereToApplyId --", new { @class = "form-control js-select2" ,@name="WhereToApplyId" })
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.PercentageValue, "PercentageValue")
+                                @Html.TextBoxFor(p => p.PercentageValue, new {@class = "form-control", @placeholder = "PercentageValue" ,@name="PercentageValue"})
+                            </div>
+                        </div>
+                        <div class="col-6" id="divUploadFile">
+                            <label id="lblRule" class="custom-file-label" style="text-align:left" for="file">Choose File</label>
+                            <div class="custom-file form-group float-sm-left mr-3" style="width:230px">
+                                <input type="file" id="FileUpload" name="FileUpload" class="custom-file-input">
+                                
+                            </div>
+                        </div>
+                        <div class="col-6">
+                                <div class="form-group">
+                                
+                                @Html.CheckBoxFor(p => p.IsMobileView, new {@name="IsMobileView", value="false"})
+                                @Html.LabelFor(model => model.IsMobileView, " IsMobileView")
+                                </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+
+                                @Html.CheckBoxFor(p => p.IsBrokerCommission, new {@name="IsBrokerCommission", value="false"})
+                                @Html.LabelFor(model => model.IsBrokerCommission, " IsBrokerCommission")
+                            </div>
+                        </div>
+                        <br>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script>
+        $(document).ready(() => {
+            debugger ;
+            $('#FileUpload').on('change', function (e) {
+                //get the file name
+                var fileName = e.target.files[0].name;
+                $(this).next('.custom-file-label').html(fileName);
+            });
+
+            $("#IsMobileView").on('change', function () {
+                if ($(this).is(':checked')) {
+                    $(this).attr('value', 'true');
+                } else {
+                    $(this).attr('value', 'false');
+                }
+            });
+
+            $("#IsBrokerCommission").on('change', function () {
+                if ($(this).is(':checked')) {
+                    $(this).attr('value', 'true');
+                } else {
+                    $(this).attr('value', 'false');
+                }
+            });
+
+
+            $(document).on("submit", "#frmAddCommissionRule", function (e) {
+                e.preventDefault();
+                CommissionRuleValidation();
+                var form = $(this);
+                $("#Loader").show();
+                form.ajaxSubmit({
+                    beforeSubmit: function () {
+                        if (!form.valid()) {
+                            $("#Loader").hide();
+                            return false;
+                          
+                        }
+                        else {
+                            return true;
+                        }
+                    },
+                    success: function (res) {
+                        debugger;
+                        if (res.statusCode) {
+                            $('#FileUpload').val('');
+                            $('#lblRule').html('Choose File')
+                            $("#Loader").hide();
+                            NotifyMsg('success', res.message);
+                            //$('#Id').val(res.response.id);
+                            //$('#divRuleCondition').show();
+                            //$('#divUploadFile').hide();
+                            //setTimeout(function () {
+                            //    NotifyMsg('success', res.message);
+                            //}, 2000);
+                            window.location.href = "/CommissionRule/Edit?Id=" + res.data;
+                        } else {
+                            NotifyMsg('error', res.message);
+                            $("#Loader").hide();
+                        }
+                    },
+                    Errors: function () {
+                        $("#Loader").hide();
+                        console.log('error', res.message);
+                        NotifyMsg('error', res.message);
+                    }
+                });
+                return false;
+            });
+           
+            function CommissionRuleValidation() {
+                $('#frmAddCommissionRule').validate({
+                    rules: {
+                        TimeToApply: { step: false },
+                        Comment: {required: true},
+
+                    },
+                    messages: {
+                        Comment: "Please Enter Comment"
+                    },
+                    errorElement: 'span',
+                    errorPlacement: function (error, element) {
+                        error.addClass('invalid-feedback');
+                        element.closest('.form-group').append(error);
+                    },
+                    highlight: function (element, errorClass, validClass) {
+                        $(element).addClass('is-invalid');
+                    },
+                    unhighlight: function (element, errorClass, validClass) {
+                        $(element).removeClass('is-invalid');
+                    }
+                });
+            }
+
+        });
+    </script>
+}

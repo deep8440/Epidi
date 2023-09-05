@@ -1,0 +1,65 @@
+﻿@model Epidi.Models.ViewModel.Steps.StepsViewModel;
+@{
+    Layout = null;
+}
+
+@using (Html.BeginForm("SaveStep", "Step", FormMethod.Post, new { id = "StepForm" }))
+{
+    <div class="row">
+        <div class="col-12">
+            <div class="form-group">
+                @Html.HiddenFor(p => p.Id)
+                @Html.LabelFor(model => model.Title,"Title")
+                @Html.TextBoxFor(p => p.Title, new { @class = "form-control", @placeholder = "Title" ,@name="Title" })
+
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.CountryId, "CountryName")
+                @Html.DropDownListFor(model => model.CountryId, new SelectList(ViewBag.CountryList, "Value", "Text", Model.CountryId), "-- Select Country --", new { @class = "form-control" ,@name="CountryName" })
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.Priority,"Priority")
+                @Html.TextBoxFor(p => p.Priority, new { @class = "form-control", @placeholder = "Priority" ,@name="Priority" })
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.PageSize,"Page Size")
+                @Html.TextBoxFor(p => p.PageSize, new { @class = "form-control", @placeholder = "Page Size" ,@name="PageSize" })
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.EstimateTime,"Estimate Time")
+                @Html.TextBoxFor(p => p.EstimateTime, new { @class = "form-control", @placeholder = "Estimate Time" ,@name="EstimateTime" })
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.FooterTitle,"Footer Title")
+                @Html.TextBoxFor(p => p.FooterTitle, new { @class = "form-control", @placeholder = "FooterTitle" ,@name="FooterTitle" })
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.FooterDescription,"Footer Description")
+                @Html.TextBoxFor(p => p.FooterDescription, new { @class = "form-control", @placeholder = "FooterDescription" ,@name="FooterDescription" })
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="form-check form-check-inline">
+                @Html.CheckBoxFor(model => model.IsTermsAndConditions, new { @class="form-check-input"})
+                @Html.LabelFor(model => model.IsTermsAndConditions,"Is Terms and Conditions?",new { @class="form-check-label text-bold"})
+                
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+}

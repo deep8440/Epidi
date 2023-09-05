@@ -1,0 +1,287 @@
+﻿@{
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+    ViewBag.PageTitle = "Terms and Condition";
+    ViewBag.Method = "Terms and Condition";
+}
+<style>
+    .select2-container {
+        display: inline-block;
+    }
+</style>
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="col-12">
+                    <button id="btnAddTCs" type="button" class="btn btn-outline-primary btn-uppercase float-right">
+                        <i class="ti-plus mr-2"></i> Add T & Cs
+                    </button>
+                </div>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+                <table id="tblTCList" class="table table-bordered table-striped">
+                </table>
+            </div>
+            <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+    </div>
+    <!-- /.col -->
+</div>
+<div class="modal fade" id="frmModelTermsCondition">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                </div>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.9/summernote.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.9/summernote.js"></script>
+    <script src="~/js/summernote/summernote.js"></script>
+    <script src="~/js/summernote/summernote.min.js"></script>
+
+    <script>
+        $(document).ready(() => {
+            GetTermsConditionListData("");          
+            $("body").on("click", "#btnAddTCs", function () {
+                //$("#frmModelTermsCondition").modal("show");
+                AddModal("/TermsCondition/AddTermsCondition", "Add New Terms & Condition");
+                let summernoteOptions = {
+                    height: 100
+                }                
+                $('#TermsConditionText').summernote(summernoteOptions);
+            });
+            $(document).on('click', '#change', function () {
+                summernoteOptions.height = 100;
+                let content = $('#TermsConditionText').summernote('code');
+                $('#TermsConditionText').summernote('destroy');
+                $('#TermsConditionText').summernote(summernoteOptions);
+                $('#TermsConditionText').summernote('code', content);
+            });
+            $("body").on("submit", "#termsconditionForm", function (e) {
+                if (!isFileUpload) {
+                    Toast.fire({
+                        icon: 'error',
+                        title: "please import the file."
+                    });
+                    return false;
+                }
+                e.preventDefault();
+                Validation();
+                var form = $(this);
+                form.ajaxSubmit({
+                    beforeSubmit: function () {
+                        if (!form.valid ()) {
+                           return false;
+                         }
+                         else {
+                            return true;
+                        }
+                    },
+                    success: function (res) {
+                        if (res.code == 200) {
+                            $("#frmModel").modal('hide');
+                            $("#termsconditionForm").resetForm();
+                            GetTermsConditionListData("");
+                            Toast.fire({
+                                icon: 'success',
+                                title: " " + res.message
+                            })
+                        } else {
+                            //$("#Loader").hide();
+                            Toast.fire({
+                                icon: 'error',
+                                title: " " + res.message
+                            })
+                        }
+                    },
+                    Errors: function () {
+                        //$("#Loader").hide();
+                        Toast.fire({
+                            icon: 'error',
+                            title: " " + res[0].message
+                        })
+                    }
+                });
+                return false;
+            });
+        });
+
+
+        function Validation() {
+            $('#termsconditionForm').validate({
+                rules: {
+                    CountryName: {
+                        required: true
+                    },
+                    CountryId: {
+                        required: true
+                    },
+                    TermsConditionText:
+                    {
+                        required: true
+                    },
+                    Title:
+                    {
+                        required: true
+                    }
+                },
+                messages: {
+                    CountryName: {
+                        required: "Please enter Countryname"
+                    },
+                    CountryId: {
+                        required: "Please enter Countryname"
+                    },
+                    TermsConditionText: {
+                        required: "Please enter TermsConditionText"
+                    },
+                    Title: {
+                        required: "Please enter Title"
+                    },
+                },
+                errorElement: 'span',
+                errorPlacement: function (error, element) {
+                    error.addClass('invalid-feedback');
+                    element.closest('.form-group').append(error);
+                },
+                highlight: function (element, errorClass, validClass) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function (element, errorClass, validClass) {
+                    $(element).removeClass('is-invalid');
+                }
+            });
+        }
+
+        function GetTermsConditionListData(Name) {
+            $('#tblTCList').DataTable(
+                {
+                    ajax: {
+                        url: "/TermsCondition/TermsCondition_All",
+                        type: "post",
+                        data: { Name: Name }
+                    },
+                    "language": {
+                        "aria": {
+                            "sortAscending": ": activate to sort column ascending",
+                            "sortDescending": ": activate to sort column descending"
+                        },
+                        "emptyTable": "No data available in table",
+                        "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+                        "infoEmpty": "No entries found",
+                        "infoFiltered": "(filtered1 from MAX total entries)",
+                        //"lengthMenu": "MENU entries",
+                        "search": "Search:",
+                        "zeroRecords": "No matching records found"
+                    },
+                    destroy: true,
+                    autoWidth: false,
+                    paging: true,
+                    pageLength: 10,
+                    processing: true,
+                    serverSide: true,
+                    filter: true,
+                    columnDefs: [{
+                        //"targets": [0],
+                        "visible": false,
+                        "searchable": false
+                    }],
+                    columns: [                       
+                        {
+                            "title": "Id", "data": "id", "name": "Id", "orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "Title", "data": "title", "name": "title", "orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "Terms & Condition", "data": "TermsConditionText", "name": "TermsConditionText",
+                            "render": function (data, type, row) {
+                               
+                                var str = removeTags(row.termsConditionText);
+
+                                return str.length > 70 ? '<span data-toggle="tooltip" title= \"' + str + '\">' + str.substr(0, 70) + '...</span>' : str;
+                            },
+                            "orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "CountryName", "data": "countryName", "name": "countryName", "orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "AutoFill", "data": "autoFill", "name": "autoFill",  "orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "Action", "data": "Id",
+                            "render": function (data, type, row) {
+                                var html = "<div class='btn-group dropleft'>";
+                                html += "<a class='btn btn-success mr-1' href='javascript:void(0);' onclick='edit(this);' data-uri='/TermsCondition/Edit?Id=" + row.id + "' ><i class='fa fa-edit'></i></a>";
+                                html += "<a class='btn btn-danger edt-dlt mr-1' href='javascript:void(0);' data-uri='/TermsCondition/DeleteTermsCondition?Id=" + row.id + "' ><i class='fa fa-trash'></i></a>";
+                                html += "</div>";
+                                return html;
+                            }
+                            , "orderable": false, "width": "3%"
+                        },
+                    ]
+                }
+            );
+        }
+        function removeTags(str) {
+            if ((str === null) || (str === ''))
+                return false;
+            else
+                str = str.toString();
+
+            // Regular expression to identify HTML tags in
+            // the input string. Replacing the identified
+            // HTML tag with a null string.
+            return str.replace(/(<([^>]+)>)/ig, '');
+        }
+        function AddTermsConditionModal(url, title) {
+            
+            $.ajax({
+                url: url,
+                Type: 'get',
+                dataType: 'html',
+                success: function (result) {
+                    if (result != "undefined") {
+                        $("#frmModelTermsCondition .modal-body").html(result);
+                        $("#frmModelTermsCondition .modal-title").text(title);
+                      }
+                },
+                error: function (result) {
+                    alert("Error");
+                }
+            });
+        }
+
+        function edit(obj) {
+            debugger
+                 var uri = $(obj).attr('data-uri');
+            var header = $(obj).closest('table').attr('edit-header');
+            $.get(uri, { async: false }, function (data) {
+                $("#frmModel .modal-body").html(data);
+                $("#frmModel .modal-title").html(header);
+               
+                $("#frmModel").modal('show');
+                
+                let summernoteOptions = {
+                    height: 100
+                }
+                $('#TermsConditionText').summernote(summernoteOptions);
+                 }).fail(function () {
+                //NotifyMsg("getting errors", "warning");
+
+            });          
+        }
+    </script>
+}

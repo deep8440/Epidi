@@ -1,0 +1,32 @@
+﻿@model List<SelectListItem>
+@{
+    Layout = null;
+}
+<div class="row">
+    <div class="col-6">
+        <div class="form-group">
+            <label>From Country</label>
+            @Html.DropDownList("ddlFromCountry", Model)
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-6">
+        <div class="form-group">
+            <label>Steps</label><br />
+            @Html.DropDownList("ddlSteps", (IEnumerable<SelectListItem>)ViewBag.StepsList, new { style = "width: 100%;" })
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-6">
+        <div class="form-group">
+            <label>To Country</label>
+            @Html.DropDownList("ddlToCountry", (IEnumerable<SelectListItem>)ViewBag.CountryList)
+        </div>
+    </div>
+</div>
+
+<div class="modal-footer">
+    <button onclick="SaveStepCopyClick();" class="btn btn-primary">Save</button>
+</div>

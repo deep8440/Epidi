@@ -1,0 +1,27 @@
+﻿@model RuleInstrumentViewModel
+@{
+    Layout = null;
+}
+@using (Html.BeginForm("SaveRuleInstrument", "RuleInstrument", FormMethod.Post, new { id = "ruleInstrumentForm" }))
+{
+    <div id="CommitionDetails">
+        <div class="row">
+            <div class="col-12">
+                <div class="form-group">
+                    @Html.HiddenFor(model => model.Id)
+                    @Html.LabelFor(model => model.QuoteMarkUpRuleName, "Quote MarkUp Rule")
+                    @Html.DropDownListFor(model => model.RuleId, new SelectList(ViewBag.MarkUpRuleDropDown, "Value", "Text", Model.RuleId), "-- Select Rule --", new { @class = "form-control" ,@name="QuoteMarkUpRuleName" })
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.InstrumentId, "Instrument")
+                    @Html.DropDownListFor(model => model.InstrumentId, new SelectList(ViewBag.InstrumentList, "Value", "Text", Model.InstrumentId), "-- Select Instrument --", new { @name="InstrumentIds", @multiple = "multiple" })
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+}

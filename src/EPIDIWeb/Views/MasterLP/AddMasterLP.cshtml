@@ -1,0 +1,89 @@
+﻿@model MasterLPViewModel
+@{
+    Layout = null;
+}
+@using (Html.BeginForm("SaveMasterLP", "MasterLP", FormMethod.Post, new { id = "masterLPForm" }))
+{
+    <div id="CommitionDetails">
+        <div class="row">
+            <div class="col-12">
+                <div class="form-group">
+                    @Html.HiddenFor(model => model.Id)
+                    @Html.LabelFor(model => model.Name, "Name")
+                    @Html.TextBoxFor(p => p.Name, new { @class = "form-control", @placeholder = "Name" ,@name="Name"})
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.HealthCheckURL , "Health Check URL")
+                    @Html.TextBoxFor(model => model.HealthCheckURL, new { @class = "form-control" , @placeholder = "Health Check URL" ,@name="HealthCheckURL"})
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.LastHealthCheckTime , "Last Health Check Time")
+                    @*@Html.TextBoxFor(p => p.LastHealthCheckTime,"HH:mm", new { @class = "form-control", @name="EndTime"})*@
+                    @Html.EditorFor(model => model.LastHealthCheckTime,new{ htmlAttributes = new { @class = "form-control"}})
+                    @*@Html.TextBoxFor(m => m.LastHealthCheckTime, new Dictionary<string, object> { { "data-val", false }, { "class", "form-control Sche-ToDate" } })*@
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Username , "Username")
+                    @*@Html.TextBoxFor(p => p.LastHealthCheckTime,"HH:mm", new { @class = "form-control", @name="EndTime"})*@
+                    @Html.EditorFor(model => model.Username, new{ htmlAttributes = new { @class = "form-control"}})
+                    @*@Html.TextBoxFor(m => m.LastHealthCheckTime, new Dictionary<string, object> { { "data-val", false }, { "class", "form-control Sche-ToDate" } })*@
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Password , "Password")
+                    @*@Html.TextBoxFor(p => p.LastHealthCheckTime,"HH:mm", new { @class = "form-control", @name="EndTime"})*@
+                    @Html.PasswordFor(model => model.Password, new { @class = "form-control"})
+                    @*@Html.TextBoxFor(m => m.LastHealthCheckTime, new Dictionary<string, object> { { "data-val", false }, { "class", "form-control Sche-ToDate" } })*@
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.DNS , "DNS")
+                    @*@Html.TextBoxFor(p => p.LastHealthCheckTime,"HH:mm", new { @class = "form-control", @name="EndTime"})*@
+                    @Html.EditorFor(model => model.DNS, new{ htmlAttributes = new { @class = "form-control"}})
+                    @*@Html.TextBoxFor(m => m.LastHealthCheckTime, new Dictionary<string, object> { { "data-val", false }, { "class", "form-control Sche-ToDate" } })*@
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.APIKey , "API Key")
+                    @*@Html.TextBoxFor(p => p.LastHealthCheckTime,"HH:mm", new { @class = "form-control", @name="EndTime"})*@
+                    @Html.EditorFor(model => model.APIKey, new{ htmlAttributes = new { @class = "form-control"}})
+                    @*@Html.TextBoxFor(m => m.LastHealthCheckTime, new Dictionary<string, object> { { "data-val", false }, { "class", "form-control Sche-ToDate" } })*@
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.IsActive, "Is Active")
+                    @Html.CheckBoxFor(p => p.IsActive)
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.IsDown, "Is Down")
+                    @Html.CheckBoxFor(p => p.IsDown)
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+}
+<script>
+    jQuery('#LastHealthCheckTime').datetimepicker({
+        format:'DD/MM/YYYY HH:mm:ss',
+        minDate: getFormattedDate(new Date())
+    });
+</script>

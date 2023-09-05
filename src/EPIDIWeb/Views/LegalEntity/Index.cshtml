@@ -1,0 +1,267 @@
+﻿@{
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+    ViewBag.PageTitle = "Instruments";
+    ViewBag.Method = "Instruments";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+               @* <h3 class="card-title">Legal Entity</h3>*@
+            </div>
+
+            <div class="col-12" style="padding: 0.75rem 1.25rem 0rem;">
+                <button id="btnAddleg" type="button" class="btn btn-outline-primary btn-uppercase float-right">
+                    @*btn-outline-primary*@
+                    <i class="ti-plus mr-2"></i> Add LegalEntity
+                </button>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+                <table id="legalentityList" class="table table-bordered table-striped">
+                </table>
+            </div>
+            <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+    </div>
+</div>
+<div class="modal entitymodal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Legal Entity</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label>Name</label>
+                        <input type="hidden" value="" id="entityid" />
+                        <input type="text" class="form-control" id="name" />
+                    </div><br />
+                    <div class="col-md-6 form-group">
+                        <label>Phone</label>
+                        <input type="tel" id="phone" class="form-control" />
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label>EMail</label>
+                        <input type="email" id="email" class="form-control" />
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label>Address</label>
+                        <textarea id="address" class="form-control"></textarea>
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label>Country</label>
+                        <select id="ddlcountry" class="form-control"></select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="InsertEntity();">Save</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        $(document).ready(() => {
+
+            LegalEntityDataTable.init();
+            BindCountries();
+            $('#btnAddleg').click(function () {
+                $('.entitymodal').modal('show');
+            });
+        });
+        var LegalEntityDataTable = function (Name) {
+            debugger 
+            let initTable1 = function () {
+                let table = $('#legalentityList');
+
+                let oTable = table.dataTable({
+                    //"columnDefs": [{
+                    //    "visible": false,
+                    //    "className": 'select-checkbox',
+                    //    "targets": 3
+                    //}],
+                    //"select": {
+                    //    "style": 'os',
+                    //    "selector": 'td:first-child'
+                    //},
+                    //"order": [[1, 'asc']],
+                    "stateSave": true,
+                    "autoWidth": false,
+                    "paging": true,
+
+                    // Internationalisation. For more info refer to http://datatables.net/manual/i18n
+                    "language": {
+                        "aria": {
+                            "sortAscending": ": activate to sort column ascending",
+                            "sortDescending": ": activate to sort column descending"
+                        },
+                        "emptyTable": "No data available in table",
+                        "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+                        "infoEmpty": "No entries found",
+                        "infoFiltered": "(filtered1 from MAX total entries)",
+                        //"lengthMenu": "MENU entries",
+                        "search": "Search:",
+                        "zeroRecords": "No matching records found"
+                    },
+                   "destroy": true,
+                   "autoWidth": false,
+                   "pageLength": 10,
+                   "processing": true,
+                   "serverSide": true,
+                   "filter": true,
+                    "ajax": {
+                        async: true,
+                        url: '/LegalEntity/GetLegalEntity_All',
+                        type: "POST",
+                        data: {Name:Name}
+                    },
+                    "columns": [
+                        {
+                            "title": "Id", "data": "id", "name": "id", "visible": true ,"width": "3%"
+,                        },
+                        {
+                            "title": "Name", "data": "name","name":"name", "orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "Phone", "data": "phone","name":"phone", "orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "Email", "data": "email","name":"email", "orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "Address", "data": "address","name":"address", "orderable": true, visible: false, "width": "3%"
+                        },
+                        {
+                            "title": "Country", "data": "country","name":"country", "orderable": true, "width": "3%"
+                        },
+                        {
+                            "title": "Action", "data": "id",
+                            "render": function (data, type, row) {
+                                let htmlData = "";
+
+                                htmlData += `<button title="Edit Entity" class="btn btn-sm btn-success mr-1" onclick="EditEntity($(this));"><i class="fa fa-edit"></i></button>`;
+
+                                //htmlData += `<button title="Delete Entity" class="btn btn-sm btn-danger mr-1" onclick="DeleteEntity($(this));"><i class="fa fa-trash"></i></button>`;
+                                htmlData += '<input type="hidden" value=' + row['id'] + ' />'
+
+                                 htmlData += "<a class='btn btn-danger edt-dlt mr-1' href='javascript:void(0);' data-uri='/LegalEntity/DeleteEntity?Id=" + row.id + "' ><i class='fa fa-trash'></i></a>";
+   
+                              //  htmlData += `<button title="Delete Entity" class="btn btn-sm btn-danger mr-1"  onclick="DeleteEntity($(this));"><i class="fa fa-trash"></i></button>`;
+
+                                //htmlData += `<button title="Edit Entity" class="btn btn-sm btn-success mr-1" onclick="EditEntity($(this));"><i class="fa fa-edit"></i></button>`;
+
+                                return htmlData;
+                            }
+                            , "orderable": false, "width": "3%"
+                        },
+                    ],
+
+                    // setup responsive extension: http://datatables.net/extensions/responsive/
+                    responsive: true,
+
+                    "lengthMenu": [
+                        [5, 10, 15, 20, 1000],
+                        [5, 10, 15, 20, 1000] // change per page values here
+                    ],
+                    // set the initial value
+
+                    //"dom": "<'row' <'col-md-12'B>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'f>r><'table-scrollable't><'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>", // horizobtal scrollable datatable
+
+                    // Uncomment below line("dom" parameter) to fix the dropdown overflow issue in the datatable cells. The default datatable layout
+                    // setup uses scrollable div(table-scrollable) with overflow:auto to enable vertical scroll(see: assets/global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js).
+                    // So when dropdowns used the scrollable div should be removed.
+                    //"dom": "<'row' <'col-md-12'T>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'f>r>t<'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>",
+                });
+
+            }
+
+            return {
+                init: function () {
+                    debugger
+                    if ($.fn.DataTable.isDataTable("#legalentityList")) {
+                        $('#legalentityList').dataTable().fnDestroy();
+                        //$('#divUserTable').html('<table class="table table-striped" width="100%" id="UserTable"></table>');
+                    }
+                    initTable1();
+                }
+            };
+        }();
+        function BindCountries() {
+            $.ajax({
+                type: "POST",
+                url: '/LegalEntity/Country_All',
+                data: {},
+                success: function (data) {
+                    debugger;
+                    $.each(data.item1, function (i, arr) {
+                        var opt = new Option(arr.countryName, arr.countryId);
+                        $('#ddlcountry').append(opt);
+                    });
+                }
+            });
+        }
+        function InsertEntity() {
+            var obj = {
+                Id: $('#entityid').val(),
+                Name: $('#name').val(),
+                Phone: $('#phone').val(),
+                Email: $('#email').val(),
+                Address: $('#address').val(),
+                Country: $('#ddlcountry').val()
+            };
+            $.ajax({
+                type: "POST",
+                url: '/LegalEntity/AddEntity',
+                data: { obj },
+                success: function (res) {
+                    if (res.code != 200) {
+                        NotifyMsg('error', res.message);
+                    } else {
+                        $('.entitymodal').modal('hide');
+                        alert('Data Saved !!');
+                        LegalEntityDataTable.init();
+                    }
+                },
+                Errors: function (res) {
+                    console.log('error', res.message);
+                    NotifyMsg('error', res.message);
+                }
+            });
+        }
+        function EditEntity(obj) {
+            debugger;
+            $('#entityid').val($(obj).closest('tr').find('input[type="hidden"]').val());
+            $('#name').val($(obj).closest('tr').find('td:eq(1)').html());
+            $('#phone').val($(obj).closest('tr').find('td:eq(2)').html());
+            $('#email').val($(obj).closest('tr').find('td:eq(3)').html());
+            $('#ddlcountry').val($(obj).closest('tr').find('td:eq(4)').html());
+            $('#address').val($(obj).closest('tr').find('td:eq(4)').html());
+            $('.entitymodal').modal('show');
+        }
+        //function DeleteEntity(obj) {
+        //    var id = $(obj).closest('tr').find('input[type="hidden"]');
+        //    if (confirm('Are you sure you want to delete this record?')) {
+        //        $.ajax({
+        //            type: "POST",
+        //            async: false,
+        //            url: '/LegalEntity/DeleteEntity',
+        //            data: id,
+        //            success: function (data) {
+        //                LegalEntityDataTable.init();
+        //                alert('Record Deleted !!');
+        //            }
+        //        });
+        //    }
+        //}
+    </script>
+}

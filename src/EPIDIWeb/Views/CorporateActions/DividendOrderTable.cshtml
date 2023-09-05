@@ -1,0 +1,116 @@
+﻿@using HtmlHelpers.BeginCollectionItemCore;
+
+@model DividendOrdersViewModel
+@{
+    Layout = null;
+    Guid guid = Guid.NewGuid();
+}
+<tr class="tr-row" id="@guid">
+    @using (Html.BeginCollectionItem("response"))
+    {
+        <td>
+            <div class="form-group" style="width:100px">
+                @Model.ClientId
+            </div>
+
+        </td>
+        <td>
+            <div class="form-group" style="width:100px">
+                @Model.TradingAccount
+            </div>
+
+        </td>
+        <td>
+            <div class="form-group" style="width:100px">
+                @Model.OrderId
+            </div>
+
+        </td>
+        <td>
+            <div class="form-group" style="width:100px">
+                @Model.SideName
+            </div>
+           
+        </td>
+        <td>
+            <div class="form-group" style="width:100px">
+                @Model.EquityName
+
+            </div>
+           
+        </td>
+        <td>
+            <div class="form-group" style="width:100px">
+                @Model.OpenDateTiming
+            </div>
+           
+
+        </td>
+        <td>
+            <div class="form-group" style="width:200px">
+                @Model.LegalEntity
+            </div>
+            
+
+        </td>
+        <td>
+            <div class="form-group" style="width:100px">
+               @Model.Leverage
+            </div>
+            
+        </td>
+        <td>
+             <div class="form-group" style="width:100px">
+                @Model.OpenUnits
+            </div>
+            
+        </td>
+        <td>
+            <div class="form-group" style="width:100px">
+                @Model.OpenPrice
+            </div>
+            
+        </td>
+        <td>
+            <div class="form-group" style="width:100px">
+                @Model.DividendPerUnitSell
+            </div>
+            
+        </td>
+        <td>
+            <div class="form-group" style="width:100px">
+                @Model.DividendPerUnitBuyLeverageGreaterThen1
+            </div>
+            
+        </td>
+        <td>
+            <div class="form-group" style="width:100px">
+                @Model.DividendPerUnitBuyLeverageEqualTo1
+            </div>
+           
+        </td>
+        <td>
+            <div class="form-group" style="width:200px">
+                @Model.ExDividendDate
+            </div>
+            
+        </td>
+        <td>
+            <div class="form-group" style="width:100px">
+                 @Model.DividendInteger
+            </div>
+           
+        </td>
+        <td>
+            <div class="form-group" style="width:100px">
+                @Model.DividendDecimal
+            </div>
+            
+        </td>
+        <td>
+            <div class="form-group" style="width:100px">
+                @Model.DividendTotal
+            </div>
+        </td>
+    }
+</tr>

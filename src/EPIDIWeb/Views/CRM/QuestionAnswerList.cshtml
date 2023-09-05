@@ -1,0 +1,357 @@
+﻿@model List<QuestionAnswerList>
+@{
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+    ViewBag.PageTitle = "View Question Answer List By User";
+    ViewBag.Method = "CRM";
+}
+<style>
+    .select2-container {
+        display: block;
+    }
+
+    h3 {
+        color: #dc3545 !important;
+        font-weight: bold;
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th, td {
+        text-align: left;
+        padding: 8px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+</style>
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-12">
+                        <h3>View Question Answer List</h3>
+                    </div>
+                </div>
+            </div>
+            @*				<div class="card-body">
+            <div class="row">
+            <div class="col-3">
+            <button type="button" class="btn btn-info" onclick='window.location = "@Url.Action("AddDepositMoney", "CRM", new { Id = @ViewBag.Id , name = "Deposite"})";'>Add Deposit Money</button>
+            </div>
+            <div class="col-3">
+            <button type="button" class="btn btn-info" onclick='window.location = "@Url.Action("AddDepositMoney", "CRM", new { Id = @ViewBag.Id , name = "Withdrawal"})";'>Add Withdrawal Money</button>
+            </div>
+            </div>
+
+            </div>*@
+        </div>
+    </div>
+</div>
+
+<div class="table-responsive">
+
+    <table class="table text-left">
+        <thead class="table table-striped">
+            <tr>
+                <th scope="col">QuestionInfo</th>
+                <th scope="col">QuesDesc</th>
+                <th scope="col">AnswerDesc</th>
+                <th scope="col">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                var strAnswerIds = string.Empty;
+                if (@item.AnswerId != null && @item.AnswerId.Contains(","))
+                {
+                    strAnswerIds = @item.AnswerId.Replace(",", "|");
+                }
+                else
+                {
+                    strAnswerIds = @item.AnswerId;
+                }
+                <tr>
+                    <td class="td-questioninfo">@item.QuestionInfo</td>
+                    <td class="td-questiondesc">@item.QuesDesc</td>
+                    <td class="td-answerdesc">@item.AnswerDesc</td>
+                    <td><a href="javascript:;" class="btn btn-primary" onclick="fnEditQuestionAnswer(this,@item.Id,'@item.AnsTypeName',@item.questionId,'@strAnswerIds')">Edit</a></td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <!-- The Modal -->
+    <div class="modal" id="mdlQuestionAnswer">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Question & Answer</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                @using (Html.BeginForm("UpdateAnswer", "CRM", FormMethod.Post, new { id = "frmUpdateAnswer", enctype = "multipart/form-data" }))
+                {
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <input type="hidden" id="hdnQuestionAnswerId" name="Id" />
+                        <input type="hidden" id="hdnUserId" name="UserId" value="@ViewBag.Id" />
+                        <div id="dvQuestionAnswerHtml">
+                        </div>
+                    </div>
+
+                    <!-- Modal footer -->
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+    <script src="~/js/jquery-validation/jquery.validate.min.js"></script>
+    <script src="~/js/jquery-validation/additional-methods.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+    <script src="~/js/rule_lp_priority.js"></script>
+
+    <script>
+
+        $(document).ready(() => {
+
+            $(document).on("submit", "#frmUpdateAnswer", function (e) {
+
+                debugger;
+                e.preventDefault();
+                AnswerValidation();
+
+                var form = $(this);
+                form.ajaxSubmit({
+                    beforeSubmit: function () {
+                        if (!form.valid()) {
+
+                            return false;
+                        }
+                        else {
+
+                            return true;
+                        }
+                    },
+                    success: function (res) {
+                        debugger;
+                        if (res.code == 200) {
+                            $("#mdlQuestionAnswer").modal('hide');
+                            $("#frmUpdateAnswer").resetForm();
+
+                            window.location.href = "/CRM/ViewQuestionAnswerListByUser?UserId=" + $("#hdnUserId").val()
+
+                            setTimeout(Toast.fire({
+                                icon: 'success',
+                                title: " " + res.message
+                            }), 3000);
+
+
+                        } else {
+                            //$("#Loader").hide();
+                            Toast.fire({
+                                icon: 'error',
+                                title: " " + res.message
+                            })
+                        }
+                    },
+                    Errors: function () {
+                        //$("#Loader").hide();
+                        Toast.fire({
+                            icon: 'error',
+                            title: " " + res.message
+                        })
+                    }
+                });
+                return false;
+            });
+
+
+        });
+        function fnEditQuestionAnswer(obj, id, anstypename, questionId, answerId) {
+            $("#hdnQuestionAnswerId").val(id);
+
+            var htmlContent = '';
+            if (anstypename == "TEXTBOX") {
+                htmlContent += '<div class="form-group">';
+                htmlContent += '<label for="txtQuestionAnwser" id="lblQuestion">' + $(obj).parent().parent().find(".td-questiondesc").html() + '</label>';
+                htmlContent += '<input type="textbox" class="form-control" name="AnswerDesc" placeholder="Enter answer" id="txtQuestionAnwser" value="' + $(obj).parent().parent().find(".td-answerdesc").html() + '">';
+                htmlContent += '</div>';
+                $("#dvQuestionAnswerHtml").html(htmlContent);
+                $("#mdlQuestionAnswer").modal("show");
+            }
+            else if (anstypename == "DROPDOWN") {
+                htmlContent += '<div class="form-group">';
+                htmlContent += '<label for="selQuestionAnwser" id="lblQuestion">' + $(obj).parent().parent().find(".td-questiondesc").html() + '</label>';
+                htmlContent += '<input type="hidden" name="AnswerDesc" id="hdnAnwserDesc" value="' + $(obj).parent().parent().find(".td-answerdesc").html() + '">';
+                htmlContent += '<select id="selAnswerList" name="AnswerId" class="form-control form-select" onchange="fnChangeAnswer(this);" style="border:1px solid;"></select>';
+                htmlContent += '</div>';
+                $("#dvQuestionAnswerHtml").html(htmlContent);
+                $("#mdlQuestionAnswer").modal("show");
+                getAnswerByQuestionId(anstypename, questionId, answerId);
+            }
+            else if (anstypename == "CHECKBOX") {
+                htmlContent += '<div class="form-group">';
+                htmlContent += '<input type="hidden" name="AnswerId" id="hdnAnswerId" value="' + answerId + '">';
+                htmlContent += '<label for="QuestionAnwser" id="lblQuestion">' + $(obj).parent().parent().find(".td-questiondesc").html() + '</label>';
+                htmlContent += '<div id="dvCheckboxes">';
+                htmlContent += '</div>';
+                htmlContent += '</div>';
+
+                $("#dvQuestionAnswerHtml").html(htmlContent);
+                $("#mdlQuestionAnswer").modal("show");
+                getAnswerByQuestionId(anstypename, questionId, answerId);
+                getGetAnswerByAnswerId(answerId, anstypename);
+            }
+            else if (anstypename == "RADIO") {
+                htmlContent += '<div class="form-group">';
+                htmlContent += '<input type="hidden" name="AnswerId" id="hdnAnswerId" value="' + answerId + '">';
+                htmlContent += '<label for="QuestionAnwser" id="lblQuestion">' + $(obj).parent().parent().find(".td-questiondesc").html() + '</label>';
+                htmlContent += '<div id="dvCheckboxes">';
+                htmlContent += '</div>';
+                htmlContent += '</div>';
+
+                $("#dvQuestionAnswerHtml").html(htmlContent);
+                $("#mdlQuestionAnswer").modal("show");
+                getAnswerByQuestionId(anstypename, questionId, answerId);
+                getGetAnswerByAnswerId(answerId, anstypename);
+            }
+
+        }
+        function fnChangeAnswer(obj) {
+            var answerdesc = $(obj).find("option:selected").text();
+            $("#hdnAnwserDesc").val(answerdesc);
+        }
+        function AnswerValidation() {
+            $('#frmUpdateAnswer').validate({
+                rules: {
+                    AnswerDesc: {
+                        required: true
+                    },
+                },
+                messages: {
+                    AnswerDesc: {
+                        required: "Please enter an Answer Description"
+                    },
+                },
+                errorElement: 'span',
+                errorPlacement: function (error, element) {
+                    error.addClass('invalid-feedback');
+                    element.closest('.form-group').append(error);
+                },
+                highlight: function (element, errorClass, validClass) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function (element, errorClass, validClass) {
+                    $(element).removeClass('is-invalid');
+                }
+            });
+        }
+
+        function getAnswerByQuestionId(anstypename, questionId, answerId) {
+            $.ajax({
+                type: "GET",
+                url: '/CRM/GetAnswerByQuestionId?QuestionId=' + questionId,
+                async: false,
+                success: function (data) {
+                    var html = '';
+                    if (anstypename == "DROPDOWN") {
+                        if (data != null && data.length > 0) {
+                            for (var i = 0; i < data.length; i++) {
+                                if (answerId == data[i].answerId) {
+                                    html += "<option value='" + data[i].answerId + "' selected >" + data[i].answerDesc + "</option > ";
+                                    $("#hdnAnwserDesc").val(data[i].answerDesc);
+                                }
+                                else {
+                                    html += "<option value='" + data[i].answerId + "'>" + data[i].answerDesc + "</option > ";
+                                }
+                            }
+                        }
+                        $("#selAnswerList").append(html);
+                        if ($("#hdnAnwserDesc").val() == "") {
+                            $("#hdnAnwserDesc").val($("#selAnswerList").find("option:nth-child(1)").text());
+                        }
+                    }
+                    else if (anstypename == "CHECKBOX") {
+                        for (var i = 0; i < data.length; i++) {
+                            html += '<div class="form-check-inline">';
+                            html += '<label>';
+                            html += '<input type="checkbox" id="check_' + data[i].answerId + '" class="form-check-input chkAnswerIds" onchange="fnChkAnswerIdsOnchange(this)" value="' + data[i].answerId + '">' + data[i].answerDesc;
+                            html += '</label>';
+                            html += '</div>';
+                        }
+                        $("#dvCheckboxes").append(html);
+                    }
+                    else if (anstypename == "RADIO") {
+                        for (var i = 0; i < data.length; i++) {
+                            html += '<div class="form-check-inline">';
+                            html += '<label class="form-check-label">';
+                            html += '<input type="radio" id="rd_' + data[i].answerId + '" name="rdAnswerId" class="form-check-input" onchange="fnGetforRadioAnswerIdsOnchange(this)" value="' + data[i].answerId + '">' + data[i].answerDesc;
+                            html += '</label>';
+                            html += '</div>';
+                        }
+                        $("#dvCheckboxes").append(html);
+                    }
+                }
+            });
+        }
+
+        function getGetAnswerByAnswerId(answerId, anstypename) 
+        {
+            $.ajax({
+                type: "GET",
+                url: '/CRM/GetAnswerByAnswerId?answerIds=' + answerId,
+                async: false,
+                success: function (data) 
+                {
+                    if (data.length > 0) 
+                    {
+                        var answerIds = '';
+                        if (anstypename == "CHECKBOX") 
+                        {
+                            for (var i = 0; i < data.length; i++) 
+                            {
+                                $("#check_" + data[i].answerId).prop("checked", true);
+                            }
+                        }
+                        else if (anstypename == "RADIO") 
+                        {
+                            for (var i = 0; i < data.length; i++) 
+                            {
+                                $("#rd_" + data[i].answerId).prop("checked", true);
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function fnChkAnswerIdsOnchange(Obj) 
+        {
+            var answerIds = $.map($('.form-check-input:checked'), function (n, i) {
+                return n.value;
+            }).join(',');
+            $("#hdnAnswerId").val(answerIds);
+        }
+
+        function fnGetforRadioAnswerIdsOnchange(Obj) 
+        {
+            var answerid = $('input[name="rdAnswerId"]:checked').val()
+            $("#hdnAnswerId").val(answerid);
+        }
+    </script>
+}

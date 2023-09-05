@@ -1,0 +1,27 @@
+﻿@using HtmlHelpers.BeginCollectionItemCore;
+
+@model Epidi.Models.ViewModel.UsersDocuments.UsersDocumentViewModel
+@{
+	Layout = null;
+	Guid guid = Guid.NewGuid();
+}
+<tr class="tr-row" id="@guid">
+	@using (Html.BeginCollectionItem("UsersDocumentViewModels"))
+	{
+		<td style="padding-bottom: 0px;vertical-align: top;border-top: 0px solid #dee2e6;">
+			<div class="form-group">
+				@Html.HiddenFor(p => p.Id,new { id = "hdnId" })
+				@Html.HiddenFor(p => p.DocumentName,new { id = "hdnDocumentName" })
+				@Html.HiddenFor(p => p.DocumentPath,new { id = "hdnDocumentPath" })
+				@Html.HiddenFor(p => p.UserId,new { id = "hdnUserId" })
+				@Html.LabelFor(p => p.DocumentName, Model.DocumentName)
+			</div>
+		</td>
+		<td style="padding-bottom: 0px;vertical-align: top;border-top: 0px solid #dee2e6;">
+			<a href="@Model.DocumentPath" class="btn btn-info form-group float-sm-left mr-3" target="_blank" style="background-color: #17a2b8">Download File</a>
+		</td>
+		<td style="padding-bottom: 0px;vertical-align: top;border-top: 0px solid #dee2e6;">
+			<a class='btn btn-danger mr-1 deletefile' href='javascript:void(0);' style='background-color: #dc3545'><i class='fa fa-trash'></i></a>
+		</td>
+	}
+</tr>

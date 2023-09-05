@@ -1,0 +1,464 @@
+﻿@{
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+    ViewBag.PageTitle = "Rule Condition";
+    ViewBag.Method = "Rule Condition";
+}
+<div class="row">
+    <div class="col-12">
+        <input type="hidden" id="rulesDetailsData" />
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-12">
+                        <button id="btnAddRuleCondition" type="button" class="btn btn-outline-secondary btn-uppercase float-right">
+                            <i class="ti-plus mr-2"></i> Add Rule Condition
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+                <table id="RuleConditionList" class="table table-bordered table-striped">
+                </table>
+            </div>
+            <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+    </div>
+</div>
+@section Scripts{
+    <script src="~/js/jquery-validation/jquery.validate.min.js"></script>
+    <script src="~/js/jquery-validation/additional-methods.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+    <script>
+        $(document).ready(() => {
+            $('#RuleConditionList').on('draw.dt', function() {
+                $('[data-toggle="tooltip"]').tooltip();
+            });
+
+            $("body").on("click", "#btnAddRuleCondition", function() {
+
+                AddModal("/RuleCondition/AddRuleCondition", "Add New RuleCondition")
+            });
+
+            RuleConditionDataTable.init('');
+            BindFiledNameDynamic();
+
+            $(document).on("submit", "#ruleConditionForm", function(e) {
+                e.preventDefault();
+                BDMValidation();
+                var form = $(this);
+                form.ajaxSubmit({
+                    beforeSubmit: function() {
+                        if (!form.valid()) {
+
+                            return false;
+                        }
+                        else {
+
+                            return true;
+                        }
+                    },
+                    success: function(res) {
+                        if (res.code == 200) {
+                            $("#frmModel").modal('hide');
+                            $("#ruleConditionForm").resetForm();
+
+                            RuleConditionDataTable.init('', '', '', '');
+
+                            NotifyMsg('success', res.message);
+
+                        } else {
+
+                            NotifyMsg('error', res.message);
+                        }
+                    },
+                    Errors: function() {
+
+                        NotifyMsg('error', res.message);
+                    }
+                });
+                return false;
+            });
+        });
+
+        function RuleValidation() {
+            $('#ruleConditionForm').validate({
+                rules: {
+                    RuleId: {
+                        required: true
+                    }
+                },
+                messages: {
+                    RuleId: "Please enter name"
+                },
+                errorElement: 'span',
+                errorPlacement: function(error, element) {
+                    error.addClass('invalid-feedback');
+                    element.closest('.form-group').append(error);
+                },
+                highlight: function(element, errorClass, validClass) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function(element, errorClass, validClass) {
+                    $(element).removeClass('is-invalid');
+                }
+            });
+        }
+        var RuleConditionDataTable = function(Name) {
+            let initTable1 = function() {
+                let table = $('#RuleConditionList');
+
+                let oTable = table.dataTable({
+                    "stateSave": true,
+                    "autoWidth": false,
+                    "paging": true,
+                    // Internationalisation. For more info refer to http://datatables.net/manual/i18n
+                    "language": {
+                        "aria": {
+                            "sortAscending": ": activate to sort column ascending",
+                            "sortDescending": ": activate to sort column descending"
+                        },
+                        "emptyTable": "No data available in table",
+                        "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+                        "infoEmpty": "No entries found",
+                        "infoFiltered": "(filtered1 from MAX total entries)",
+                        //"lengthMenu": "MENU entries",
+                        "search": "Search:",
+                        "zeroRecords": "No matching records found"
+                    },
+                    "pageLength": 10,
+                    "processing": true,
+                    "serverSide": true,
+                    "ajax": {
+                        async: true,
+                        url: '/RuleCondition/Get_All',
+                        type: "post",
+                        data: { Name: Name }
+                    },
+                    "columns": [
+                        {
+                            "title": "Quote MarkUp RuleName", "data": "quoteMarkUpRuleName", "orderable": false, "width": "30%"
+                        },
+                        {
+                            //"title": "LPRule Name", "data": "lPRuleName", "orderable": false, "width": "30%"
+                            "title": "Field Name", "data": "fieldName", "orderable": false, "width": "30%"
+                        },
+                        {
+                            "title": "Operation", "data": "opration", "orderable": false, "width": "20%"
+                        },
+                        {
+                            "title": "Action", "data": "id",
+                            "render": function(data, type, row) {
+                                var html = "<div class='btn-group dropleft'>";
+                                html += "<a class='btn btn-success edt-rcd mr-1' href='javascript:void(0);' data-uri='/RuleCondition/Edit?Id=" + row.id + "' ><i class='fa fa-edit'></i></a>";
+                                html += "<a title='Delete' class='btn btn-danger edt-dlt mr-1' onclick='DeleteRuleCondition(" + row.id + ")'><i class='fa fa-trash'></i></a>";
+                                //html += "<a class='btn btn-success edt-rcd mr-1' href='javascript:void(0);' data-uri='/LeverageRules/ShowUser?Id=" + row.id + "' ><i class='fa fa-user'></i></a>";
+                                //html += "<button title='Effected users' class='btn btn-success mr-1' onclick='OpenUserPopup(" + row.id + ");'><i class='fa fa-user'></i></button>";
+                                html += "</div>";
+                                return html;
+                            }
+                            , "orderable": false, "width": "3%"
+                        },
+                    ],
+
+                    // setup responsive extension: http://datatables.net/extensions/responsive/
+                    responsive: true,
+
+                    "lengthMenu": [
+                        [5, 10, 15, 20, 1000],
+                        [5, 10, 15, 20, 1000] // change per page values here
+                    ],
+                    // set the initial value
+
+                    //"dom": "<'row' <'col-md-12'B>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'f>r><'table-scrollable't><'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>", // horizobtal scrollable datatable
+
+                    // Uncomment below line("dom" parameter) to fix the dropdown overflow issue in the datatable cells. The default datatable layout
+                    // setup uses scrollable div(table-scrollable) with overflow:auto to enable vertical scroll(see: assets/global/plugins/datatables/plugins/bootstrap/dataTables.bootstrap.js).
+                    // So when dropdowns used the scrollable div should be removed.
+                    //"dom": "<'row' <'col-md-12'T>><'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'f>r>t<'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>",
+                });
+            }
+
+            return {
+                init: function(UserId, FromDate, ToDate, Type) {
+                    if ($.fn.DataTable.isDataTable("#RuleConditionList")) {
+                        $('#RuleConditionList').dataTable().fnDestroy();
+                        userId = UserId;
+                        fromDate = FromDate;
+                        toDate = ToDate;
+                        type = Type;
+                        //$('#divUserTable').html('<table class="table table-striped" width="100%" id="UserTable"></table>');
+                    }
+                    initTable1();
+                }
+            };
+        }();
+
+        function AddFilter() {
+
+            var name = $('#name').val();
+
+            RuleConditionDataTable.init(name);
+
+        }
+        function DeleteRuleCondition(Id) {
+            if (confirm('Are you sure you want to delete this record')) {
+                $.ajax({
+                    type: "GET",
+                    url: '/RuleCondition/Delete',
+                    data: { Id: Id },
+                    success: function(data) {
+                        RuleConditionDataTable.init('');
+                    }
+                });
+            }
+        }
+        function DeleteRule(Id) {
+            Swal.fire({
+                title: "Are you sure ?",
+                text: "You will be deleting this medicine!",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+                showCancelButton: true,
+                showCloseButton: true,
+                focusConfirm: false,
+                focusCancelButton: true,
+
+            })
+                .then((willdelete) => {
+                    if (willdelete.value == true) {
+                        $("#divTable_" + Id).remove();
+                        $("#divField_" + Id).remove();
+                        $("#divOpration_" + Id).remove();
+                        $("#ddlOprationValue_" + Id).remove();
+                        $("#ddlOprationValueTemp_" + Id).remove();
+                        $("#divDelete_" + Id).remove();
+                    }
+                });
+        }
+        function SaveRulesCondiDtl() {
+            IsValid = true;
+            if (countDetails > 0) {
+                var rulesDetails = [];
+                for (var i = 0; i <= countDetails; i++) {
+                    if (
+                        ($("#FieldName_" + i).val() != "")
+                        &&
+                        ($("#FieldName_" + i).val() != null)
+                    ) {
+                        var obj = {
+                            FieldName: $("#FieldName_" + i).val(),
+                            Opration: $("#Opration_" + i).val(),
+                            OprationValue: $("#OprationValue_" + i).val(),
+                        }
+                        rulesDetails.push(obj);
+                    }
+                }
+                $("#rulesDetailsData").val(JSON.stringify(rulesDetails));
+            }
+        }
+        function SaveRuleCondition() {
+            RuleValidation();
+            SaveRulesCondiDtl();
+            var formData = new FormData();
+            formData.append("RuleId", $("#RuleId").val());
+            formData.append("Id", $("#Id").val());
+            formData.append("conditionRulesDtlObj", $("#rulesDetailsData").val());
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("SaveRuleCondition","RuleCondition")",
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function(res) {
+                    debugger;
+                    if (res.code == 200) {
+                        $("#frmModel").modal('hide');
+                        $("#rulesDetailsData").resetForm();
+                        RuleConditionDataTable.init(0);
+
+                        Toast.fire({
+                            icon: 'success',
+                            title: " " + res.message
+                        })
+
+                    } else {
+                        //$("#Loader").hide();
+                        Toast.fire({
+                            icon: 'error',
+                            title: " " + res.message
+                        })
+                    }
+                },
+                error: function(errorTemp) {
+                    console.log('error', errorTemp);
+                }
+            })
+        }
+        ///Add New rule Dtl
+        var countDetails = 0;
+        async function AddNewRuleDtl() {
+            countDetails = countDetails + 1;
+            $("#divRuleDetails").append(`
+            <div class="col-4" id="divField_${countDetails}">
+                <div class="form-group">
+                <label>Fields Name</label>
+                <select id="FieldName_${countDetails}" class="form-control" onchange="FieldsNameOnChange(${countDetails});">
+                </select>
+                </div>
+            </div>
+            <div class="col-4" id="divOpration_${countDetails}">
+                <div class="form-group">
+                <label>Operation</label>
+                <select id="Opration_${countDetails}" class="form-control">
+                </select>
+                </div>
+            </div>
+            <div class="col-4" id="ddlOprationValue_${countDetails}">
+                <div class="form-group">
+                <label>Operation Value</label>
+                <input class="form-control" id="OprationValue_${countDetails}" placeholder="Operation Value" type="text" value="" style="width: 85%;display: inline;">
+                <a href="javascript:void(0)" value="Delete" onclick="DeleteRule(${countDetails})"><i class="fa fa-trash" style="font-size: large;margin-top: 8px;" aria-hidden="true"></i></a>
+                </div>
+            </div>
+            <div class="col-4" id="ddlOprationValueTemp_${countDetails}" style="display:none;">
+                <div class="form-group">
+                    <label>Operation Value</label>
+                    <select id="OprationIdTemp_${countDetails}" name="OprationIdTemp" class="form-control" onchange="ddlOprationValueTempOnChange(${countDetails})" style="width: 85%;display: inline;"></select>
+                    <a href="javascript:void(0)" value="Delete" onclick="DeleteRule(${countDetails})"><i class="fa fa-trash" style="font-size: large;margin-top: 8px;" aria-hidden="true"></i></a>
+                </div>
+            </div>
+             `);
+            BindFiledNameDynamic(countDetails)
+        };
+
+        function BindFiledNameDynamic(count, defaultVal = "", defaultOp = "", defaultOpValue = "") {
+            $.ajax({
+                async: true,
+                type: "POST",
+                url: "@Url.Action("GetUserFieldsForDynamic","LeverageRules")",
+                dataType: 'json',
+                data: { tblName: 'Users' },
+                success: function(response) {
+                    $("#FieldName_" + count).append(`<option value="">--Select--</option>`)
+                    for (var i = 0; i < response.length; i++) {
+                        $("#FieldName_" + count).append(`<option value="${response[i].value}">${response[i].text}</option>`)
+                    }
+                    if (defaultVal != "") {
+                        $("#FieldName_" + count).val(defaultVal);
+                        FieldsNameOnChange(count, defaultOp, defaultOpValue);
+                    }
+                },
+                error: function(errorTemp) {
+                    console.log('error', errorTemp);
+                }
+            })
+        }
+        function FieldsNameOnChange(count, defaultValue = "", defaultOpValue = "") {
+
+            $("#Opration_" + count).html("");
+            var selectedVal = $("#FieldName_" + count).val();
+            if (selectedVal != undefined) {
+                const myArray = selectedVal.split("|");
+                var FieldName = myArray[0];
+                var DataType = myArray[1];
+                var FkKey = myArray[2];
+
+                $.ajax({
+                    async: true,
+                    type: "POST",
+                    url: "@Url.Action("GetOprationDropDown","LeverageRules")",
+                    data: { FieldsName: FieldName, DataType: DataType, FkKey: FkKey },
+                    dataType: 'json',
+                    success: function(response) {
+                        $("#Opration_" + count).append(`<option value="">--Select--</option>`)
+                        for (var i = 0; i < response.length; i++) {
+                            $("#Opration_" + count).append(`<option value="${response[i].value}">${response[i].text}</option>`)
+                        }
+
+                        if (defaultValue != "") {
+                            $("#Opration_" + count).val(defaultValue);
+                        }
+
+                        $("#ddlOprationValue_" + count).show();
+                        $("#ddlOprationValueTemp_" + count).hide();
+                        if (FkKey == "1") {
+                            $("#ddlOprationValue_" + count).hide();
+                            $("#ddlOprationValueTemp_" + count).show();
+                            //}
+                            $("#OprationIdTemp_" + count).html("");
+                            $.ajax({
+                                async: true,
+                                type: "POST",
+                                url: "@Url.Action("GetTempOprationDropDown","LeverageRules")",
+                                data: { FieldsName: FieldName, DataType: DataType, FkKey: FkKey },
+                                dataType: 'json',
+                                success: function(responseTemp) {
+                                    $("#OprationIdTemp_" + count).append(`<option value="">--Select--</option>`)
+                                    for (var i = 0; i < responseTemp.length; i++) {
+                                        $("#OprationIdTemp_" + count).append(`<option value="${responseTemp[i].value}">${responseTemp[i].text}</option>`)
+                                    }
+                                    if (defaultOpValue != "") {
+                                        $("#OprationIdTemp_" + count).val(defaultOpValue);
+                                    }
+                                },
+                                error: function(errorTemp) {
+                                    console.log('error', errorTemp);
+                                }
+                            })
+                        }
+                    },
+                    error: function(error) {
+                        console.log('error', error);
+
+                    }
+                })
+            }
+        }
+        function ddlOprationValueTempOnChange(cnt) {
+            //OprationValue
+            var selectOprationIdTemp = $("#OprationIdTemp_" + cnt).val();
+            $("#OprationValue_" + cnt).val(selectOprationIdTemp);
+        }
+        function GetDtlData(Id) {
+            debugger;
+            $.ajax({
+                type: "GET",
+                async: true,
+                url: "@Url.Action("GetDetailsById","RuleCondition")",
+                data: { Id: Id },
+                dataType: 'json',
+                success: function(response) {
+                    //console.log('res. ', response);
+                    FillDataInEdit(response);
+                },
+                error: function(error) {
+                    console.log('error', error);
+                }
+            })
+        }
+        function FillDataInEdit(response) {
+            countDetails = 0;
+            for (var i = 0; i < response.rulesDtlViewModel.length; i++) {
+                var millisecondsToWait = 10000;
+                if (i > 0) {
+                    AddNewRuleDtl();
+                    var fieldName = response.rulesDtlViewModel[i].fieldName;
+                    var opration = response.rulesDtlViewModel[i].opration;
+                    var oprationValue = response.rulesDtlViewModel[i].oprationValue;
+                    BindFiledNameDynamic(i, fieldName, opration, oprationValue);
+                }
+                if (i == 0) {
+                    $("#FieldName_" + i).val(response.rulesDtlViewModel[i].fieldName);
+                    FieldsNameOnChange(i, response.rulesDtlViewModel[i].opration);
+                    $("#OprationValue_" + i).val(response.rulesDtlViewModel[i].oprationValue);
+                    //$("#OprationIdTemp_" + i).val(response.rulesDtlViewModel[i].oprationValue);
+                }
+                $("#OprationValue_" + i).val(response.rulesDtlViewModel[i].oprationValue);
+            }
+            console.log("countDetails :"+countDetails);
+        }
+    </script>
+}

@@ -1,0 +1,648 @@
+﻿@model LeverageRulesViewModel
+@{
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+    ViewBag.PageTitle = "Leverage Rule";
+    ViewBag.Method = "Leverage Rule";
+}
+<div class="row">
+    <div class="col-12">
+        <input type="hidden" id="rulesDetailsData" />
+        <div class="card">
+            <div class="card-header">
+                <div class="col-12">
+                    <button id="btnAddRule" type="button" class="btn btn-outline-secondary btn-uppercase float-right">
+                        <i class="ti-plus mr-2"></i> Create Rule
+                    </button>
+                </div>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+                <table id="LeverageRuleList" class="table table-bordered table-striped">
+                </table>
+            </div>
+            <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+    </div>
+    <div class="modal" id="UsersListModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="title" id="defaultModalLabel">User Details</h6>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="card-body">
+                        <input type="hidden" id="levergeId" name="levergeId" />
+                        <table id="UsersList" class="table table-bordered table-striped">
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.col -->
+</div>
+@section Scripts
+    {
+    <script src="~/js/jquery-validation/jquery.validate.min.js"></script>
+    <script src="~/js/jquery-validation/additional-methods.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+    <script>
+
+        $(document).ready(() => {
+
+            LeverageRuleDataTable.init(0);
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000
+            });
+
+            $("body").on("click", "#btnAddRule", function() {
+                AddModal("/LeverageRules/AddRule", "Add Leverage Rule")
+                //const link = document.getElementById("ddlOprationValueTemp");
+                //link.style.display = "none";
+                $('#ddlOprationValueTemp').hide();
+            });
+
+            $(document).on("submit", "#leverageRulesForm", function(e) {
+                e.preventDefault();
+                RuleValidation();
+                SaveRulesDtl();
+
+                var form = $(this);
+                form.ajaxSubmit({
+                    beforeSubmit: function() {
+                        if (!form.valid()) {
+
+                            return false;
+                        }
+                        else {
+
+                            return true;
+                        }
+                    },
+                    success: function(res) {
+                        console.log(res);
+                        if (res[0].code == 200) {
+                            $("#frmModel").modal('hide');
+                            $("#leverageRulesForm").resetForm();
+                            LeverageRuleDataTable.init(0);
+
+                            Toast.fire({
+                                icon: 'success',
+                                title: " " + res[0].message
+                            })
+
+                        } else {
+                            //$("#Loader").hide();
+                            Toast.fire({
+                                icon: 'error',
+                                title: " " + res[0].message
+                            })
+                        }
+                    },
+                    Errors: function() {
+                        console.log("error");
+                        //$("#Loader").hide();
+                        Toast.fire({
+                            icon: 'error',
+                            title: " " + res[0].message
+                        })
+                    }
+                });
+                return false;
+            });
+        });
+        //Get Table list
+        var LeverageRuleDataTable = function() {
+            let initTable1 = function() {
+                let table = $('#LeverageRuleList');
+
+                let oTable = table.dataTable({
+                    "stateSave": true,
+                    "autoWidth": false,
+                    "paging": true,
+                    // Internationalisation. For more info refer to http://datatables.net/manual/i18n
+                    "language": {
+                        "aria": {
+                            "sortAscending": ": activate to sort column ascending",
+                            "sortDescending": ": activate to sort column descending"
+                        },
+                        "emptyTable": "No data available in table",
+                        "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+                        "infoEmpty": "No entries found",
+                        "infoFiltered": "(filtered1 from MAX total entries)",
+                        //"lengthMenu": "MENU entries",
+                        "search": "Search:",
+                        "zeroRecords": "No matching records found"
+                    },
+                    "pageLength": 10,
+                    "processing": true,
+                    "serverSide": true,
+                    "ajax": {
+                        async: true,
+                        url: '/LeverageRules/LeverageRules_All',
+                        type: "post",
+                    },
+                    "columns": [
+
+                        {
+                            "title": "RuleName", "data": "ruleName", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "LevregeValue", "data": "levregeValue", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Rules On", "data": "fieldName", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Action", "data": "id",
+                            "render": function(data, type, row) {
+                                var html = "<div class='btn-group dropleft'>";
+                                html += "<a class='btn btn-success edt-rcd mr-1' href='javascript:void(0);' data-uri='/LeverageRules/Edit?Id=" + row.id + "' ><i class='fa fa-edit'></i></a>";
+                                //html += "<a class='btn btn-success edt-rcd mr-1' href='javascript:void(0);' data-uri='/LeverageRules/ShowUser?Id=" + row.id + "' ><i class='fa fa-user'></i></a>";
+                                html += "<button title='Effected users' class='btn btn-success mr-1' onclick='OpenUserPopup(" + row.id + ");'><i class='fa fa-user'></i></button>";
+                                html += "</div>";
+                                return html;
+                            }
+                            , "orderable": false, "width": "3%"
+                        },
+                    ],
+                    // setup responsive extension: http://datatables.net/extensions/responsive/
+                    responsive: true,
+
+                    "lengthMenu": [
+                        [5, 10, 15, 20, 25, 1000],
+                        [5, 10, 15, 20, 25, 1000] // change per page values here
+                    ],
+                });
+            }
+
+            return {
+                init: function() {
+                    if ($.fn.DataTable.isDataTable("#LeverageRuleList")) {
+                        $('#LeverageRuleList').dataTable().fnDestroy();
+                        //$('#divUserTable').html('<table class="table table-striped" width="100%" id="UserTable"></table>');
+                    }
+                    initTable1();
+                }
+            };
+        }();
+
+        function SaveLeverageRule() {
+            RuleValidation();
+            SaveRulesDtl();
+            var formData = new FormData();
+            formData.append("RuleName", $("#RuleName").val());
+            formData.append("LevregeValue", $("#LevregeValue").val());
+            formData.append("Priority", $("#Priority").val());
+            formData.append("IsActive", $("#IsActive").val());
+            formData.append("leverageRulesDtlObj", $("#rulesDetailsData").val());
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("SaveLeverageRules","LeverageRules")",
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function(res) {
+                    if (res[0].code == 200) {
+                        $("#frmModel").modal('hide');
+                        $("#leverageRulesForm").resetForm();
+                        LeverageRuleDataTable.init(0);
+
+                        Toast.fire({
+                            icon: 'success',
+                            title: " " + res[0].message
+                        })
+
+                    } else {
+                        //$("#Loader").hide();
+                        Toast.fire({
+                            icon: 'error',
+                            title: " " + res[0].message
+                        })
+                    }
+                },
+                error: function(errorTemp) {
+                    console.log('error', errorTemp);
+                }
+            })
+        }
+
+        function RuleValidation() {
+            $('#leverageRulesForm').validate({
+                rules: {
+                    RuleName: {
+                        required: true
+                    },
+                    FieldName: {
+                        required: true
+                    },
+                    Opration: {
+                        required: true
+                    },
+                    OprationValue: {
+                        required: true
+                    },
+                    LevregeValue: {
+                        required: true
+                    },
+                    Priority: {
+                        required: true
+                    }
+                },
+                messages: {
+                    RuleName: {
+                        required: "Please enter Rule name"
+                    },
+                    FieldName: {
+                        required: "Please enter Field name"
+                    },
+                    Opration: {
+                        required: "Please enter opration"
+                    },
+                    OprationValue: {
+                        required: "Please enter opration value"
+                    },
+                    LevregeValue: "Please enter Levrege value",
+                    Priority: "Please enter Priority",
+                },
+                errorElement: 'span',
+                errorPlacement: function(error, element) {
+                    error.addClass('invalid-feedback');
+                    element.closest('.form-group').append(error);
+                },
+                highlight: function(element, errorClass, validClass) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function(element, errorClass, validClass) {
+                    $(element).removeClass('is-invalid');
+                }
+            });
+        }
+
+        function ddlOprationValueTempOnChange(cnt) {
+            //OprationValue
+            var selectOprationIdTemp = $("#OprationIdTemp_" + cnt).val();
+            $("#OprationValue_" + cnt).val(selectOprationIdTemp);
+        }
+
+        function FieldsNameOnChange(count, defaultVal = "", defaultOpValue = "") {
+            $("#Opration_" + count).html("");
+            var selectedVal = $("#FieldName_" + count).val();
+            if (selectedVal != undefined) {
+                const myArray = selectedVal.split("|")
+                var FieldName = myArray[0];
+                var DataType = myArray[1];
+                var FkKey = myArray[2];
+
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("GetOprationDropDown","LeverageRules")",
+                    data: { FieldsName: FieldName, DataType: DataType, FkKey: FkKey },
+                    dataType: 'json',
+                    success: function(response) {
+                        $("#Opration_" + count).append(`<option value="">--Select--</option>`)
+                        for (var i = 0; i < response.length; i++) {
+                            $("#Opration_" + count).append(`<option value="${response[i].value}">${response[i].text}</option>`)
+                        }
+                        if (defaultVal != "") {
+                            $("#Opration_" + count).val(defaultVal);
+                        }
+                        $("#ddlOprationValue_" + count).show();
+                        $("#ddlOprationValueTemp_" + count).hide();
+                        if (FkKey == "1") {
+                            $("#ddlOprationValue_" + count).hide();
+                            $("#ddlOprationValueTemp_" + count).show();
+                            //}
+                            $("#OprationIdTemp_" + count).html("");
+                            $.ajax({
+                                type: "POST",
+                                url: "@Url.Action("GetTempOprationDropDown","LeverageRules")",
+                                data: { FieldsName: FieldName, DataType: DataType, FkKey: FkKey },
+                                dataType: 'json',
+                                success: function(responseTemp) {
+                                    $("#OprationIdTemp_" + count).append(`<option value="">--Select--</option>`)
+                                    for (var i = 0; i < responseTemp.length; i++) {
+                                        $("#OprationIdTemp_" + count).append(`<option value="${responseTemp[i].value}">${responseTemp[i].text}</option>`)
+                                    }
+                                    if (defaultOpValue != "") {
+                                        $("#OprationIdTemp_" + count).val(defaultOpValue);
+                                    }
+                                },
+                                error: function(errorTemp) {
+                                    console.log('error', errorTemp);
+                                }
+                            })
+                        }
+                    },
+                    error: function(error) {
+                        console.log('error', error);
+
+                    }
+                })
+            }
+        }
+        ///Add New rule Dtl
+        var countDetails = 0;
+        function AddNewRuleDtl() {
+            countDetails = countDetails + 1;
+            $("#divRuleDetails").append(`
+                <div class="col-3" id="divTable_${countDetails}">
+                    <div class="form-group">
+                        <label>Table Name</label>
+                        <select id="TableName_${countDetails}" name="Opration" onchange="tableNameOnChange(${countDetails})" class="form-control">
+                            <option value="">--Select--</option>
+                            <option value="Users">Customer</option>
+                            <option value="LookUpInstrument">LookUpInstrument</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-3" id="divField_${countDetails}">
+                    <div class="form-group">
+                    <label>Fields Name</label>
+                    <select id="FieldName_${countDetails}" class="form-control" onchange="FieldsNameOnChange(${countDetails});">
+                    </select>
+                    </div>
+                </div>
+                <div class="col-3" id="divOpration_${countDetails}">
+                    <div class="form-group">
+                    <label>Opration</label>
+                    <select id="Opration_${countDetails}" class="form-control">
+                    </select>
+                    </div>
+                </div>
+                <div class="col-3" id="ddlOprationValue_${countDetails}">
+                    <div class="form-group">
+                    <label>Opration Value</label>
+                    <input class="form-control" id="OprationValue_${countDetails}" placeholder="Opration Value" type="text" value="" style="width: 85%;display: inline;">
+                    <a href="javascript:void(0)" value="Delete" onclick="DeleteRule(${countDetails})"><i class="fa fa-trash" style="font-size: large;margin-top: 8px;" aria-hidden="true"></i></a>
+                    </div>
+                </div>
+                <div class="col-3" id="ddlOprationValueTemp_${countDetails}" style="display:none;">
+                    <div class="form-group">
+                        <label>Opration Value</label>
+                        <select id="OprationIdTemp_${countDetails}" name="OprationIdTemp" class="form-control" onchange="ddlOprationValueTempOnChange(${countDetails})" style="width: 85%;display: inline;"></select>
+                        <a href="javascript:void(0)" value="Delete" onclick="DeleteRule(${countDetails})"><i class="fa fa-trash" style="font-size: large;margin-top: 8px;" aria-hidden="true"></i></a>
+                    </div>
+                </div>
+                    `);
+            BindFiledNameDynamic(countDetails)
+        };
+
+        function BindFiledNameDynamic(count,defaultTable="", defaultField = "", defaultOp = "", defaultOpValue = "") {
+            $.ajax({
+                async: true,
+                type: "POST",
+                url: "@Url.Action("GetUserFieldsForDynamic","LeverageRules")",
+                dataType: 'json',
+                data: { tblName: 'Users' },
+                success: function(response) {
+                    $("#FieldName_" + count).append(`<option value="">--Select--</option>`)
+                    for (var i = 0; i < response.length; i++) {
+                        $("#FieldName_" + count).append(`<option value="${response[i].value}">${response[i].text}</option>`)
+                    }
+                    if (defaultTable != "") {
+                        $("#TableName_" + count).val(defaultTable);
+                        $("#FieldName_" + count).val(defaultField);                        
+                        FieldsNameOnChange(count, defaultOp, defaultOpValue);
+                    }
+                },
+                error: function(errorTemp) {
+                    console.log('error', errorTemp);
+                }
+            })
+        }
+
+        function DeleteRule(Id) {
+            Swal.fire({
+                title: "Are you sure ?",
+                text: "You will be deleting this rule!",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+                showCancelButton: true,
+                showCloseButton: true,
+                focusConfirm: false,
+                focusCancelButton: true,
+
+            })
+                .then((willdelete) => {
+                    if (willdelete.value == true) {
+                        $("#divTable_" + Id).remove();
+                        $("#divField_" + Id).remove();
+                        $("#divOpration_" + Id).remove();
+                        $("#ddlOprationValue_" + Id).remove();
+                        $("#ddlOprationValueTemp_" + Id).remove();
+                        $("#divDelete_" + Id).remove();
+                    }
+                });
+        }
+
+        function SaveRulesDtl() {
+            IsValid = true;
+            if (countDetails > 0) {
+                var rulesDetails = [];
+                for (var i = 0; i <= countDetails; i++) {
+                    if (
+                        ($("#FieldName_" + i).val() != "")
+                        &&
+                        ($("#FieldName_" + i).val() != null)
+                    ) {
+                        var obj = {
+                            FieldName: $("#FieldName_" + i).val(),
+                            Opration: $("#Opration_" + i).val(),
+                            OprationValue: $("#OprationValue_" + i).val(),
+                            TableName: $("#TableName_" + i).val(),
+                        }
+                        rulesDetails.push(obj);
+                    }
+                }
+                $("#rulesDetailsData").val(JSON.stringify(rulesDetails));
+            }
+        }
+
+        function OpenUserPopup(Id) {
+            $("#levergeId").val(Id);
+            UserDataTable.init();
+            $('#UsersListModal').modal('show');
+        }
+        ////Get userlist
+        var UserDataTable = function() {
+            let initTable1 = function() {
+                let table = $('#UsersList');
+
+                let oTable = table.dataTable({
+                    "stateSave": true,
+                    "autoWidth": false,
+                    "paging": true,
+                    // Internationalisation. For more info refer to http://datatables.net/manual/i18n
+                    "language": {
+                        "aria": {
+                            "sortAscending": ": activate to sort column ascending",
+                            "sortDescending": ": activate to sort column descending"
+                        },
+                        "emptyTable": "No data available in table",
+                        "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+                        "infoEmpty": "No entries found",
+                        "infoFiltered": "(filtered1 from MAX total entries)",
+                        //"lengthMenu": "MENU entries",
+                        "search": "Search:",
+                        "zeroRecords": "No matching records found"
+                    },
+                    "pageLength": 5,
+                    "processing": true,
+                    "serverSide": true,
+                    "ajax": {
+                        async: true,
+                        url: '/LeverageRules/ShowUsersList',
+                        type: "post",
+                        data: { Id: $("#levergeId").val() },
+                    },
+                    "columns": [
+
+                        {
+                            "title": "Name", "data": "name", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Surname", "data": "surname", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Mobile", "data": "mobile", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Email", "data": "email", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "CurrentBalance", "data": "currentBalance", "orderable": false, "width": "3%"
+                        },
+                        {
+                            "title": "Action", "data": "id",
+                            "render": function(data, type, row) {
+                                let htmlData = "";
+                                if (row.usersVsRulesIsDeleted == true) {
+                                    htmlData += `<button title="Edit State" class="btn btn-sm btn-outline-success mr-1" onclick="DeleteUserVsRules('${(row["usersVsRulesId"])}',0);"><i class="fa fa-plus"></i></button>`;
+                                }
+                                else {
+                                    htmlData += `<button title="Delete State" class="btn btn-sm btn-outline-danger mr-1" onclick="DeleteUserVsRules('${(row["usersVsRulesId"])}',1);"><i class="fa fa-trash"></i></button>`;
+                                }
+                                return htmlData;
+                            }
+                            , "orderable": false, "width": "3%"
+                        },
+                    ],
+
+                    // setup responsive extension: http://datatables.net/extensions/responsive/
+                    responsive: true,
+
+                    "lengthMenu": [
+                        [5, 10, 15, 20, 1000],
+                        [5, 10, 15, 20, 1000] // change per page values here
+                    ],
+                });
+            }
+
+            return {
+                init: function() {
+                    if ($.fn.DataTable.isDataTable("#UsersList")) {
+                        $('#UsersList').dataTable().fnDestroy();
+                        //$('#divUserTable').html('<table class="table table-striped" width="100%" id="UserTable"></table>');
+                    }
+                    initTable1();
+                }
+            };
+        }();
+
+        function tableNameOnChange(count, defaultVal = "", defaultOp = "", defaultOpVal = "") {
+            var tbName = $("#TableName_" + count).val();
+            $("#FieldName_" + count).html("");
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("GetUserFieldsForDynamic","LeverageRules")",
+                dataType: 'json',
+                data: { tblName: tbName },
+                success: function(response) {
+                    $("#FieldName_" + count).append(`<option value="">--Select--</option>`)
+                    for (var i = 0; i < response.length; i++) {
+                        $("#FieldName_" + count).append(`<option value="${response[i].value}">${response[i].text}</option>`)
+                    }
+                    if (defaultVal != "") {
+                        $("#FieldName_" + count).val(defaultVal);
+                        FieldsNameOnChange(count, defaultOp, defaultOpVal);
+                    }
+                },
+                error: function(errorTemp) {
+                    console.log('error', errorTemp);
+                }
+            })
+        }
+        function DeleteUserVsRules(Id, delFlg) {
+            console.log(delFlg);
+            $.ajax({
+                async: true,
+                type: "POST",
+                url: "@Url.Action("Delete_UserVsRules","LeverageRules")",
+                dataType: 'json',
+                data: { UserId: Id },
+                success: function(response) {
+                    //console.log("response" + response);
+                },
+                error: function(errorTemp) {
+                    //console.log('error', errorTemp);
+                }
+            })
+            UserDataTable.init();
+        }
+        function GetLeverageDtlData(Id) {
+            debugger;
+            $.ajax({
+                type: "GET",
+                async: true,
+                url: "@Url.Action("GetDetailsById","LeverageRules")",
+                data: { Id: Id },
+                dataType: 'json',
+                success: function(response) {
+                    console.log('res. ', response);
+                    FillRuleDataInEdit(response);
+                },
+                error: function(error) {
+                    console.log('error', error);
+                }
+            })
+        }
+        function FillRuleDataInEdit(response) {
+            countDetails = 0;
+            for (var i = 0; i < response.leverageRulesDtlViewModels.length; i++) {
+
+                var tableName = response.leverageRulesDtlViewModels[i].tableName;
+                var fieldName = response.leverageRulesDtlViewModels[i].fieldName;
+                var opration = response.leverageRulesDtlViewModels[i].opration;
+                var oprationValue = response.leverageRulesDtlViewModels[i].oprationValue;
+                $("#TableName_" + i).val(response.leverageRulesDtlViewModels[i].tableName);
+                if (i > 0) {
+                    //AddNewRuleDtl();
+                    tableNameOnChange(i, fieldName, opration, oprationValue);
+                }
+                $("#OprationValue_" + i).val(response.leverageRulesDtlViewModels[i].oprationValue);
+                
+                $('#FieldName_'+i).val(response.leverageRulesDtlViewModels[i].fieldName);
+                $('#Opration_'+i).val(response.leverageRulesDtlViewModels[i].opration);
+                
+                
+                //if (i == 0) {
+                    
+                //    tableNameOnChange(i, fieldName, opration, oprationValue);
+
+                //    $("#OprationValue_" + i).val(response.leverageRulesDtlViewModels[i].oprationValue);
+                //    //$("#OprationIdTemp_" + i).val(response.leverageRulesDtlViewModels[i].oprationValue);
+                //}
+
+            }
+        }
+    </script>
+    }

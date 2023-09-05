@@ -1,0 +1,99 @@
+﻿@model List<Epidi.Models.ViewModel.Instrument.MasterInstrumentViewModel>
+<div class="row">
+    <div class="col-md-6 form-group">
+        <label>Instrument Name</label>
+        <input type="hidden" value="@Model.FirstOrDefault().Id" id="MasterInstrumentId" />
+        <input type="hidden" value="@Model.FirstOrDefault().TradeId" id="TradeId" />
+        <select class="form-control" id="ddlinstrumentmaster">
+            @foreach (var item in (List<InstrumentMaster>)ViewBag.Instruments)
+            {
+                if (Model.FirstOrDefault().InstrumentName == item.name)
+                {
+                    <option value="@item.id" selected="selected">@item.name</option>
+                }
+                else
+                {
+                    <option value="@item.id">@item.name</option>
+                }
+            }
+        </select>
+    </div>
+    <div class="col-md-6 form-group">
+        <label>Symbol group</label>
+        <select class="form-control" id="ddlsymbolgroup">
+            @foreach (var item in (List<Epidi.Models.ViewModel.SymbolGroup.SymbolGroupViewModel>)ViewBag.Symbolgroup)
+            {
+                if (Model.FirstOrDefault().SymbolGroup == item.Group)
+                {
+                    <option value="@item.Id" selected="selected">@item.Group</option>
+                }
+                else
+                {
+                    <option value="@item.Id">@item.Group</option>
+                }
+
+            }
+        </select>
+    </div>
+    @{
+        int counter = 0;
+    }
+    @foreach (var item in Model)
+    {
+        <div class="row tradetimingcontrols">
+            <div class="col-md-2 form-group">
+                <label>QT From</label>
+                <input type="time" class="form-control" value="@DateTime.Parse(item.QTFrom).ToString("HH:mm:ss")" id=@("txtQTFrom"+counter) />
+            </div>
+            <div class="col-md-2 form-group">
+                <label>QT To</label>
+                <input type="time" class="form-control" id=@("txtQTTo"+counter) value="@DateTime.Parse(item.QTTo).ToString("HH:mm:ss")" />
+            </div>
+            <div class="col-md-2 form-group">
+                <label>Days</label>
+                <input type="number" class="form-control" id=@("txtdays"+counter) value="@item.Day" />
+            </div>
+            <div class="col-md-2 form-group">
+                <label>TT From</label>
+                <input type="time" class="form-control" id=@("txtTTFrom"+counter) value="@DateTime.Parse(item.TTFrom).ToString("HH:mm:ss")" />
+            </div>
+            <div class="col-md-2 form-group">
+                <label>TT To</label>
+                <input type="time" class="form-control" id=@("txtTTTo"+counter) value="@DateTime.Parse(item.TTTo).ToString("HH:mm:ss")" />
+            </div>
+        </div>
+        <br />
+        counter++;
+    }
+    <div class="col-md-6 form-group">
+        <label>Symbol Denomination</label>
+        <input type="text" class="form-control" id="txtsymboldenom" value="@Model.FirstOrDefault().SymbolDenomination" />
+    </div>
+    <div class="col-md-6 form-group">
+        <label>Trade Status</label>
+        <select class="form-control" id="ddltradestatus">
+            @foreach (var item in (List<Epidi.Models.ViewModel.TradeStatus.TradeStatusViewModel>)ViewBag.TradeStatus)
+            {
+                if (Model.FirstOrDefault().TradeStatus == item.Status)
+                {
+                    <option value="@item.Id" selected="selected">@item.Status</option>
+                }
+                else
+                {
+                    <option value="@item.Id">@item.Status</option>
+                }
+            }
+        </select>
+    </div>
+
+    <div class="col-md-6 form-group">
+        <label>Average Spread</label>
+        <input type="number" class="form-control" id="txtaveragespeed" value="@Model.FirstOrDefault().AverageSpread" />
+    </div>
+
+    <div class="col-md-6 form-group">
+        <label>Decimals</label>
+        <input type="number" class="form-control" id="txtdecimals" value="@Model.FirstOrDefault().Decimals" />
+    </div>
+
+</div>

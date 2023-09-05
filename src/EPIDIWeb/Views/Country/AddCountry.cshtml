@@ -1,0 +1,68 @@
+﻿@model CountryViewModel
+@{
+    Layout = null;
+}
+@using (Html.BeginForm("SaveCountry", "Country", FormMethod.Post, new { id = "countryForm" }))
+{
+    <div class="row">
+        <div class="col-4">
+            <div class="form-group">
+                @Html.HiddenFor(model => model.CountryId)
+                @Html.LabelFor(model => model.CountryCode,"Country Code")
+                @Html.TextBoxFor(p => p.CountryCode, new { @class = "form-control", @placeholder = "CountryCode" ,@name="CountryCode"})
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="form-group">
+                @Html.LabelFor(model => model.CountryName,"Country Name")
+                @Html.TextBoxFor(p => p.CountryName, new { @class = "form-control", @placeholder = "Country Name" ,@name="CountryName"})
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="form-group">
+                @Html.LabelFor(model => model.NiceName,"Nice Name")
+                @Html.TextBoxFor(p => p.NiceName, new { @class = "form-control", @placeholder = "Nice Name" ,@name="NiceName"})
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="form-group">
+                @Html.LabelFor(model => model.Iso3,"ISO3")
+                @Html.TextBoxFor(p => p.Iso3, new { @class = "form-control", @placeholder = "Iso3" ,@name="Iso3"})
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="form-group">
+                @Html.LabelFor(model => model.NumCode,"Num Code")
+                @Html.TextBoxFor(p => p.NumCode, new { @class = "form-control", @placeholder = "Num Code" ,@name="NumCode"})
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="form-group">
+                @Html.LabelFor(model => model.PhoneCode,"Country Code")
+                @Html.TextBoxFor(p => p.PhoneCode, new { @class = "form-control", @placeholder = "Country Code" ,@name="PhoneCode"})
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="form-group">
+                @Html.LabelFor(model => model.OnboardingSteps,"Onboarding Steps")
+                @Html.TextBoxFor(p => p.OnboardingSteps, new { @class = "form-control", @placeholder = "OnboardingSteps" ,@name="OnboardingSteps"})
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="form-group">
+                @Html.LabelFor(model => model.Nationality,"Nationality")
+                @Html.TextBoxFor(p => p.Nationality, new { @class = "form-control", @placeholder = "Nationality" ,@name="Nationality"})
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="form-group">
+                @Html.LabelFor(model => model.TaxResidence,"TaxResidence")
+                @Html.TextBoxFor(p => p.TaxResidence, new { @class = "form-control", @placeholder = "TaxResidence" ,@name="TaxResidence"})
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+}

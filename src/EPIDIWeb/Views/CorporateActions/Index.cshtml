@@ -1,0 +1,118 @@
+﻿@{
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+    ViewBag.PageTitle = "Corporate Actions";
+    ViewBag.Method = "Corporate Actions";
+}
+
+<div class="row">
+    <div class="col-12">
+       
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card card-primary card-tabs">
+            <div class="card-header p-0 pt-1">
+                <ul class="nav nav-tabs" id="custom-tabs-five-tab" role="tablist">
+                    <li class="nav-item">
+                        <a onclick="AppendView(1)" class="nav-link" id="custom-tabs-five-overlay-tab" data-toggle="pill" href="#custom-tabs-five-overlay" role="tab" aria-controls="custom-tabs-five-overlay" aria-selected="false">Split</a>
+                    </li>
+                    <li class="nav-item">
+                        <a onclick="AppendView(2)" class="nav-link" id="custom-tabs-five-overlay-dark-tab" data-toggle="pill" href="#custom-tabs-five-overlay-dark" role="tab" aria-controls="custom-tabs-five-overlay-dark" aria-selected="false">Reverse Split</a>
+                    </li>
+                    <li class="nav-item">
+                        <a onclick="AppendView(3)" class="nav-link" id="custom-tabs-five-normal-tab" data-toggle="pill" href="#custom-tabs-five-normal" role="tab" aria-controls="custom-tabs-five-normal" aria-selected="false">Delisting</a>
+                    </li>
+                    <li class="nav-item">
+                        <a onclick="AppendView(4)" class="nav-link" id="custom-tabs-five-normal-tab1" data-toggle="pill" href="#custom-tabs-five-normal1" role="tab" aria-controls="custom-tabs-five-normal1" aria-selected="false">Spin-off / Dividend In Shares</a>
+                    </li>
+                    <li class="nav-item">
+                        <a onclick="AppendView(5)" class="nav-link" id="custom-tabs-five-normal-tab2" data-toggle="pill" href="#custom-tabs-five-normal2" role="tab" aria-controls="custom-tabs-five-normal2" aria-selected="false">Dividend In $</a>
+                    </li>
+                    <li class="nav-item">
+                        <a onclick="AppendView(6)" class="nav-link" id="custom-tabs-five-normal-tab3" data-toggle="pill" href="#custom-tabs-five-normal3" role="tab" aria-controls="custom-tabs-five-normal3" aria-selected="false">Rename Of Stock</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body">
+                <div class="tab-content" id="custom-tabs-five-tabContent">
+                    <div class="tab-pane fade show active" id="custom-tabs-five-overlay" role="tabpanel" aria-labelledby="custom-tabs-five-overlay-tab">
+                    </div>
+                    <div class="tab-pane fade" id="custom-tabs-five-overlay-dark" role="tabpanel" aria-labelledby="custom-tabs-five-overlay-dark-tab">
+                        <div class="overlay-wrapper">
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="custom-tabs-five-normal" role="tabpanel" aria-labelledby="custom-tabs-five-normal-tab">
+                    </div>
+                    <div class="tab-pane fade" id="custom-tabs-five-normal1" role="tabpanel" aria-labelledby="custom-tabs-five-normal-tab1">
+                    </div>
+                    <div class="tab-pane fade" id="custom-tabs-five-normal2" role="tabpanel" aria-labelledby="custom-tabs-five-normal-tab2">
+                       
+                    </div>
+                    <div class="tab-pane fade" id="custom-tabs-five-normal3" role="tabpanel" aria-labelledby="custom-tabs-five-normal-tab3">
+                    </div>
+                </div>
+            </div>
+            <!-- /.card -->
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+
+        $(document).ready(() => {
+            AppendView(1);
+            $("#custom-tabs-five-overlay-tab").trigger("click");
+        });
+
+        function AppendView(value) {
+            try {
+                $('#Loader').show();
+               
+                $.ajax({
+                    type: "POST",
+                    url: '/CorporateActions/CorporateActionsView',
+                    data: { 'no': value },
+                    //dataType: "html",
+                    success: function (data) {
+                        
+                        if (data != null) {
+                            if (value == 1) {
+                                $("#custom-tabs-five-overlay").html(data);
+                            }
+                            else if (value == 2) {
+                                $("#custom-tabs-five-overlay-dark").html(data);
+                            }
+                            else if (value == 3) {
+                                $("#custom-tabs-five-normal").html(data);
+                            }
+                            else if (value == 4) {
+                                $("#custom-tabs-five-normal1").html(data);
+                            }
+                            else if (value == 5) {
+                                $("#custom-tabs-five-normal2").html(data);
+                            }
+                            else if (value == 6) {
+
+                                $("#custom-tabs-five-normal3").html(data);
+                            }
+                        }
+                        $('#Loader').hide();
+
+                    },
+                    error: function (data) {
+                        $('#Loader').hide();
+                    }
+                });
+            }
+            catch (e) {
+                console.log(e.message);
+                $('#Loader').hide();
+            }
+        }
+
+
+    </script>
+}

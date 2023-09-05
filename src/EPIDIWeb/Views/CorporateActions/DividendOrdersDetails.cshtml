@@ -1,0 +1,241 @@
+﻿@model List<DividendOrdersViewModel>
+@{
+    Layout = null;
+}
+<style>
+    /* Chrome, Safari, Edge, Opera */
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    /* Firefox */
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+
+    .select2-container {
+        display: block;
+    }
+
+    h3 {
+        color: #dc3545 !important;
+        font-weight: bold;
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th, td {
+        text-align: left;
+        padding: 5px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
+</style>
+<div class="row">
+    <div class="col-4">
+        <div class="form-group">
+            <label>From Date:</label>
+        </div>
+        <div class="btn float-left" style="margin-top: -19px;">
+            <div class="form-group">
+                <div class="input-group date" id="fmdate" data-target-input="nearest">
+                    <input type="text" class="form-control datetimepicker-input" id="frmdate" data-target="#fmdate">
+                    <div class="input-group-append" data-target="#fmdate" data-toggle="datetimepicker">
+                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-4">
+        <div class="form-group">
+            <label>To Date:</label>
+        </div>
+        <div class="btn float-left" style="margin-top: -19px;">
+            <div class="form-group">
+                <div class="input-group date" id="todate" data-target-input="nearest">
+                    <input type="text" class="form-control datetimepicker-input" id="trdate" data-target="#todate">
+                    <div class="input-group-append" data-target="#todate" data-toggle="datetimepicker">
+                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-3" style="margin-top: 34px;">
+        <button id="btnSearch" type="button" class="btn btn-primary" onclick="ApplyFilter()">Search</button>
+    </div>
+</div>
+<div class="row">
+    <div class="col-6">
+        <button onclick="ExportDividendOrderDetails()" class="btn btn-info form-group float-sm-left mr-3">Export Details</button>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+                <div class="card-body">
+                    <div id="accordion2">
+                        <div class="card card-info">
+                            <div class="card-header">
+                                <h3 class="card-title w-100">
+                                    <a class="d-block w-100 collapsed" data-toggle="collapse" href="#collapseOne2" aria-expanded="false">
+                                        Dividend Order List
+                                    </a>
+                                </h3>
+                            </div>
+                            <div id="collapseOne2" class="collapse show" data-parent="#accordion2" style="overflow:auto">
+                                <div class="card-body">
+                                    <div id="Divdividend">
+                                        <table id="tbldividend">
+                                            <tr>
+                                                <th>ClientId</th>
+                                                <th>Trading Account</th>
+                                                <th>Order ID</th>
+                                                <th>Side</th>
+                                                <th>Equity Name</th>
+                                                <th>Open Date Time</th>
+                                                <th>Legal Entity</th>
+                                                <th>Leverage</th>
+                                                <th>Open Units</th>
+                                                <th>Open Price</th>
+                                                <th>Dividend per Unit, Sell</th>
+                                                <th>Dividend per Unit, Buy (Leverage>1)</th>
+                                                <th>Dividend per Unit, Buy (Leverage=1)</th>
+                                                <th>Ex Dividend Date</th>
+                                                <th>Dividend Integer</th>
+                                                <th>Dividend Decimal</th>
+                                                <th>Dividend Total</th>
+                                            </tr>
+                                            <tbody id="orderDetails">
+                                                @Html.Partial("DividendOrdersAppendToTable", Model)
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(() => {
+        $('#fmdate').datetimepicker({
+            format: 'DD-MM-YYYY'
+        });
+
+        $('#todate').datetimepicker({
+            format: 'DD-MM-YYYY'
+        });
+
+    });
+
+    function ApplyFilter()
+    {
+        debugger;
+        var fromdate = $('#frmdate').val();
+        var todate = $('#trdate').val();
+        var instrumentId = $("#hdnInstrumentId").val();
+
+        if (fromdate == "" && todate == "") {
+
+            NotifyMsg('error', 'Please select to date');
+
+            return false;
+        }
+        if (fromdate != "" && todate != "") {
+            var fdateAr = fromdate.split('-');
+            var tdateAr = todate.split('-');
+            var newFromDate = fdateAr[2] + '-' + fdateAr[1] + '-' + fdateAr[0].slice(-2);
+            var newToDate = tdateAr[2] + '-' + tdateAr[1] + '-' + tdateAr[0].slice(-2);
+            fromdate = newFromDate;
+            todate = newToDate;
+            newFromDate = new Date(newFromDate);
+            newToDate = new Date(newToDate);
+            if (newFromDate > newToDate) {
+
+                NotifyMsg('error', 'Please select greter than To Date');
+                return false;
+            }
+        }
+        if (fromdate != "" && todate == "") {
+
+            NotifyMsg('error', 'Please select to date');
+
+            return false;
+        }
+        if (todate != "" && fromdate == "") {
+            NotifyMsg('error', 'Please select from date');
+            return false;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: '/CorporateActions/FilterDivedendOrderDetails',
+            data: { InstrumentId: instrumentId, FromDate: fromdate, ToDate: todate },
+            dataType: "html",
+            success: function (res) {
+
+                if (res != null) {
+                    $("#orderDetails").html(res);
+                } else {
+                    NotifyMsg('error', res.message);
+                }
+            },
+            error: function (errorTemp) {
+
+                NotifyMsg('error', errorTemp);
+                console.log('error', errorTemp);
+            }
+        })
+    }
+
+    function ExportDividendOrderDetails()
+    {
+        debugger;
+        $("#Loader").show();
+        var instrumentId = $("#hdnInstrumentId").val();
+
+        $.ajax({
+            type: "POST",
+            data: { InstrumentId: instrumentId, FromDate: '', ToDate: ''},
+            url: '/CorporateActions/ExportDivedendOrderDetails',
+            dataType: "binary",
+            //processData: false,
+            xhrFields: {
+                'responseType': 'blob'
+            },
+            success: function (res, contextType, fileName) {
+                debugger;
+                const date = new Date();
+                let day = date.getDate();
+                let month = date.getMonth() + 1;
+                let year = date.getFullYear();
+                // This arrangement can be altered based on how we want the date's format to appear.
+                let currentDate = `${day}${month}${year}`;
+
+                var link = document.createElement('a'),
+                    filename = "DividendOrderDetails_" + currentDate + ".xlsx";
+                link.href = URL.createObjectURL(res);
+                link.download = filename;
+                link.click();
+                $("#Loader").hide();
+            },
+            error: function (errorTemp) {
+                $("#Loader").hide();
+                NotifyMsg('error', errorTemp);
+                console.log('error', errorTemp);
+            }
+        })
+    }
+</script>

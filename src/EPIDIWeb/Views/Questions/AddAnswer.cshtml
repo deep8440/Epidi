@@ -1,0 +1,34 @@
+﻿@using HtmlHelpers.BeginCollectionItemCore;
+
+@model AnswerViewModel
+@{
+	Layout = null;
+	Guid guid = Guid.NewGuid();
+}
+@*<style>
+	 td {
+			padding: 0.75rem;
+			vertical-align: top;
+			border-top: 0px solid #dee2e6;
+	 }
+</style>*@
+
+<tr class="tr-row" id="@guid">
+	@using (Html.BeginCollectionItem("Answers"))
+	{
+		<td style="padding-bottom: 0px;vertical-align: top;border-top: 0px solid #dee2e6;">
+			<div class="form-group">
+				@Html.HiddenFor(p => p.AnswerId, new { id = "hdnAnswerId" })
+				@Html.HiddenFor(p => p.QuestionId, new { id = "hdnQuestionId" })
+				@Html.TextBoxFor(p => p.AnswerDesc, new { @class = "form-control", @placeholder = "AnswerDesc" ,@name="AnswerDesc"})
+
+			</div>
+		</td>
+		<td style="padding-bottom: 0px;vertical-align: top;border-top: 0px solid #dee2e6;">
+			<div class="">
+				<a class='btn btn-danger mr-1 deleteAns' href='javascript:void(0);'><i class='fa fa-trash'></i></a>
+			</div>
+		</td>
+
+	}
+</tr>

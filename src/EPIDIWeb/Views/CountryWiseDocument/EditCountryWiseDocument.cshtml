@@ -1,0 +1,27 @@
+﻿@model CountryWiseDocumentViewModel
+@{
+    Layout = null;
+}
+@using (Html.BeginForm("SaveCountryWiseDocument", "CountryWiseDocument", FormMethod.Post, new { id = "documentForm" }))
+{
+    <div class="row">
+        <div class="col-6">
+            <div class="form-group">
+                @Html.HiddenFor(p => p.Id)
+                @Html.LabelFor(model => model.DocumentName,"DocumentName")
+                @Html.TextBoxFor(p => p.DocumentName, new { @class = "form-control", @placeholder = "DocumentName" ,@name="DocumentName" })
+            </div>
+        </div>
+        <input type="hidden" id="countryWiseDocumentData" />
+        <div class="col-6">
+            <div class="form-group">
+                @Html.LabelFor(model => model.CountryName, "CountryName")
+                @Html.DropDownListFor(model => model.CountryId, new SelectList(ViewBag.CountryList, "Value", "Text", Model.CountryId), "-- Select Country --", new { @class = "form-control js-select2" ,@name="CountryName" })
+            </div>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary" >Save</button>
+    </div>
+}
